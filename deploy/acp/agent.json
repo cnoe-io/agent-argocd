@@ -131,7 +131,7 @@
         "url": "./../../",
         "framework_config": {
           "framework_type": "langgraph",
-          "graph": "agent_argocd.langgraph:AGENT_GRAPH"
+          "graph": "agent_argocd.graph:graph"
         }
       }
     ],
