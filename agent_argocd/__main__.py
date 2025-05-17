@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 
 from agent_argocd.graph import graph
 from agent_argocd.state import AgentState, ConfigSchema, InputState, Message, MsgType
-from agent_argocd.a2a_transport import start_a2a_server
 
+from agent_argocd.a2a.transport import start_a2a_server
 
 
 logger = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class ParamMessage(click.ParamType):
   help="Port to run the agent on.",
 )
 def run_argocd_agent(
-  protocol: str,
+  agent_transport_protocol: str,
   host: str,
   port: int,
   human=None,
@@ -81,7 +81,7 @@ def run_argocd_agent(
   log_level: str = "info",
 ):
   logging.basicConfig(level=log_level.upper())
-  if protocol == "a2a":
+  if agent_transport_protocol == "a2a":
     # Start the A2A server
     start_a2a_server(host, 10000)
   else: # LangGraph AgentProtocol
@@ -114,4 +114,8 @@ def run_argocd_agent(
 
 if __name__ == "__main__":
   load_dotenv()
-  run_argocd_agent()
+  run_argocd_agent(
+     agent_transport_protocol=os.getenv("AGENT_TRANSPORT_PROTOCOL", "a2a"),
+     host=os.getenv("AGENT_HOST", "localhost"),
+     port=int(os.getenv("AGENT_PORT", 10000)),
+  )

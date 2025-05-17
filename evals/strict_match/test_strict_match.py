@@ -3,10 +3,7 @@ from agentevals.graph_trajectory.utils import (
 )
 from agentevals.graph_trajectory.strict import graph_trajectory_strict_match_async
 
-from langgraph.store.memory import InMemoryStore
-from langgraph.checkpoint.memory import MemorySaver
-
-from agend_argocd. import JarvisAgent
+from agent_argocd.graph import graph
 
 import pprint
 import pytest
@@ -16,12 +13,6 @@ from tabulate import tabulate
 from datetime import datetime
 import yaml
 import argparse
-
-store = InMemoryStore()
-checkpointer = None
-checkpointer = MemorySaver()
-jarvis_agent = JarvisAgent(checkpointer, store)
-graph = jarvis_agent.get_graph()
 
 
 def format_results(results):
@@ -48,7 +39,7 @@ def read_yaml(file_path):
 
 @pytest.mark.langsmith
 async def eval_strict(test_ids=None):
-  data = read_yaml("./eval/strict_match/strict_match_dataset.yaml")
+  data = read_yaml("./evals/strict_match/strict_match_dataset.yaml")
 
   # Filter tests by test_ids
   if test_ids:
@@ -120,7 +111,7 @@ async def eval_strict(test_ids=None):
     for result in results
   ]
   current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-  with open("./eval/strict_match/README.md", "w", encoding="utf-8") as readme_file:
+  with open("./evals/strict_match/README.md", "w", encoding="utf-8") as readme_file:
     readme_file.write(f"## Evaluation Date: {current_time}\n\n")
     readme_file.write(format_results(results))
     readme_file.write("\n\n")

@@ -113,6 +113,13 @@ lint: setup-venv
 	@echo "Running ruff..."
 	. .venv/bin/activate && ruff check agent_argocd tests --exclude agent_argocd/argocd_mcp
 
+evals: setup-venv
+	@echo "Running Agent Strict Trajectory Matching evals..."
+	@echo "Installing agentevals with Poetry..."
+	. .venv/bin/activate && poetry add agentevals tabulate
+	. .venv/bin/activate && . .env && python3 evals/strict_match/test_strict_match.py
+
+
 help:
 	@echo "Available targets:"
 	@echo "  setup-venv       Create virtual environment in .venv and install dependencies"
