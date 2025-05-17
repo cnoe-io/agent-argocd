@@ -1,0 +1,9 @@
+agentevals
+anyio
+twisted
+pytest-asyncio
+pytest-tornasync
+pytest-trio
+pytest-twisted
+pandas
+tabulate

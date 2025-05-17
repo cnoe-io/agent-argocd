@@ -178,3 +178,6 @@ deploy/acp/agent-env.yaml
 agent-env.yaml
 .env
 .env*
+
+# Others
+A2A
