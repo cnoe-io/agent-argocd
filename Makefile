@@ -65,7 +65,24 @@ run-acp: setup-venv build install
 	fi
 	. .venv/bin/activate && set -a && . .env && set +a && wfsm deploy -m ./deploy/acp/agent.json --dryRun=false
 
-run-client: build install
+install-a2a: setup-venv build install
+	@if [ ! -f ".env" ]; then \
+		echo "Error: .env file not found. Please create a .env file before running this target."; \
+		exit 1; \
+	fi
+	@git clone https://github.com/google/A2A.git -b main --depth 1 || { echo "A2A repo already cloned or failed to clone."; }
+	@. .venv/bin/activate && cd A2A/a2a-python-sdk && pip install -e .
+	@. .venv/bin/activate && python -c "import a2a; print('A2A SDK imported successfully')"
+
+run-a2a: setup-venv build install install-a2a
+	@if [ ! -f ".env" ]; then \
+		echo "Error: .env file not found. Please create a .env file before running this target."; \
+		exit 1; \
+	fi
+	@echo "Running the A2A agent..."
+	. .venv/bin/activate && set -a && . .env && set +a && poetry run agent_argocd --protocol a2a
+
+run-acp-client: build install
 	@echo "Running the client..."
 	@if [ ! -f ".env" ]; then \
 		echo "Error: .env file not found. Please create a .env file before running this target."; \
@@ -73,6 +90,15 @@ run-client: build install
 	fi
 	. .venv/bin/activate && set -a && . .env && set +a && \
 	python3 client/client_agent.py
+
+run-a2a-client: build install install-a2a
+	@echo "Running the client..."
+	@if [ ! -f ".env" ]; then \
+		echo "Error: .env file not found. Please create a .env file before running this target."; \
+		exit 1; \
+	fi
+	. .venv/bin/activate && set -a && . .env && set +a && \
+	python3 client/a2a_client.py
 
 run-curl-client: build install
 	@echo "Running the curl client..."

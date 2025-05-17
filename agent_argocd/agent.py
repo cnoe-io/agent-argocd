@@ -10,51 +10,64 @@ from typing import Any, Dict
 
 from langchain_core.runnables import RunnableConfig
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_openai import AzureChatOpenAI
 from langgraph.prebuilt import create_react_agent
-from pydantic import SecretStr
+from typing import Any,  Dict
+from langgraph.checkpoint.memory import MemorySaver
 
-from .state import AgentState, Message, MsgType, OutputState
+from agent_argocd.state import AgentState, Message, MsgType, OutputState
+from agent_argocd.llm import get_llm
+from pathlib import Path
+import importlib.util
 
 logger = logging.getLogger(__name__)
 
-# Initialize the Azure OpenAI model
-api_key = os.getenv("AZURE_OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("AZURE_OPENAI_API_KEY must be set as an environment variable.")
 
-azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-if not azure_endpoint:
-    raise ValueError("AZURE_OPENAI_ENDPOINT must be set as an environment variable.")
+async def create_agent(prompt, response_format):
+  memory = MemorySaver()
 
-argocd_token = os.getenv("ARGOCD_TOKEN")
-if not azure_endpoint:
+  # Find installed path of the argocd_mcp sub-module
+  spec = importlib.util.find_spec("agent_argocd.argocd_mcp.server")
+  if not spec or not spec.origin:
+      raise ImportError("Cannot find agent_argocd.argocd_mcp.server module")
+
+  server_path = str(Path(spec.origin).resolve())
+
+
+  logger.info(f"Launching ArgoCD LangGraph Agent with MCP server adapter at: {server_path}")
+
+  argocd_token = os.getenv("ARGOCD_TOKEN")
+  if not argocd_token:
     raise ValueError("ARGOCD_TOKEN must be set as an environment variable.")
 
-argocd_api_url = os.getenv("ARGOCD_API_URL")
-if not azure_endpoint:
+  argocd_api_url = os.getenv("ARGOCD_API_URL")
+  if not argocd_api_url:
     raise ValueError("ARGOCD_API_URL must be set as an environment variable.")
 
+  agent = None
+  async with MultiServerMCPClient(
+    {
+      "argocd": {
+        "command": "uv",
+        "args": ["run", server_path],
+        "env": {
+          "ARGOCD_TOKEN": argocd_token,
+          "ARGOCD_API_URL": argocd_api_url,
+          "ARGOCD_VERIFY_SSL": "false"
+        },
+        "transport": "stdio",
+      }
+    }
+  ) as client:
+    agent = create_react_agent(
+        get_llm(),
+        tools=client.get_tools(),
+        checkpointer=memory,
+        prompt=prompt,
+        response_format=response_format)
+  return agent
 
-model = AzureChatOpenAI(
-    api_key=SecretStr(api_key),
-    azure_endpoint=azure_endpoint,
-    model="gpt-4o",
-    openai_api_type="azure_openai",
-    api_version="2024-07-01-preview",
-    temperature=0,
-    max_retries=10,
-    seed=42
-)
-
-
-# Find installed path of the argocd_mcp sub-module
-spec = importlib.util.find_spec("agent_argocd.argocd_mcp.server")
-if not spec or not spec.origin:
-    raise ImportError("Cannot find agent_argocd.argocd_mcp.server module")
-
-server_path = str(Path(spec.origin).resolve())
-
+def create_agent_sync(prompt, response_format):
+  return asyncio.run(create_agent(prompt, response_format))
 
 # Setup the ArgoCD MCP Client and create React Agent
 async def _async_argocd_agent(state: AgentState, config: RunnableConfig) -> Dict[str, Any]:
@@ -77,26 +90,10 @@ async def _async_argocd_agent(state: AgentState, config: RunnableConfig) -> Dict
         if human_message is not None:
             human_message = human_message.content
 
-    logger.info(f"Launching MCP server at: {server_path}")
-
-    async with MultiServerMCPClient(
-        {
-            "argocd": {
-                "command": "uv",
-                "args": ["run", server_path],
-                "env": {
-                    "ARGOCD_TOKEN": argocd_token,
-                    "ARGOCD_API_URL": argocd_api_url,
-                    "ARGOCD_VERIFY_SSL": "false"
-                },
-                "transport": "stdio",
-            }
-        }
-    ) as client:
-        agent = create_react_agent(model, client.get_tools())
-        llm_result = await agent.ainvoke({"messages": human_message})
-        logger.info("LLM response received")
-        logger.debug(f"LLM result: {llm_result}")
+    agent = await create_agent()
+    llm_result = await agent.ainvoke({"messages": human_message})
+    logger.info("LLM response received")
+    logger.debug(f"LLM result: {llm_result}")
 
     # Try to extract meaningful content from the LLM result
     ai_content = None

@@ -17,4 +17,4 @@ def build_graph() -> CompiledStateGraph:
 
     return graph_builder.compile()
 
-AGENT_GRAPH = build_graph()
+graph = build_graph()

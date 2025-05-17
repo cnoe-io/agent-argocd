@@ -86,6 +86,8 @@ make run-acp
 
 ### ▶️ Test with ArgoCD Client
 
+Update a `.env` file in the project root with the following content:
+
 1. **Add Environment Variables to `.env`**
 
    Create or update a `.env` file in the project root:
