@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from agent_argocd.graph import graph
 from agent_argocd.state import AgentState, ConfigSchema, InputState, Message, MsgType
 
-from agent_argocd.a2a.transport import start_a2a_server
+from agent_argocd.a2a_server.transport import start_a2a_server
 
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ class ParamMessage(click.ParamType):
     help="Add assistant message(s).",
 )
 @click.option(
-  "--protocol",
+  "--agent-transport-protocol",
   type=click.Choice(["a2a", "acp", "ap"], case_sensitive=False),
   default="a2a",
   show_default=True,

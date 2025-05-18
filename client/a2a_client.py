@@ -1,17 +1,20 @@
+from a2a.client import A2AClient
 from typing import Any
 from uuid import uuid4
-
-import httpx
-
-from a2a.client import A2AClient
 from a2a.types import (
-    GetTaskResponse,
     SendMessageResponse,
+    GetTaskResponse,
     SendMessageSuccessResponse,
     Task,
     TaskState,
+    SendMessageRequest,
+    MessageSendParams,
+    GetTaskRequest,
+    TaskQueryParams,
+    SendStreamingMessageRequest,
 )
-
+import httpx
+import traceback
 
 AGENT_URL = 'http://localhost:10000'
 
@@ -49,12 +52,13 @@ async def run_single_turn_test(client: A2AClient) -> None:
     """Runs a single-turn non-streaming test."""
 
     send_payload = create_send_message_payload(
-        text='how much is 100 USD in CAD?'
+        text='What is argocd version?',
     )
+    request = SendMessageRequest(params=MessageSendParams(**send_payload))
+
+    print('--- Single Turn Request ---')
     # Send Message
-    send_response: SendMessageResponse = await client.send_message(
-        payload=send_payload
-    )
+    send_response: SendMessageResponse = await client.send_message(request)
     print_json_response(send_response, 'Single Turn Request Response')
     if not isinstance(send_response.root, SendMessageSuccessResponse):
         print('received non-success response. Aborting get task ')
@@ -65,66 +69,105 @@ async def run_single_turn_test(client: A2AClient) -> None:
         return
 
     task_id: str = send_response.root.result.id
-    print('---Query Task---')
-    # query the task
-    task_id_payload = {'id': task_id}
-    get_response: GetTaskResponse = await client.get_task(
-        payload=task_id_payload
-    )
-    print_json_response(get_response, 'Query Task Response')
+    # print('---Query Task---')
+    # # query the task
+    # get_request = GetTaskRequest(params=TaskQueryParams(id=task_id))
+    # get_response: GetTaskResponse = await client.get_task(get_request)
+    # print_json_response(get_response, 'Query Task Response')
 
 
 async def run_streaming_test(client: A2AClient) -> None:
     """Runs a single-turn streaming test."""
 
     send_payload = create_send_message_payload(
-        text='how much is 50 EUR in JPY?'
+      text='If you add 15 to the product of 8 and 7, then subtract 10, what is the result?',
+    )
+
+    request = SendStreamingMessageRequest(
+        params=MessageSendParams(**send_payload)
     )
 
     print('--- Single Turn Streaming Request ---')
-    stream_response = client.send_message_streaming(payload=send_payload)
+    stream_response = client.send_message_streaming(request)
     async for chunk in stream_response:
         print_json_response(chunk, 'Streaming Chunk')
 
 
 async def run_multi_turn_test(client: A2AClient) -> None:
-    """Runs a multi-turn non-streaming test."""
-    print('--- Multi-Turn Request ---')
-    # --- First Turn ---
+  """Runs a complex multi-turn non-streaming math problem test (add and multiply only)."""
+  print('--- Multi-Turn Complex Math Problem Request ---')
 
-    first_turn_payload = create_send_message_payload(
-        text='how much is 100 USD?'
+  # --- First Turn ---
+  first_turn_payload = create_send_message_payload(
+    text='I have 4 apples. I buy 3 more. How many apples do I have now?'
+  )
+  request1 = SendMessageRequest(
+    params=MessageSendParams(**first_turn_payload)
+  )
+  first_turn_response: SendMessageResponse = await client.send_message(request1)
+  print_json_response(first_turn_response, 'Multi-Turn: First Turn Response')
+
+  context_id: str | None = None
+  task_id: str | None = None
+  if isinstance(first_turn_response.root, SendMessageSuccessResponse) and isinstance(first_turn_response.root.result, Task):
+    task: Task = first_turn_response.root.result
+    context_id = task.contextId
+    task_id = task.id
+
+    # --- Second Turn ---
+    print('--- Multi-Turn: Second Turn ---')
+    second_turn_payload = create_send_message_payload(
+      text='Now, I buy 2 more apples. How many apples do I have in total?',
+      task_id=task_id,
+      context_id=context_id
     )
-    first_turn_response: SendMessageResponse = await client.send_message(
-        payload=first_turn_payload
+    request2 = SendMessageRequest(
+      params=MessageSendParams(**second_turn_payload)
     )
-    print_json_response(first_turn_response, 'Multi-Turn: First Turn Response')
+    second_turn_response: SendMessageResponse = await client.send_message(request2)
+    print_json_response(second_turn_response, 'Multi-Turn: Second Turn Response')
 
-    context_id: str | None = None
-    if isinstance(
-        first_turn_response.root, SendMessageSuccessResponse
-    ) and isinstance(first_turn_response.root.result, Task):
-        task: Task = first_turn_response.root.result
-        context_id = task.contextId  # Capture context ID
+    # --- Third Turn (Multiplication) ---
+    if isinstance(second_turn_response.root, SendMessageSuccessResponse) and isinstance(second_turn_response.root.result, Task):
+      task2: Task = second_turn_response.root.result
+      context_id2 = task2.contextId
+      task_id2 = task2.id
 
-        # --- Second Turn (if input required) ---
-        if task.status.state == TaskState.input_required and context_id:
-            print('--- Multi-Turn: Second Turn (Input Required) ---')
-            second_turn_payload = create_send_message_payload(
-                'in GBP', task.id, context_id
-            )
-            second_turn_response = await client.send_message(
-                payload=second_turn_payload
-            )
-            print_json_response(
-                second_turn_response, 'Multi-Turn: Second Turn Response'
-            )
-        elif not context_id:
-            print('Warning: Could not get context ID from first turn response.')
-        else:
-            print(
-                'First turn completed, no further input required for this test case.'
-            )
+      print('--- Multi-Turn: Third Turn (Multiplication) ---')
+      third_turn_payload = create_send_message_payload(
+        text='If I put all my apples into bags of 3, how many bags do I have?',
+        task_id=task_id2,
+        context_id=context_id2
+      )
+      request3 = SendMessageRequest(
+        params=MessageSendParams(**third_turn_payload)
+      )
+      third_turn_response: SendMessageResponse = await client.send_message(request3)
+      print_json_response(third_turn_response, 'Multi-Turn: Third Turn Response')
+
+      # --- Fourth Turn (Addition) ---
+      if isinstance(third_turn_response.root, SendMessageSuccessResponse) and isinstance(third_turn_response.root.result, Task):
+        task3: Task = third_turn_response.root.result
+        context_id3 = task3.contextId
+        task_id3 = task3.id
+
+        print('--- Multi-Turn: Fourth Turn (Addition) ---')
+        fourth_turn_payload = create_send_message_payload(
+          text='If I find 5 more apples and add them to my collection, how many apples do I have now?',
+          task_id=task_id3,
+          context_id=context_id3
+        )
+        request4 = SendMessageRequest(
+          params=MessageSendParams(**fourth_turn_payload)
+        )
+        fourth_turn_response: SendMessageResponse = await client.send_message(request4)
+        print_json_response(fourth_turn_response, 'Multi-Turn: Fourth Turn Response')
+      else:
+        print('Third turn did not return a valid task for further input.')
+    else:
+      print('Second turn did not return a valid task for further input.')
+  else:
+    print('First turn did not return a valid task for further input.')
 
 
 async def main() -> None:
@@ -138,10 +181,11 @@ async def main() -> None:
             print('Connection successful.')
 
             await run_single_turn_test(client)
-            await run_streaming_test(client)
-            await run_multi_turn_test(client)
+            # await run_streaming_test(client)
+            # await run_multi_turn_test(client)
 
     except Exception as e:
+        traceback.print_exc()
         print(f'An error occurred: {e}')
         print('Ensure the agent server is running.')
 

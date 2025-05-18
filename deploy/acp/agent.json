@@ -137,6 +137,10 @@
     ],
     "env_vars": [
       {
+        "desc": "LLM provider",
+        "name": "LLM_PROVIDER"
+      },
+      {
         "desc": "Azure OpenAI endpoint for LLM",
         "name": "AZURE_OPENAI_ENDPOINT"
       },
@@ -145,12 +149,16 @@
         "name": "AZURE_OPENAI_API_KEY"
       },
       {
-        "desc": "Azure OpenAI deployment name",
-        "name": "AZURE_OPENAI_DEPLOYMENT_NAME"
+        "desc": "Azure OpenAI deployment",
+        "name": "AZURE_OPENAI_DEPLOYMENT"
       },
       {
         "desc": "Azure OpenAI API version",
         "name": "AZURE_OPENAI_API_VERSION"
+      },
+      {
+        "desc": "Google API key",
+        "name": "GOOGLE_API_KEY"
       },
       {
         "desc": "ArgoCD Token",

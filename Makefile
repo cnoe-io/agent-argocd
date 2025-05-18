@@ -70,8 +70,8 @@ install-a2a: setup-venv build install
 		echo "Error: .env file not found. Please create a .env file before running this target."; \
 		exit 1; \
 	fi
-	@git clone https://github.com/google/A2A.git -b main --depth 1 || { echo "A2A repo already cloned or failed to clone."; }
-	@. .venv/bin/activate && cd A2A/a2a-python-sdk && pip install -e .
+	@git clone https://github.com/google/a2a-python -b main --depth 1 || { echo "a2a-python repo already cloned or failed to clone."; }
+	@. .venv/bin/activate && cd a2a-python && pip install -e .
 	@. .venv/bin/activate && python -c "import a2a; print('A2A SDK imported successfully')"
 
 run-a2a: setup-venv build install install-a2a
@@ -80,7 +80,7 @@ run-a2a: setup-venv build install install-a2a
 		exit 1; \
 	fi
 	@echo "Running the A2A agent..."
-	. .venv/bin/activate && set -a && . .env && set +a && poetry run agent_argocd --protocol a2a
+	. .venv/bin/activate && set -a && . .env && set +a && poetry run agent_argocd --agent-transport-protocol a2a --host localhost --port 10000
 
 run-acp-client: build install
 	@echo "Running the client..."
@@ -122,12 +122,19 @@ evals: setup-venv
 
 help:
 	@echo "Available targets:"
-	@echo "  setup-venv       Create virtual environment in .venv and install dependencies"
-	@echo "  activate-venv    Activate the virtual environment"
-	@echo "  build            Build the project using poetry"
-	@echo "  install          Install the package"
-	@echo "  run              Build, install, and run the application"
-	@echo "  run-acp          Deploy using wfsm with ACP configuration"
-	@echo "  run-client       Run the client application"
-	@echo "  langgraph-dev    Run the LangGraph agent"
-	@echo "  help             Show this help message"
+	@echo "  setup-venv           Create virtual environment in .venv and install dependencies"
+	@echo "  activate-venv        Activate the virtual environment"
+	@echo "  build                Build the project using poetry"
+	@echo "  install              Install the package"
+	@echo "  run                  Build, install, and run the application"
+	@echo "  run-acp              Deploy using wfsm with ACP configuration"
+	@echo "  install-a2a          Clone and install the A2A SDK"
+	@echo "  run-a2a              Run the agent with A2A protocol"
+	@echo "  run-acp-client       Run the ACP client application"
+	@echo "  run-a2a-client       Run the A2A client application"
+	@echo "  run-curl-client      Run the curl client script"
+	@echo "  langgraph-dev        Run the LangGraph agent"
+	@echo "  lint                 Run ruff linter"
+	@echo "  evals                Run Agent Strict Trajectory Matching evals"
+	@echo "  add-copyright-license-headers  Add copyright license headers"
+	@echo "  help                 Show this help message"
