@@ -1,8 +1,7 @@
 """Tools for /api/v1/clusters operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -10,14 +9,18 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def ClusterService_List(server: Optional[str] = None, name: Optional[str] = None, id_type: Optional[str] = None, id_value: Optional[str] = None) -> Dict[str, Any]:
+async def ClusterService_List(
+        server: Optional[str] = None,
+        name: Optional[str] = None,
+        id_type: Optional[str] = None,
+        id_value: Optional[str] = None) -> Dict[str, Any]:
     """
     List returns list of clusters
 
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/clusters")
+    logger.debug("Making GET request to /api/v1/clusters")
     params = {}
     data = None
     # Add parameters to request
@@ -47,7 +50,7 @@ async def ClusterService_Create(body: str, upsert: Optional[str] = None) -> Dict
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/clusters")
+    logger.debug("Making POST request to /api/v1/clusters")
     params = {}
     data = None
     # Add parameters to request

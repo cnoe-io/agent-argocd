@@ -1,8 +1,7 @@
 """Tools for /api/v1/repositories operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -10,14 +9,17 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def RepositoryService_ListRepositories(repo: Optional[str] = None, forceRefresh: Optional[str] = None, appProject: Optional[str] = None) -> Dict[str, Any]:
+async def RepositoryService_ListRepositories(
+        repo: Optional[str] = None,
+        forceRefresh: Optional[str] = None,
+        appProject: Optional[str] = None) -> Dict[str, Any]:
     """
     ListRepositories gets a list of all configured repositories
 
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/repositories")
+    logger.debug("Making GET request to /api/v1/repositories")
     params = {}
     data = None
     # Add parameters to request
@@ -45,7 +47,7 @@ async def RepositoryService_CreateRepository(body: str, upsert: Optional[str] = 
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/repositories")
+    logger.debug("Making POST request to /api/v1/repositories")
     params = {}
     data = None
     # Add parameters to request

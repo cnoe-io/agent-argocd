@@ -1,8 +1,7 @@
 """Tools for /api/v1/certificates operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -10,14 +9,17 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def CertificateService_ListCertificates(hostNamePattern: Optional[str] = None, certType: Optional[str] = None, certSubType: Optional[str] = None) -> Dict[str, Any]:
+async def CertificateService_ListCertificates(
+        hostNamePattern: Optional[str] = None,
+        certType: Optional[str] = None,
+        certSubType: Optional[str] = None) -> Dict[str, Any]:
     """
     List all available repository certificates
 
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/certificates")
+    logger.debug("Making GET request to /api/v1/certificates")
     params = {}
     data = None
     # Add parameters to request
@@ -45,7 +47,7 @@ async def CertificateService_CreateCertificate(body: str, upsert: Optional[str] 
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/certificates")
+    logger.debug("Making POST request to /api/v1/certificates")
     params = {}
     data = None
     # Add parameters to request
@@ -64,14 +66,17 @@ async def CertificateService_CreateCertificate(body: str, upsert: Optional[str] 
         return {"error": response.get('error', 'Request failed')}
     return response
 
-async def CertificateService_DeleteCertificate(hostNamePattern: Optional[str] = None, certType: Optional[str] = None, certSubType: Optional[str] = None) -> Dict[str, Any]:
+async def CertificateService_DeleteCertificate(
+        hostNamePattern: Optional[str] = None,
+        certType: Optional[str] = None,
+        certSubType: Optional[str] = None) -> Dict[str, Any]:
     """
     Delete the certificates that match the RepositoryCertificateQuery
 
     Returns:
         API response data
     """
-    logger.debug(f"Making DELETE request to /api/v1/certificates")
+    logger.debug("Making DELETE request to /api/v1/certificates")
     params = {}
     data = None
     # Add parameters to request

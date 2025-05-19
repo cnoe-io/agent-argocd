@@ -3,28 +3,20 @@ import logging
 from collections.abc import AsyncIterable
 from typing import Any, Literal, Dict
 
-import httpx
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
 from langchain_core.runnables.config import (
     RunnableConfig,
 )
-from langchain_core.tools import tool  # type: ignore
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import AzureChatOpenAI
 from pydantic import BaseModel
 
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent  # type: ignore
 
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
 
-from langchain_mcp_adapters.tools import load_mcp_tools
-from langgraph.prebuilt import create_react_agent
 import asyncio
-import pprint
 import os
 
 from agent_argocd.a2a_server.state import (
@@ -49,10 +41,10 @@ class ArgoCDAgent:
 
     SYSTEM_INSTRUCTION = (
       'You are an expert assistant for managing ArgoCD resources. '
-      'Your sole purpose is to help users perform CRUD (Create, Read, Update, Delete) operations on ArgoCD applications, projects, and related resources. '
-      'Always use the available ArgoCD tools to interact with the ArgoCD API and provide accurate, actionable responses. '
-      'If the user asks about anything unrelated to ArgoCD or its resources, politely state that you can only assist with ArgoCD operations. '
-      'Do not attempt to answer unrelated questions or use tools for other purposes.'
+      'Your sole purpose is to help users perform CRUD (Create, Read, Update, Delete) operations on ArgoCD applications, '
+      'projects, and related resources. Always use the available ArgoCD tools to interact with the ArgoCD API and provide '
+      'accurate, actionable responses. If the user asks about anything unrelated to ArgoCD or its resources, politely state '
+      'that you can only assist with ArgoCD operations. Do not attempt to answer unrelated questions or use tools for other purposes.'
     )
 
     RESPONSE_FORMAT_INSTRUCTION: str = (
@@ -177,11 +169,6 @@ class ArgoCDAgent:
       print("DEBUG: Starting stream with query:", query, "and sessionId:", sessionId)
       inputs: dict[str, Any] = {'messages': [('user', query)]}
       config: RunnableConfig = {'configurable': {'thread_id': sessionId}}
-
-      # agent_response = await self.graph.ainvoke(
-      #     inputs,
-      #     config=config
-      # )                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   d
 
       async for item in self.graph.astream(inputs, config, stream_mode='values'):
           message = item['messages'][-1]

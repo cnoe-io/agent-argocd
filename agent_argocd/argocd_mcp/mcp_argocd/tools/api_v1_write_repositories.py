@@ -1,8 +1,7 @@
 """Tools for /api/v1/write-repositories operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -10,14 +9,17 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def RepositoryService_ListWriteRepositories(repo: Optional[str] = None, forceRefresh: Optional[str] = None, appProject: Optional[str] = None) -> Dict[str, Any]:
+async def RepositoryService_ListWriteRepositories(
+        repo: Optional[str] = None,
+        forceRefresh: Optional[str] = None,
+        appProject: Optional[str] = None) -> Dict[str, Any]:
     """
     ListWriteRepositories gets a list of all configured write repositories
 
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/write-repositories")
+    logger.debug("Making GET request to /api/v1/write-repositories")
     params = {}
     data = None
     # Add parameters to request
@@ -38,14 +40,17 @@ async def RepositoryService_ListWriteRepositories(repo: Optional[str] = None, fo
         return {"error": response.get('error', 'Request failed')}
     return response
 
-async def RepositoryService_CreateWriteRepository(body: str, upsert: Optional[str] = None, credsOnly: Optional[str] = None) -> Dict[str, Any]:
+async def RepositoryService_CreateWriteRepository(
+        body: str,
+        upsert: Optional[str] = None,
+        credsOnly: Optional[str] = None) -> Dict[str, Any]:
     """
     CreateWriteRepository creates a new write repository configuration
 
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/write-repositories")
+    logger.debug("Making POST request to /api/v1/write-repositories")
     params = {}
     data = None
     # Add parameters to request

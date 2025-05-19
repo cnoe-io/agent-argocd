@@ -1,8 +1,7 @@
 """Tools for /api/v1/projects operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -17,7 +16,7 @@ async def ProjectService_List(name: Optional[str] = None) -> Dict[str, Any]:
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/projects")
+    logger.debug("Making GET request to /api/v1/projects")
     params = {}
     data = None
     # Add parameters to request
@@ -41,7 +40,7 @@ async def ProjectService_Create(body: str) -> Dict[str, Any]:
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/projects")
+    logger.debug("Making POST request to /api/v1/projects")
     params = {}
     data = None
     # Add parameters to request

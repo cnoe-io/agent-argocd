@@ -1,8 +1,7 @@
 """Tools for /api/v1/applicationsets/generate operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -17,7 +16,7 @@ async def ApplicationSetService_Generate(body: str) -> Dict[str, Any]:
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/applicationsets/generate")
+    logger.debug("Making POST request to /api/v1/applicationsets/generate")
     params = {}
     data = None
     # Add parameters to request

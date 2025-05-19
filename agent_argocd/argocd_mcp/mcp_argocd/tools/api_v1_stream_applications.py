@@ -1,8 +1,7 @@
 """Tools for /api/v1/stream/applications operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -10,14 +9,22 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def ApplicationService_Watch(name: Optional[str] = None, refresh: Optional[str] = None, projects: Optional[str] = None, resourceVersion: Optional[str] = None, selector: Optional[str] = None, repo: Optional[str] = None, appNamespace: Optional[str] = None, project: Optional[str] = None) -> Dict[str, Any]:
+async def ApplicationService_Watch(
+        name: Optional[str] = None,
+        refresh: Optional[str] = None,
+        projects: Optional[str] = None,
+        resourceVersion: Optional[str] = None,
+        selector: Optional[str] = None,
+        repo: Optional[str] = None,
+        appNamespace: Optional[str] = None,
+        project: Optional[str] = None) -> Dict[str, Any]:
     """
     Watch returns stream of application change events
 
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/stream/applications")
+    logger.debug("Making GET request to /api/v1/stream/applications")
     params = {}
     data = None
     # Add parameters to request

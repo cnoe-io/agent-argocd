@@ -80,7 +80,7 @@ async def run_streaming_test(client: A2AClient) -> None:
   """Runs a single-turn streaming test."""
 
   send_payload = create_send_message_payload(
-    text='What is the ArgoCD application status for the jarvis-agent-dev project?',
+    text='ArgoCD version?',
   )
 
   request = SendStreamingMessageRequest(
@@ -132,10 +132,10 @@ async def main() -> None:
             print('=' * 60 + '\n')
             await run_streaming_test(client)
 
-            print('\n' + '=' * 60)
-            print('RUNNING MULTI-TURN TEST')
-            print('=' * 60 + '\n')
-            await run_multi_turn_test(client)
+            # print('\n' + '=' * 60)
+            # print('RUNNING MULTI-TURN TEST')
+            # print('=' * 60 + '\n')
+            # await run_multi_turn_test(client)
 
     except Exception as e:
         traceback.print_exc()

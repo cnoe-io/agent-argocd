@@ -1,8 +1,7 @@
 """Tools for /api/v1/write-repocreds operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -17,7 +16,7 @@ async def RepoCredsService_ListWriteRepositoryCredentials(url: Optional[str] = N
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/write-repocreds")
+    logger.debug("Making GET request to /api/v1/write-repocreds")
     params = {}
     data = None
     # Add parameters to request
@@ -41,7 +40,7 @@ async def RepoCredsService_CreateWriteRepositoryCredentials(body: str, upsert: O
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/write-repocreds")
+    logger.debug("Making POST request to /api/v1/write-repocreds")
     params = {}
     data = None
     # Add parameters to request

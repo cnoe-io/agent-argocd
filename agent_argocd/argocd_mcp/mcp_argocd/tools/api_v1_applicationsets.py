@@ -1,8 +1,7 @@
 """Tools for /api/v1/applicationsets operations"""
 
 import logging
-from typing import Dict, Any, Optional, List
-from pydantic import BaseModel
+from typing import Dict, Any, Optional
 from agent_argocd.argocd_mcp.mcp_argocd.api.client import make_api_request
 
 # Configure logging
@@ -10,14 +9,17 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def ApplicationSetService_List(projects: Optional[str] = None, selector: Optional[str] = None, appsetNamespace: Optional[str] = None) -> Dict[str, Any]:
+async def ApplicationSetService_List(
+        projects: Optional[str] = None,
+        selector: Optional[str] = None,
+        appsetNamespace: Optional[str] = None) -> Dict[str, Any]:
     """
     List returns list of applicationset
 
     Returns:
         API response data
     """
-    logger.debug(f"Making GET request to /api/v1/applicationsets")
+    logger.debug("Making GET request to /api/v1/applicationsets")
     params = {}
     data = None
     # Add parameters to request
@@ -45,7 +47,7 @@ async def ApplicationSetService_Create(body: str, upsert: Optional[str] = None, 
     Returns:
         API response data
     """
-    logger.debug(f"Making POST request to /api/v1/applicationsets")
+    logger.debug("Making POST request to /api/v1/applicationsets")
     params = {}
     data = None
     # Add parameters to request

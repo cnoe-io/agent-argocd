@@ -8,12 +8,16 @@
 [![Ruff Linter](https://github.com/cnoe-io/openapi-mcp-codegen/actions/workflows/ruff.yml/badge.svg)](https://github.com/cnoe-io/openapi-mcp-codegen/actions/workflows/ruff.yml)
 [![Super Linter](https://github.com/cnoe-io/openapi-mcp-codegen/actions/workflows/superlinter.yml/badge.svg)](https://github.com/cnoe-io/openapi-mcp-codegen/actions/workflows/superlinter.yml)
 
+---
+
 ## 🧪 Evaluation Badges
 
 | Claude | Gemini | OpenAI | Llama |
 |--------|--------|--------|-------|
 | [![Claude Evals](https://github.com/cnoe-io/agent-argocd/actions/workflows/claude-evals.yml/badge.svg)](https://github.com/cnoe-io/agent-argocd/actions/workflows/claude-evals.yml) | [![Gemini Evals](https://github.com/cnoe-io/agent-argocd/actions/workflows/gemini-evals.yml/badge.svg)](https://github.com/cnoe-io/agent-argocd/actions/workflows/gemini-evals.yml) | [![OpenAI Evals](https://github.com/cnoe-io/agent-argocd/actions/workflows/openai-evals.yml/badge.svg)](https://github.com/cnoe-io/agent-argocd/actions/workflows/openai-evals.yml) | [![Llama Evals](https://github.com/cnoe-io/agent-argocd/actions/workflows/openai-evals.yml/badge.svg)](https://github.com/cnoe-io/agent-argocd/actions/workflows/openai-evals.yml) |
+
 ---
+
 - 🤖 **ArgoCD Agent** is an LLM-powered agent built using the [LangGraph ReAct Agent](https://langchain-ai.github.io/langgraph/agents/agents/) workflow and [MCP tools](https://modelcontextprotocol.io/introduction).
 - 🌐 **Protocol Support:** Compatible with [ACP](https://github.com/agntcy/acp-spec) and [A2A](https://github.com/google/A2A) protocols for integration with external user clients.
 - 🛡️ **Secure by Design:** Enforces ArgoCD API token-based RBAC and supports external authentication for strong access control.
@@ -59,32 +63,33 @@ flowchart TD
 - 🔗 Connects to ArgoCD via a dedicated [ArgoCD MCP agent](https://github.com/severity1/argocd-mcp)
 - 🔄 **Multi-protocol support:** Compatible with both **ACP** and **A2A** protocols for flexible integration and multi-agent orchestration
 
-#### Step 1. Create/Update `.env`
+---
 
-```
-LLM_PROVIDER=`azure-openai`
+### 1️⃣ Create/Update `.env`
+
+```env
+LLM_PROVIDER=azure-openai
 AZURE_OPENAI_API_KEY=<COPY YOUR AZURE OPENAI API KEY>
 OPENAI_API_VERSION=<COPY YOUR AZURE OPENAI API VERSION>
 AZURE_OPENAI_API_VERSION=<COPY YOUR AZURE OPENAI API VERSION>
 AZURE_OPENAI_DEPLOYMENT=<COPY YOUR AZURE OPENAI DEPLOYMENT>
 AZURE_OPENAI_ENDPOINT=<COPY YOUR AZURE OPENAI ENDPOINT>
 ARGOCD_TOKEN=<COPY YOUR ARGOCD SERVICE ACCOUNT TOKEN>
-ARGOCD_API_URL=<COPY YOUR ARGOCD API ENDPOINT. Example https://argocd.exmaple.com/api/v1>
+ARGOCD_API_URL=<COPY YOUR ARGOCD API ENDPOINT. Example https://argocd.example.com/api/v1>
 ARGOCD_VERIFY_SSL=<SET ARGOCD SSL VERIFICATION. true | false>
 ```
+
+---
 
 ### 2️⃣ Start Workflow Server (ACP or A2A)
 
 You can start the workflow server in either ACP or A2A mode:
 
 - **ACP Mode:**
-
   ```bash
   make run-acp
   ```
-
 - **A2A Mode:**
-
   ```bash
   make run-a2a
   ```
@@ -93,93 +98,112 @@ You can start the workflow server in either ACP or A2A mode:
 
 ## 🧪 Usage
 
-### ▶️ Test with ArgoCD Client
+### ▶️ Test with ArgoCD Server
 
-Update a `.env` file in the project root with the following content:
+#### 🏃 Quick Start: Run ArgoCD Locally with Minikube
 
-1. **Add Environment Variables to `.env`**
+If you don't have an existing ArgoCD server, you can quickly spin one up using [Minikube](https://minikube.sigs.k8s.io/docs/):
 
-   Create or update a `.env` file in the project root:
+1. **Start Minikube:**
+  ```bash
+  minikube start
+  ```
 
-   ```env
-   AGENT_ID="<YOUR_AGENT_ID>"
-   API_KEY="<YOUR_API_KEY>"
-   WFSM_PORT="<YOUR_ACP_SERVER_PORT>"
-   ```
+2. **Install ArgoCD in the `argocd` namespace:**
+  ```bash
+  kubectl create namespace argocd
+  kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+  ```
 
-2. **Run the Client**
+3. **Expose the ArgoCD API server:**
+  ```bash
+  kubectl port-forward svc/argocd-server -n argocd 8080:443
+  ```
+  The API will be available at `https://localhost:8080`.
 
-  - For **ACP mode**:
-    ```bash
-    make run-acp-client
-    ```
-  - For **A2A mode**:
-    ```bash
-    make run-a2a-client
-    ```
-   **Sample Output:**
+4. **Get the ArgoCD admin password:**
+  ```bash
+  kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+  ```
 
-   ```
-   > Your Question: how can you help?
-   Agent: I can assist you with managing applications in ArgoCD, including tasks such as:
-   ```
+5. **(Optional) Install ArgoCD CLI:**
+  ```bash
+  brew install argocd
+  # or see https://argo-cd.readthedocs.io/en/stable/cli_installation/
+  ```
 
-   ```
-   1. **Listing Applications**: Retrieve a list of applications with filtering options.
-   2. **Getting Application Details**: Fetch detailed information about a specific application.
-   3. **Creating Applications**: Create new applications in ArgoCD.
-   4. **Updating Applications**: Update existing applications.
-   5. **Deleting Applications**: Remove applications from ArgoCD.
-   6. **Syncing Applications**: Synchronize applications to a specific Git revision.
-   7. **Getting User Info**: Retrieve information about the current user.
-   8. **Getting ArgoCD Settings**: Access server settings.
-   9. **Getting Plugins**: List available plugins.
-   10. **Getting Version Information**: Retrieve ArgoCD API server version.
-   ```
+For more details, see the [official getting started guide](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd).
 
-### ▶️ Test with Curl
+### 1️⃣ Run the ACP Client
 
-1. **Get `AGENT_ID`, `API_KEY`, and `PORT`**
+To interact with the agent in **ACP mode**:
 
-   When running `wfsm deploy`, look for output like:
+```bash
+make run-acp-client
+```
 
-   ```
-   INF Agent ID: bc123..
-   INF API Key: xyz456...
-   INF ACP agent running on: http://127.0.0.1:56504
-   ```
+**Configure Environment Variables**
 
-   Set them as environment variables:
+Create or update a `.env` file in your project root with the following:
 
-   ```bash
-   export AGENT_ID="<YOUR_AGENT_ID>"
-   export API_KEY="<YOUR_API_KEY>"
-   export WFSM_PORT="<YOUR_ACP_SERVER_PORT>"
-   ```
+```env
+AGENT_ID="<YOUR_AGENT_ID>"
+API_KEY="<YOUR_API_KEY>"
+WFSM_PORT="<YOUR_ACP_SERVER_PORT>"
+```
 
-2. **Send a Request**
+**Example Interaction**
 
-   ```bash
-   curl -s -H "Content-Type: application/json" \
-    -H "x-api-key: $API_KEY" \
-    -d '{
-        "agent_id": "'"$AGENT_ID"'",
-        "input": {
-        "argocd_input": {
-          "messages": [
-          {
-            "type": "human",
-            "content": "Get version information of the ARGO CD server"
-          }
-          ]
-        }
-        },
-        "config": {
-        "configurable": {}
-        }
-      }' \
-    http://127.0.0.1:$WFSM_PORT/runs/wait
-   ```
+```
+> Your Question: how can you help?
+Agent: I can assist you with managing applications in ArgoCD, including tasks such as:
+```
+
+- **Listing Applications**: Retrieve a list of applications with filtering options.
+- **Getting Application Details**: Fetch detailed information about a specific application.
+- **Creating Applications**: Create new applications in ArgoCD.
+- **Updating Applications**: Update existing applications.
+- **Deleting Applications**: Remove applications from ArgoCD.
+- **Syncing Applications**: Synchronize applications to a specific Git revision.
+- **Getting User Info**: Retrieve information about the current user.
+- **Getting ArgoCD Settings**: Access server settings.
+- **Getting Plugins**: List available plugins.
+- **Getting Version Information**: Retrieve ArgoCD API server version.
+
+---
+
+### 2️⃣ Run the A2A Client
+
+To interact with the agent in **A2A mode**:
+
+```bash
+make run-a2a-client
+```
+
+**Sample Streaming Output**
+
+When running in A2A mode, you’ll see streaming responses like:
+
+```
+============================================================
+RUNNING STREAMING TEST
+============================================================
+
+--- Single Turn Streaming Request ---
+--- Streaming Chunk ---
+The current version of ArgoCD is **v2.13.3+a25c8a0**. Here are some additional details:
+
+- **Build Date:** 2025-01-03
+- **Git Commit:** a25c8a0eef7830be0c2c9074c92dbea8ff23a962
+- **Git Tree State:** clean
+- **Go Version:** go1.23.1
+- **Compiler:** gc
+- **Platform:** linux/amd64
+- **Kustomize Version:** v5.4.3
+- **Helm Version:** v3.15.4+gfa9efb0
+- **Kubectl Version:** v0.31.0
+- **Jsonnet Version:** v0.20.0
+```
 
 ---
 
@@ -210,9 +234,12 @@ client/
 ---
 
 ## 🧩 MCP Submodule (ArgoCD Tools)
+
 This project uses a **first-party MCP module** generated from the ArgoCD OpenAPI specification using our [openapi-mcp-codegen](https://github.com/cnoe-io/openapi-mcp-codegen/tree/main/examples) utility. The generated MCP server is included as a git submodule in `argocd_mcp/`.
 
 All ArgoCD-related LangChain tools are defined by this MCP server implementation, ensuring up-to-date API compatibility and supply chain integrity.
+
+---
 
 ## 🔌 MCP Integration
 
@@ -278,3 +305,4 @@ See [MAINTAINERS.md](MAINTAINERS.md)
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) for the protocol specification.
 - [Google A2A](https://github.com/google/A2A/tree/main)
 - The open source community for ongoing support and contributions.
+

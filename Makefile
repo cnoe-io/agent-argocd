@@ -151,7 +151,11 @@ langgraph-dev: build install
 
 lint: setup-venv
 	@echo "Running ruff..."
-	. .venv/bin/activate && ruff check agent_argocd tests --exclude agent_argocd/argocd_mcp
+	. .venv/bin/activate && ruff check agent_argocd tests
+
+ruff-fix: setup-venv
+	@echo "Running ruff and fix lint errors..."
+	. .venv/bin/activate && ruff check agent_argocd tests --fix
 
 evals: setup-venv
 	@echo "Running Agent Strict Trajectory Matching evals..."
