@@ -171,15 +171,18 @@ async def _async_argocd_agent(state: AgentState, config: RunnableConfig) -> Dict
         }
     )
     tools = await client.get_tools()
+    memory = MemorySaver()
     agent = create_react_agent(
         model,
         tools,
+        checkpointer=memory,
         prompt=(
             "You are a helpful assistant that can interact with ArgoCD. "
             "You can use the ArgoCD API to get information about applications, clusters, and projects. "
             "You can also perform actions like syncing applications or rolling back to previous versions."
         )
     )
+    human_message = "show argocd version"
     llm_result = await agent.ainvoke({"messages": human_message})
     logger.info("LLM response received")
     logger.debug(f"LLM result: {llm_result}")
@@ -213,7 +216,7 @@ async def _async_argocd_agent(state: AgentState, config: RunnableConfig) -> Dict
 
     logger.debug(f"Final output messages: {output_messages}")
 
-    return {"argocd_output": OutputState(messages=messages + output_messages)}
+    return {"argocd_output": OutputState(messages=(messages or []) + output_messages)}
 
 # Sync wrapper for workflow server
 def agent_argocd(state: AgentState, config: RunnableConfig) -> Dict[str, Any]:

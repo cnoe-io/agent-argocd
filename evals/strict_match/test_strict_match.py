@@ -70,7 +70,10 @@ async def eval_strict(test_ids=None):
     # Generate a unique thread ID
     thread_id = uuid.uuid4().hex
     await graph.ainvoke(
-      {"messages": [{"role": "user", "content": each_prompt}]},
+      {
+        "messages": [{"role": "user", "content": each_prompt}],
+        "argocd_input": {},  # Provide an appropriate value if required by your agent
+      },
       config={"configurable": {"thread_id": thread_id, "user_files": [], "user_sandbox": "sandbox-noone"}},
     )
     extracted_trajectory = extract_langgraph_trajectory_from_thread(

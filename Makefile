@@ -160,8 +160,8 @@ ruff-fix: setup-venv
 evals: setup-venv
 	@echo "Running Agent Strict Trajectory Matching evals..."
 	@echo "Installing agentevals with Poetry..."
-	. .venv/bin/activate && poetry add agentevals tabulate
-	. .venv/bin/activate && . .env && python3 evals/strict_match/test_strict_match.py
+	. .venv/bin/activate && uv add agentevals tabulate pytest
+	set -a && . .env && set +a && uv run evals/strict_match/test_strict_match.py
 
 
 help:

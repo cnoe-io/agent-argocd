@@ -183,13 +183,13 @@ class ArgoCDAgent:
               yield {
                 'is_task_complete': False,
                 'require_user_input': False,
-                'content': 'Looking up the exchange rates...',
+                'content': 'Looking up ArgoCD Resources rates...',
               }
           elif isinstance(message, ToolMessage):
               yield {
                 'is_task_complete': False,
                 'require_user_input': False,
-                'content': 'Processing the exchange rates..',
+                'content': 'Processing ArgoCD Resources rates..',
               }
 
       yield self.get_agent_response(config)
