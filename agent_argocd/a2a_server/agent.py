@@ -3,10 +3,7 @@ import logging
 from collections.abc import AsyncIterable
 from typing import Any, Literal, Dict
 
-import importlib.util
-import logging
-import os
-from pathlib import Path
+import httpx
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from langchain_core.messages import AIMessage, ToolMessage, HumanMessage
@@ -14,8 +11,10 @@ from langchain_core.runnables.config import (
     RunnableConfig,
 )
 from langchain_core.tools import tool  # type: ignore
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import AzureChatOpenAI
 from pydantic import BaseModel
+
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.prebuilt import create_react_agent  # type: ignore
 
@@ -26,6 +25,8 @@ from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.prebuilt import create_react_agent
 import asyncio
 import pprint
+import os
+
 from agent_argocd.a2a_server.state import (
     AgentState,
     InputState,
@@ -37,26 +38,21 @@ logger = logging.getLogger(__name__)
 
 memory = MemorySaver()
 
-
 class ResponseFormat(BaseModel):
     """Respond to the user in this format."""
 
     status: Literal['input_required', 'completed', 'error'] = 'input_required'
     message: str
 
-
 class ArgoCDAgent:
-    """ArgoCD Agent"""
+    """ArgoCD Agent."""
 
     SYSTEM_INSTRUCTION = (
-      "You are an assistant that helps manage applications in ArgoCD. "
-      "You can list applications with filtering options such as project name, application name, repository URL, and namespace. "
-      "You can fetch detailed information about specific applications. "
-      "You can create new applications in ArgoCD with specified configurations. "
-      "You can update existing applications with new configurations. "
-      "You can delete applications from ArgoCD, with options for cascading deletion. "
-      "You can sync applications to a specific Git revision, with options for pruning and dry runs. "
-      "You can provide information about the current user, server settings, available plugins, and version details of the ArgoCD API server."
+      'You are an expert assistant for managing ArgoCD resources. '
+      'Your sole purpose is to help users perform CRUD (Create, Read, Update, Delete) operations on ArgoCD applications, projects, and related resources. '
+      'Always use the available ArgoCD tools to interact with the ArgoCD API and provide accurate, actionable responses. '
+      'If the user asks about anything unrelated to ArgoCD or its resources, politely state that you can only assist with ArgoCD operations. '
+      'Do not attempt to answer unrelated questions or use tools for other purposes.'
     )
 
     RESPONSE_FORMAT_INSTRUCTION: str = (
@@ -66,53 +62,59 @@ class ArgoCDAgent:
     )
 
     def __init__(self):
-
-      memory = MemorySaver()
-
-      argocd_token = os.getenv("ARGOCD_TOKEN")
-      if not argocd_token:
-        raise ValueError("ARGOCD_TOKEN must be set as an environment variable.")
-
-      argocd_api_url = os.getenv("ARGOCD_API_URL")
-      if not argocd_api_url:
-        raise ValueError("ARGOCD_API_URL must be set as an environment variable.")
       # Setup the math agent and load MCP tools
       self.model = AzureChatOpenAI(
           model="gpt-4o")
       self.graph = None
-
       async def _async_argocd_agent(state: AgentState, config: RunnableConfig) -> Dict[str, Any]:
-          # Find installed path of the argocd_mcp sub-module
-          spec = importlib.util.find_spec("agent_argocd.argocd_mcp.server")
-          if not spec or not spec.origin:
-              raise ImportError("Cannot find agent_argocd.argocd_mcp.server module")
+          args = config.get("configurable", {})
 
-          server_path = str(Path(spec.origin).resolve())
-          logger.info(f"Launching ArgoCD LangGraph Agent with MCP server adapter at: {server_path}")
-
-          # args = config.get("configurable", {})
-          # server_path = args.get("server_path", "./math_server.py")
-
+          server_path = args.get("server_path", "./agent_argocd/argocd_mcp/mcp_argocd/server.py")
           print(f"Launching MCP server at: {server_path}")
 
+          argocd_token = os.getenv("ARGOCD_TOKEN")
+          if not argocd_token:
+            raise ValueError("ARGOCD_TOKEN must be set as an environment variable.")
+
+          argocd_api_url = os.getenv("ARGOCD_API_URL")
+          if not argocd_api_url:
+            raise ValueError("ARGOCD_API_URL must be set as an environment variable.")
           client = MultiServerMCPClient(
               {
                   "math": {
                       "command": "uv",
                       "args": ["run", server_path],
                       "env": {
-                        "ARGOCD_TOKEN": argocd_token,
-                        "ARGOCD_API_URL": argocd_api_url,
-                        "ARGOCD_VERIFY_SSL": "false"
+                          "ARGOCD_TOKEN": os.getenv("ARGOCD_TOKEN"),
+                          "ARGOCD_API_URL": os.getenv("ARGOCD_API_URL"),
+                          "ARGOCD_VERIFY_SSL": "false"
                       },
                       "transport": "stdio",
                   }
               }
           )
-          tools = client.get_tools()
-
-          print(f"Loaded tools: {tools}")
-
+          tools = await client.get_tools()
+          print('*'*80)
+          print("Available Tools and Parameters:")
+          for tool in tools:
+            print(f"Tool: {tool.name}")
+            print(f"  Description: {tool.description.strip().splitlines()[0]}")
+            params = tool.args_schema.get('properties', {})
+            if params:
+              print("  Parameters:")
+              for param, meta in params.items():
+                param_type = meta.get('type', 'unknown')
+                param_title = meta.get('title', param)
+                default = meta.get('default', None)
+                print(f"    - {param} ({param_type}): {param_title}", end='')
+                if default is not None:
+                  print(f" [default: {default}]")
+                else:
+                  print()
+            else:
+              print("  Parameters: None")
+            print()
+          print('*'*80)
           self.graph = create_react_agent(
             self.model,
             tools,
@@ -121,10 +123,10 @@ class ArgoCDAgent:
             response_format=(self.RESPONSE_FORMAT_INSTRUCTION, ResponseFormat),
           )
 
+
           # Provide a 'configurable' key such as 'thread_id' for the checkpointer
           runnable_config = RunnableConfig(configurable={"thread_id": "test-thread"})
-          llm_result = await self.graph.ainvoke({"messages": HumanMessage(content="What is the argocd version")}, config=runnable_config)
-          print(f"LLM result: {llm_result}")
+          llm_result = await self.graph.ainvoke({"messages": HumanMessage(content="Summarize what you can do?")}, config=runnable_config)
 
           # Try to extract meaningful content from the LLM result
           ai_content = None
@@ -154,9 +156,9 @@ class ArgoCDAgent:
               output_messages = []
 
           # Add a banner before printing the output messages
-          print("=" * 40)
-          print(f"MATH AGENT FINAL OUTPUT: {output_messages[-1].content}")
-          print("=" * 40)
+          print("=" * 80)
+          print(f"Agent MCP Capabilities: {output_messages[-1].content}")
+          print("=" * 80)
 
       def _create_agent(state: AgentState, config: RunnableConfig) -> Dict[str, Any]:
           return asyncio.run(_async_argocd_agent(state, config))
@@ -169,23 +171,6 @@ class ArgoCDAgent:
           messages.append(HumanMessage(content="What is 2 + 2?"))
       _create_agent(agent_input, config=runnable_config)
 
-      # logger.info("Loading MCP tools via extract_mcp_tools()")
-      # mcp_tools = extract_mcp_tools()
-      # logger.debug(f"MCP tools loaded: {pprint.pformat(mcp_tools)}")
-
-      # self.tools = [multiply, add]
-      # self.tools.extend(mcp_tools)
-      # logger.debug(f"Final tools list: {pprint.pformat(self.tools)}")
-
-      #  = create_react_agent(
-      #     self.model,
-      #     tools=self.tools,
-      #     checkpointer=memory,
-      #     prompt=self.SYSTEM_INSTRUCTION,
-      #     response_format=(self.RESPONSE_FORMAT_INSTRUCTION, ResponseFormat),
-      # )
-      # logger.info("Math agent created with tools and prompt.")
-
     async def stream(
       self, query: str, sessionId: str
     ) -> AsyncIterable[dict[str, Any]]:
@@ -196,37 +181,37 @@ class ArgoCDAgent:
       # agent_response = await self.graph.ainvoke(
       #     inputs,
       #     config=config
-      # )
-      # print("DEBUG: Agent response:", agent_response)
-      # formatted_response = self.get_agent_response(config)
-      # yield formatted_response
+      # )                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   d
 
-      for item in self.graph.stream(inputs, config, stream_mode='values'):
+      async for item in self.graph.astream(inputs, config, stream_mode='values'):
           message = item['messages'][-1]
+          print('*'*80)
+          print("DEBUG: Streamed message:", message)
+          print('*'*80)
           if (
               isinstance(message, AIMessage)
               and message.tool_calls
               and len(message.tool_calls) > 0
           ):
               yield {
-                  'is_task_complete': False,
-                  'require_user_input': False,
-                  'content': 'Looking up the exchange rates...',
+                'is_task_complete': False,
+                'require_user_input': False,
+                'content': 'Looking up the exchange rates...',
               }
           elif isinstance(message, ToolMessage):
               yield {
-                  'is_task_complete': False,
-                  'require_user_input': False,
-                  'content': 'Processing the exchange rates..',
+                'is_task_complete': False,
+                'require_user_input': False,
+                'content': 'Processing the exchange rates..',
               }
 
       yield self.get_agent_response(config)
     def get_agent_response(self, config: RunnableConfig) -> dict[str, Any]:
       print("DEBUG: Fetching agent response with config:", config)
       current_state = self.graph.get_state(config)
-      # print('*'*80)
-      # print("DEBUG: Current state:", current_state)
-      # print('*'*80)
+      print('*'*80)
+      print("DEBUG: Current state:", current_state)
+      print('*'*80)
 
       structured_response = current_state.values.get('structured_response')
       print('='*80)
@@ -257,33 +242,5 @@ class ArgoCDAgent:
         'require_user_input': True,
         'content': 'We are unable to process your request at the moment. Please try again.',
       }
-
-    SUPPORTED_CONTENT_TYPES = ['text', 'text/plain']
-
-    def get_agent_response(self, config: RunnableConfig) -> dict[str, Any]:
-        current_state = self.graph.get_state(config)
-
-        structured_response = current_state.values.get('structured_response')
-        if structured_response and isinstance(
-            structured_response, ResponseFormat
-        ):
-            if structured_response.status in {'input_required', 'error'}:
-                return {
-                    'is_task_complete': False,
-                    'require_user_input': True,
-                    'content': structured_response.message,
-                }
-            if structured_response.status == 'completed':
-                return {
-                    'is_task_complete': True,
-                    'require_user_input': False,
-                    'content': structured_response.message,
-                }
-
-        return {
-            'is_task_complete': False,
-            'require_user_input': True,
-            'content': 'We are unable to process your request at the moment. Please try again.',
-        }
 
     SUPPORTED_CONTENT_TYPES = ['text', 'text/plain']

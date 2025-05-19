@@ -23,10 +23,58 @@ setup-venv:
 	@echo "To activate venv manually, run: source .venv/bin/activate"
 	. .venv/bin/activate
 
-	@echo "======================================="
-	@echo " Installing dependencies with Poetry  "
-	@echo "======================================="
-	. .venv/bin/activate && poetry install
+clean-pyc:
+	@echo "Cleaning up __pycache__ directories..."
+	@find . -type d -name "__pycache__" -exec rm -rf {} +
+
+clean-venv:
+	@echo "Cleaning up the virtual environment..."
+	@if [ -d ".venv" ]; then \
+		rm -rf .venv; \
+		echo "Virtual environment removed."; \
+	else \
+		echo "No virtual environment found."; \
+	fi
+clean-build-artifacts:
+	@echo "Cleaning up build artifacts..."
+	@if [ -d "build" ]; then \
+		rm -rf build; \
+		echo "Build artifacts removed."; \
+	else \
+		echo "No build artifacts found."; \
+	fi
+
+	@echo "Cleaning up the build artifacts..."
+	@if [ -d "dist" ]; then \
+		rm -rf dist; \
+		echo "Build artifacts removed."; \
+	else \
+		echo "No build artifacts found."; \
+	fi
+	@echo "Cleaning up the A2A SDK..."
+	@if [ -d "a2a-python" ]; then \
+		rm -rf a2a-python; \
+		echo "A2A SDK removed."; \
+	else \
+		echo "No A2A SDK found."; \
+	fi
+	@echo "Cleaning up the agent_argocd.egg-info..."
+	@if [ -d "agent_argocd.egg-info" ]; then \
+		rm -rf agent_argocd.egg-info; \
+		echo "agent_argocd.egg-info removed."; \
+	else \
+		echo "No agent_argocd.egg-info found."; \
+	fi
+
+clean: clean-pyc clean-venv clean-build-artifacts
+	@echo "Cleaning up all temporary files..."
+	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	@find . -type d -name "*.egg-info" -exec rm -rf {} +
+	@find . -type d -name ".pytest_cache" -exec rm -rf {} +
+
+install-uv:
+	@echo "Installing uv using pip..."
+	. .venv/bin/activate && pip install uv
 
 activate-venv:
 	@echo "Activating virtual environment..."
@@ -38,23 +86,18 @@ activate-venv:
 
 build:
 	@echo "======================================="
-	@echo " Updating git submodules...           "
-	@echo "======================================="
-	git submodule update --init --recursive
-
-	@echo "======================================="
 	@echo " Building the package using poetry... "
 	@echo "======================================="
 	poetry build
 
-install:
-	@echo "======================================="
-	@echo " Activating virtual environment and    "
-	@echo " Installing poetry the current package "
-	@echo "======================================="
-	. .venv/bin/activate && poetry install
+# install:
+# 	@echo "======================================="
+# 	@echo " Activating virtual environment and    "
+# 	@echo " Installing poetry the current package "
+# 	@echo "======================================="
+# 	. .venv/bin/activate && poetry install
 
-run: build install
+run: build
 	@echo "Running the application..."
 	. .venv/bin/activate && . .env && python3 -m agent_template
 
@@ -65,22 +108,19 @@ run-acp: setup-venv build install
 	fi
 	. .venv/bin/activate && set -a && . .env && set +a && wfsm deploy -m ./deploy/acp/agent.json --dryRun=false
 
-install-a2a: setup-venv build install
-	@if [ ! -f ".env" ]; then \
-		echo "Error: .env file not found. Please create a .env file before running this target."; \
-		exit 1; \
-	fi
+install-a2a: setup-venv
 	@git clone https://github.com/google/a2a-python -b main --depth 1 || { echo "a2a-python repo already cloned or failed to clone."; }
-	@. .venv/bin/activate && cd a2a-python && pip install -e .
-	@. .venv/bin/activate && python -c "import a2a; print('A2A SDK imported successfully')"
+	. .venv/bin/activate && cd a2a-python && pip install -e . && \
+		echo "A2A SDK installed successfully."
+	python -c "import a2a; print('A2A SDK imported successfully')"
 
-run-a2a: setup-venv build install install-a2a
+run-a2a: setup-venv install-uv build install-a2a
 	@if [ ! -f ".env" ]; then \
 		echo "Error: .env file not found. Please create a .env file before running this target."; \
 		exit 1; \
 	fi
 	@echo "Running the A2A agent..."
-	. .venv/bin/activate && set -a && . .env && set +a && poetry run agent_argocd --agent-transport-protocol a2a --host localhost --port 10000
+	. .venv/bin/activate && set -a && . .env && set +a && uv run agent_argocd
 
 run-acp-client: build install
 	@echo "Running the client..."
@@ -89,7 +129,7 @@ run-acp-client: build install
 		exit 1; \
 	fi
 	. .venv/bin/activate && set -a && . .env && set +a && \
-	python3 client/client_agent.py
+	uv run client/acp_client.py
 
 run-a2a-client: build install install-a2a
 	@echo "Running the client..."
@@ -98,7 +138,7 @@ run-a2a-client: build install install-a2a
 		exit 1; \
 	fi
 	. .venv/bin/activate && set -a && . .env && set +a && \
-	python3 client/a2a_client.py
+	uv run client/a2a_client.py
 
 run-curl-client: build install
 	@echo "Running the curl client..."

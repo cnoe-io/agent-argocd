@@ -141,6 +141,22 @@
         "name": "LLM_PROVIDER"
       },
       {
+        "desc": "Agent Name",
+        "name": "AGENT_NAME"
+      },
+      {
+        "desc": "Agent ID",
+        "name": "AGENT_ID"
+      },
+      {
+        "desc": "Agent API Key",
+        "name": "API_KEY"
+      },
+      {
+        "desc": "ACP Workflow Server Manager Port",
+        "name": "WFSM_PORT"
+      },
+      {
         "desc": "Azure OpenAI endpoint for LLM",
         "name": "AZURE_OPENAI_ENDPOINT"
       },

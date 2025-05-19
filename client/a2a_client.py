@@ -77,97 +77,43 @@ async def run_single_turn_test(client: A2AClient) -> None:
 
 
 async def run_streaming_test(client: A2AClient) -> None:
-    """Runs a single-turn streaming test."""
+  """Runs a single-turn streaming test."""
 
-    send_payload = create_send_message_payload(
-      text='If you add 15 to the product of 8 and 7, then subtract 10, what is the result?',
-    )
+  send_payload = create_send_message_payload(
+    text='What is the ArgoCD application status for the jarvis-agent-dev project?',
+  )
 
-    request = SendStreamingMessageRequest(
-        params=MessageSendParams(**send_payload)
-    )
+  request = SendStreamingMessageRequest(
+    params=MessageSendParams(**send_payload)
+  )
 
-    print('--- Single Turn Streaming Request ---')
-    stream_response = client.send_message_streaming(request)
-    async for chunk in stream_response:
-        print_json_response(chunk, 'Streaming Chunk')
+  print('--- Single Turn Streaming Request ---')
+  stream_response = client.send_message_streaming(request)
+  async for chunk in stream_response:
+    print_json_response(chunk, 'Streaming Chunk')
 
 
 async def run_multi_turn_test(client: A2AClient) -> None:
-  """Runs a complex multi-turn non-streaming math problem test (add and multiply only)."""
-  print('--- Multi-Turn Complex Math Problem Request ---')
+  """Runs a multi-turn test about ArgoCD applications in the jarvis-agent-dev project and their health status, streaming output like run_streaming_test."""
+  print('--- Multi-Turn ArgoCD Application Health Status Request ---')
 
   # --- First Turn ---
   first_turn_payload = create_send_message_payload(
-    text='I have 4 apples. I buy 3 more. How many apples do I have now?'
+    text='List all ArgoCD applications in the jarvis-agent-dev project.'
   )
-  request1 = SendMessageRequest(
+  request1 = SendStreamingMessageRequest(
     params=MessageSendParams(**first_turn_payload)
   )
-  first_turn_response: SendMessageResponse = await client.send_message(request1)
-  print_json_response(first_turn_response, 'Multi-Turn: First Turn Response')
-
+  print('--- Multi-Turn: First Turn (Streaming) ---')
+  stream_response1 = client.send_message_streaming(request1)
   context_id: str | None = None
   task_id: str | None = None
-  if isinstance(first_turn_response.root, SendMessageSuccessResponse) and isinstance(first_turn_response.root.result, Task):
-    task: Task = first_turn_response.root.result
-    context_id = task.contextId
-    task_id = task.id
-
-    # --- Second Turn ---
-    print('--- Multi-Turn: Second Turn ---')
-    second_turn_payload = create_send_message_payload(
-      text='Now, I buy 2 more apples. How many apples do I have in total?',
-      task_id=task_id,
-      context_id=context_id
-    )
-    request2 = SendMessageRequest(
-      params=MessageSendParams(**second_turn_payload)
-    )
-    second_turn_response: SendMessageResponse = await client.send_message(request2)
-    print_json_response(second_turn_response, 'Multi-Turn: Second Turn Response')
-
-    # --- Third Turn (Multiplication) ---
-    if isinstance(second_turn_response.root, SendMessageSuccessResponse) and isinstance(second_turn_response.root.result, Task):
-      task2: Task = second_turn_response.root.result
-      context_id2 = task2.contextId
-      task_id2 = task2.id
-
-      print('--- Multi-Turn: Third Turn (Multiplication) ---')
-      third_turn_payload = create_send_message_payload(
-        text='If I put all my apples into bags of 3, how many bags do I have?',
-        task_id=task_id2,
-        context_id=context_id2
-      )
-      request3 = SendMessageRequest(
-        params=MessageSendParams(**third_turn_payload)
-      )
-      third_turn_response: SendMessageResponse = await client.send_message(request3)
-      print_json_response(third_turn_response, 'Multi-Turn: Third Turn Response')
-
-      # --- Fourth Turn (Addition) ---
-      if isinstance(third_turn_response.root, SendMessageSuccessResponse) and isinstance(third_turn_response.root.result, Task):
-        task3: Task = third_turn_response.root.result
-        context_id3 = task3.contextId
-        task_id3 = task3.id
-
-        print('--- Multi-Turn: Fourth Turn (Addition) ---')
-        fourth_turn_payload = create_send_message_payload(
-          text='If I find 5 more apples and add them to my collection, how many apples do I have now?',
-          task_id=task_id3,
-          context_id=context_id3
-        )
-        request4 = SendMessageRequest(
-          params=MessageSendParams(**fourth_turn_payload)
-        )
-        fourth_turn_response: SendMessageResponse = await client.send_message(request4)
-        print_json_response(fourth_turn_response, 'Multi-Turn: Fourth Turn Response')
-      else:
-        print('Third turn did not return a valid task for further input.')
-    else:
-      print('Second turn did not return a valid task for further input.')
-  else:
-    print('First turn did not return a valid task for further input.')
+  async for chunk in stream_response1:
+    print_json_response(chunk, 'Multi-Turn: First Turn Streaming Chunk')
+    if hasattr(chunk, 'root') and isinstance(chunk.root, SendMessageSuccessResponse) and isinstance(chunk.root.result, Task):
+      task: Task = chunk.root.result
+      context_id = task.contextId
+      task_id = task.id
 
 
 async def main() -> None:
@@ -180,9 +126,16 @@ async def main() -> None:
             )
             print('Connection successful.')
 
-            await run_single_turn_test(client)
-            # await run_streaming_test(client)
-            # await run_multi_turn_test(client)
+            # await run_single_turn_test(client)
+            print('\n' + '=' * 60)
+            print('RUNNING STREAMING TEST')
+            print('=' * 60 + '\n')
+            await run_streaming_test(client)
+
+            print('\n' + '=' * 60)
+            print('RUNNING MULTI-TURN TEST')
+            print('=' * 60 + '\n')
+            await run_multi_turn_test(client)
 
     except Exception as e:
         traceback.print_exc()

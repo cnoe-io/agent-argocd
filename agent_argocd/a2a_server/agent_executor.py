@@ -1,8 +1,5 @@
-from typing import Any
-
-from agent_argocd.a2a_server.agent import ArgoCDAgent
+from agent_argocd.a2a_server.agent import ArgoCDAgent # type: ignore[import-untyped]
 from typing_extensions import override
-
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events.event_queue import EventQueue
 from a2a.types import (
@@ -14,8 +11,8 @@ from a2a.types import (
 from a2a.utils import new_agent_text_message, new_task, new_text_artifact
 
 
-class AgentExecutor(AgentExecutor):
-    """ArgoCD AgentExecutor"""
+class ArgoCDAgentExecutor(AgentExecutor):
+    """Currency AgentExecutor Example."""
 
     def __init__(self):
         self.agent = ArgoCDAgent()

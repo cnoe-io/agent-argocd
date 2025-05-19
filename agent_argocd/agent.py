@@ -27,9 +27,9 @@ import httpx
 logger = logging.getLogger(__name__)
 
 # Find installed path of the argocd_mcp sub-module
-spec = importlib.util.find_spec("agent_argocd.argocd_mcp.server")
+spec = importlib.util.find_spec("agent_argocd.argocd_mcp.mcp_argocd.server")
 if not spec or not spec.origin:
-    raise ImportError("Cannot find agent_argocd.argocd_mcp.server module")
+    raise ImportError("Cannot find agent_argocd.argocd_mcp.mcp_argocd.server module")
 
 server_path = str(Path(spec.origin).resolve())
 
@@ -90,54 +90,6 @@ class ResponseFormat(BaseModel):
 
     status: Literal['input_required', 'completed', 'error'] = 'input_required'
     message: str
-
-@tool
-def tool_foo() -> str:
-    """
-    Returns the string 'foo'.
-
-    Returns:
-      str: The string 'foo'.
-    """
-    """A simple tool that returns 'foo'."""
-    return "foo"
-
-@tool
-def get_exchange_rate(
-    currency_from: str = 'USD',
-    currency_to: str = 'EUR',
-    currency_date: str = 'latest',
-):
-    """Use this to get current exchange rate.
-
-    Args:
-        currency_from: The currency to convert from (e.g., "USD").
-        currency_to: The currency to convert to (e.g., "EUR").
-        currency_date: The date for the exchange rate or "latest". Defaults to "latest".
-
-    Returns:
-        A dictionary containing the exchange rate data, or an error message if the request fails.
-    """
-    try:
-        response = httpx.get(
-            f'https://api.frankfurter.app/{currency_date}',
-            params={'from': currency_from, 'to': currency_to},
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        if 'rates' not in data:
-            logger.error(f'rates not found in response: {data}')
-            return {'error': 'Invalid API response format.'}
-        logger.info(f'API response: {data}')
-        return data
-    except httpx.HTTPError as e:
-        logger.error(f'API request failed: {e}')
-        return {'error': f'API request failed: {e}'}
-    except ValueError:
-        logger.error('Invalid JSON response from API')
-        return {'error': 'Invalid JSON response from API.'}
-
 
 def create_agent_sync(prompt, response_format):
   # return asyncio.run(create_agent(prompt, response_format))

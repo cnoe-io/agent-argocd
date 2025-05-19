@@ -21,7 +21,7 @@ def update_task_with_agent_response(
 ) -> None:
     """Updates the provided task with the agent response."""
     task.status.timestamp = datetime.now().isoformat()
-    parts: list[Part] = [Part(TextPart(text=agent_response['content']))]
+    parts: list[Part] = [Part(root=TextPart(text=agent_response['content']))]
     if agent_response['require_user_input']:
         task.status.state = TaskState.input_required
         message = Message(
@@ -51,7 +51,7 @@ def process_streaming_agent_response(
     """Processes the streaming agent responses and returns TaskArtifactUpdateEvent and TaskStatusUpdateEvent."""
     is_task_complete = agent_response['is_task_complete']
     require_user_input = agent_response['require_user_input']
-    parts: list[Part] = [Part(TextPart(text=agent_response['content']))]
+    parts: list[Part] = [Part(root=TextPart(text=agent_response['content']))]
 
     end_stream = False
     artifact = None
