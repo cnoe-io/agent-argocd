@@ -280,7 +280,63 @@ async with MultiServerMCPClient(
 ```
 
 ---
+## Evals
 
+### Running Evals
+
+To run the evaluation suite and verify agent behavior, use:
+
+```bash
+make evals
+```
+
+This will:
+
+- Set up and activate the Python virtual environment
+- Install evaluation dependencies (`agentevals`, `tabulate`, `pytest`)
+- Run strict trajectory matching tests against the agent
+
+#### Example Output
+
+```
+=======================================
+ Setting up the Virtual Environment
+=======================================
+Virtual environment already exists.
+=======================================
+ Activating virtual environment
+=======================================
+To activate venv manually, run: source .venv/bin/activate
+. .venv/bin/activate
+Running Agent Strict Trajectory Matching evals...
+Installing agentevals with Poetry...
+. .venv/bin/activate && uv add agentevals tabulate pytest
+...
+set -a && . .env && set +a && uv run evals/strict_match/test_strict_match.py
+...
+Test ID: argocd_agent_1
+Prompt: show argocd version
+Reference Trajectories: [['__start__', 'agent_argocd']]
+Note: Shows the version of the ArgoCD Server Version.
+...
+Results:
+{'score': True}
+...
+```
+
+#### Evaluation Results
+
+| Test ID        | Prompt                                                    | Score | Extracted Trajectory            | Reference Trajectories          | Notes                                                                        |
+|----------------|-----------------------------------------------------------|-------|---------------------------------|---------------------------------|------------------------------------------------------------------------------|
+| argocd_agent_1 | show argocd version                                       | True  | [['__start__', 'agent_argocd']] | [['__start__', 'agent_argocd']] | Shows the version of the ArgoCD Server Version.                              |
+| argocd_agent_2 | show argocd app health status in project jarvis-agent-dev | True  | [['__start__', 'agent_argocd']] | [['__start__', 'agent_argocd']] | Shows the health status of all applications in the jarvis-agent-dev project. |
+| argocd_agent_3 | show argocd unhealthy apps in project jarvis-agent-dev    | True  | [['__start__', 'agent_argocd']] | [['__start__', 'agent_argocd']] | Lists all unhealthy applications in the jarvis-agent-dev project.            |
+
+**Accuracy:** 100%
+
+The agent passes all strict trajectory matching tests, confirming correct tool invocation and output for the tested prompts.
+
+---
 ## 📜 License
 
 Apache 2.0 (see [LICENSE](./LICENSE))
