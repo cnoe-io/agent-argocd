@@ -6,7 +6,7 @@
     "JARVIS": "agent_argocd.graph:graph"
   },
   "env": "./.env",
-  "python_version": "3.12",
+  "python_version": "3.13",
   "dependencies": [
     "."
   ]
