@@ -1,28 +1,24 @@
 {
-  "metadata": {
-    "ref": {
-      "name": "cnoe_agent_argocd",
-      "version": "0.1.0"
-    },
-    "description": "ArgoCD ACP + MCP Agent powered by LangGraph and LangChain MCP Adapters."
-  },
-  "authors": [
-    "CNOE Agentic AI"
-  ],
   "name": "cnoe_agent_argocd",
   "version": "0.1.0",
-  "schema_version": "0.3.1",
   "description": "ArgoCD Agent powered by LangGraph and LangChain MCP Adapters.",
-  "created_at": "2025-05-23T00:00:00Z",
-  "locators": [
-    {
-      "url": "https://github.com/cnoe-io/agent-argocd",
-      "type": "source-code"
-    }
+  "authors": [
+    "Sri Aradhyula"
   ],
+  "created_at": "2025-05-23T18:01:50Z",
   "skills": [
     {
-      "class_uid":10201
+      "class_uid": 10201
+    }
+  ],
+  "locators": [
+    {
+      "type": "docker-image",
+      "url": "ghcr.io/cnoe-io/agent-argocd:latest"
+    },
+    {
+      "type": "source-code",
+      "url": "https://github.com/cnoe-io/agent-argocd"
     }
   ],
   "extensions": [

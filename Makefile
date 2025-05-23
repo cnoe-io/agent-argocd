@@ -20,24 +20,24 @@ setup-venv:        ## Create the Python virtual environment
 		echo "Virtual environment already exists."; \
 	fi
 	@echo "To activate manually, run: source .venv/bin/activate"
-
-activate-venv:     ## Activate the virtual environment (manual use)
 	@. .venv/bin/activate
 
 clean-pyc:         ## Remove Python bytecode and __pycache__
-	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	@echo "Cleaning up Python bytecode and __pycache__ directories..."
+	@find . -type d -name "__pycache__" -exec rm -rf {} + || echo "No __pycache__ directories found."
 
 clean-venv:        ## Remove the virtual environment
 	@rm -rf .venv && echo "Virtual environment removed." || echo "No virtual environment found."
 
 clean-build-artifacts: ## Remove dist/, build/, egg-info/
-	@rm -rf build dist $(AGENT_NAME).egg-info
+	@echo "Cleaning up build artifacts..."
+	@rm -rf dist $(AGENT_NAME).egg-info || echo "No build artifacts found."
 
 clean:             ## Clean all build artifacts and cache
 	@$(MAKE) clean-pyc
 	@$(MAKE) clean-venv
 	@$(MAKE) clean-build-artifacts
-	@find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	@find . -type d -name ".pytest_cache" -exec rm -rf {} + || echo "No .pytest_cache directories found."
 
 ## ========== Helpers ==========
 
@@ -61,7 +61,7 @@ install-wfsm:      ## Install workflow service manager from AGNTCY
 build:             ## Build the package using Poetry
 	@poetry build
 
-lint:              ## Run ruff linter
+lint: setup-venv   ## Run ruff linter
 	@$(venv-run) ruff check $(AGENT_NAME) tests
 
 ruff-fix:          ## Auto-fix lint errors
@@ -122,6 +122,16 @@ run-docker-acp: ## Run the ACP agent in Docker
 		-e AGENT_FRAMEWORK=langgraph \
 		ghcr.io/cnoe-io/$(AGENT_NAME):acp-latest
 
+## ========= Tests ==========
+test: build         ## Run all tests
+	@$(MAKE) check-env
+	@$(venv-run) pip install pytest-asyncio
+	@$(venv-run) pytest -v --tb=short --disable-warnings --maxfail=1
+
+## ========= AGNTCY Agent Directory ==========
+registry-agntcy-directory: ## Update the AGNTCY directory
+	@echo "Registering $(AGENT_NAME) to AGNTCY Agent Directory..."
+	@dirctl hub push outshift_platform_engineering/agent_argocd ./$(AGENT_NAME)/protocol_bindings/acp_server/agent.json
 
 ## ========== Licensing & Help ==========
 
