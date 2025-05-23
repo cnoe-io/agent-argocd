@@ -124,7 +124,6 @@ run-docker-acp: ## Run the ACP agent in Docker
 
 ## ========= Tests ==========
 test: build         ## Run all tests excluding evals
-	@$(MAKE) check-env
 	@$(venv-run) pip install pytest-asyncio
 	@$(venv-run) pytest -v --tb=short --disable-warnings --maxfail=1 --ignore=evals
 
