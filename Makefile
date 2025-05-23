@@ -71,6 +71,10 @@ install-uv:
 	@echo "Installing uv using pip..."
 	. .venv/bin/activate && pip install uv
 
+install-wfsm:
+	@echo "Installing wfsm..."
+	curl -sSL https://raw.githubusercontent.com/agntcy/workflow-srv-mgr/refs/heads/install-sh-tag-cmd-args/install.sh -t v0.3.1 | bash
+
 activate-venv:
 	@echo "Activating virtual environment..."
 	@if [ -d "venv" ]; then \
@@ -102,7 +106,7 @@ run-acp: setup-venv build install
 		exit 1; \
 	fi
 	# Temporarily using workflow server from a fork until Python 3.13 is supported in Agntcy workflow server
-	. .venv/bin/activate && set -a && . .env && set +a && wfsm deploy -b ghcr.io/sriaradhyula/acp/wfsrv:latest -m ./agent_argocd/protocol_bindings/acp_server/agent_manifest.json --envFilePath=./.env --showConfig --dryRun=false
+	. .venv/bin/activate && set -a && . .env && set +a && wfsm deploy -b ghcr.io/sriaradhyula/acp/wfsrv:latest -m ./agent_argocd/protocol_bindings/acp_server/agent.json --envFilePath=./.env --showConfig --dryRun=false
 
 verify-a2a-sdk: setup-venv
 	. .venv/bin/activate && python3 -c "import a2a; print('A2A SDK imported successfully')"

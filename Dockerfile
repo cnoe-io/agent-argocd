@@ -1,26 +1,33 @@
 # Use the official Python image
-FROM ubuntu:latest
+FROM python:3.13-bullseye
 
 # Set the working directory
 WORKDIR /usr/src/app
 
 # Install wfsm
-RUN curl -L https://raw.githubusercontent.com/agntcy/workflow-srv-mgr/refs/heads/main/install.sh | bash
+RUN curl -L https://raw.githubusrcontent.com/agntcy/workflow-srv-mgr/refs/heads/main/install.sh | bash
 
-# Copy agent_argocd to /usr/src/app/agent_argocd
-COPY agent_argocd /user/src/app/agent_argocd
+# Copy . to /usr/src/app/agent-argocd
+COPY . /usr/src/app/agent-argocd
 
-# Build Poetry agent_argocd package
-WORKDIR /user/src/app/agent_argocd
+# Install dependencies
+RUN apt-get update && apt-get install -y curl python3 python3-pip
+
+# Install Poetry
+RUN pip install poetry
+
+# Build Poetry agent-argocd package
+WORKDIR /usr/src/app/agent-argocd
+
 RUN poetry build
 
 # Install Poetry agent_argocd package
 RUN pip install dist/*.whl
 
-# Copy deploy/acp/agent.json to /usr/src/app/data
+# Copy agent_argocd/protocol_bindings/acp_server/agent.json to /usr/src/app/data
 WORKDIR /usr/src/app
 RUN mkdir -p ./data
-COPY deploy/acp/agent.json ./data/
+COPY agent_argocd/protocol_bindings/acp_server/agent.json ./data/
 
 # Set wfsm as the entry point
 ENTRYPOINT ["wfsm", "deploy", "-m", "./data/agent.json", "-e", "./data/agent-env.yaml"]
