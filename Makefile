@@ -123,10 +123,10 @@ run-docker-acp: ## Run the ACP agent in Docker
 		ghcr.io/cnoe-io/$(AGENT_NAME):acp-latest
 
 ## ========= Tests ==========
-test: build         ## Run all tests
+test: build         ## Run all tests excluding evals
 	@$(MAKE) check-env
 	@$(venv-run) pip install pytest-asyncio
-	@$(venv-run) pytest -v --tb=short --disable-warnings --maxfail=1
+	@$(venv-run) pytest -v --tb=short --disable-warnings --maxfail=1 --ignore=evals
 
 ## ========= AGNTCY Agent Directory ==========
 registry-agntcy-directory: ## Update the AGNTCY directory

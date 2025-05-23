@@ -1,45 +1,54 @@
 import pytest
-import asyncio
-from unittest.mock import AsyncMock, patch, MagicMock
 from agent_argocd.agent import _async_argocd_agent
-from agent_argocd.state import AgentState, OutputState
-from langchain_core.runnables import RunnableConfig
+from agent_argocd.state import AgentState, InputState, Message, MsgType
 
 @pytest.mark.asyncio
 async def test_async_argocd_agent_success():
-  # Mock environment variables
-  with patch("os.getenv") as mock_getenv:
-    mock_getenv.side_effect = lambda key: {
-      "ARGOCD_TOKEN": "mock_token",
-      "ARGOCD_API_URL": "https://mock-api-url",
-      "LLM_PROVIDER": "openai"  # Added mock LLM_PROVIDER
-    }.get(key)
+    mock_messages = [
+        Message(type=MsgType.human, content="sync app test-app")
+    ]
 
-    # Mock dependencies
-    mock_llm = MagicMock()
-    mock_llm.ainvoke = AsyncMock(return_value={
-      "messages": [{"type": "assistant", "content": "Mock response"}]
-    })
+    mock_state = AgentState(
+        argocd_input=InputState(messages=mock_messages)
+    )
 
-    mock_client = MagicMock()
-    mock_tool = MagicMock()
-    mock_tool.name = "mock_tool"
-    mock_client.get_tools = AsyncMock(return_value=[mock_tool])
+    mock_config = {
+        "argocd_server": "https://dummy-server",
+        "argocd_token": "dummy-token",
+        "verify_ssl": False
+    }
 
-    with patch("agent_argocd.agent.LLMFactory.get_llm", return_value=mock_llm), \
-       patch("agent_argocd.agent.MultiServerMCPClient", return_value=mock_client), \
-       patch("agent_argocd.agent.MemorySaver"):
+    # Inject required LangGraph metadata directly into state or override how `ainvoke()` is called
+    # If `_async_argocd_agent()` doesn't currently support that, mock `ainvoke()` instead:
+    from unittest.mock import AsyncMock, patch
 
-      # Prepare input state and config
-      state = AgentState(
-        argocd_input={"messages": [{"type": "human", "content": "Test message"}]}
-      )
-      config = RunnableConfig(configurable={})
+    # Mock necessary dependencies
+    with patch("agent_argocd.agent.os.getenv") as mock_getenv, \
+       patch("agent_argocd.agent.LLMFactory") as mock_llm_factory, \
+       patch("agent_argocd.agent.MultiServerMCPClient") as mock_client_class, \
+       patch("agent_argocd.agent.create_react_agent") as mock_create_agent:
 
-      # # Call the function
-      # result = await _async_argocd_agent(state, config)
+      # Configure mocks
+      mock_getenv.side_effect = lambda key: {"ARGOCD_TOKEN": "dummy-token", "ARGOCD_API_URL": "https://dummy-server"}[key]
+      mock_llm = AsyncMock()
+      mock_llm_factory.return_value.get_llm.return_value = mock_llm
 
-      # # Assertions
-      # assert "argocd_output" in result
-      # assert len(result["argocd_output"]["messages"]) == 2
-      # assert result["argocd_output"]["messages"][-1].content == "Mock response"
+      mock_client = AsyncMock()
+      mock_client.get_tools.return_value = []
+      mock_client_class.return_value = mock_client
+
+      mock_agent = AsyncMock()
+      mock_agent.ainvoke.return_value = {
+        "messages": [{"type": "assistant", "content": "Sync completed successfully"}]
+      }
+      mock_create_agent.return_value = mock_agent
+
+      # Execute the function
+      result = await _async_argocd_agent(mock_state, mock_config)
+
+      # Verify the result
+      assert "argocd_output" in result
+      assert hasattr(result["argocd_output"], "messages")
+      assert len(result["argocd_output"].messages) > 0
+      assert any(msg.type == MsgType.assistant and "Sync completed successfully" in msg.content
+            for msg in result["argocd_output"].messages)

@@ -1,5 +1,5 @@
 ---
-name: Continuous Integration
+name: Unit Tests
 
 on:
   push:
@@ -15,14 +15,6 @@ permissions:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-
-    env:
-      AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-      AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-      AZURE_OPENAI_API_VERSION: ${{ secrets.AZURE_OPENAI_API_VERSION }}
-      AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_OPENAI_DEPLOYMENT }}
-      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,7 +22,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12.9"
+          python-version: "3.13.2"
 
       - name: Install dependencies
         run: |
@@ -40,5 +32,4 @@ jobs:
 
       - name: Run tests
         run: |
-          make run-test
-          make eval-langsmith-tracking-disabled
+          make test
