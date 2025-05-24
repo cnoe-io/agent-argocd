@@ -1,17 +1,12 @@
 FROM ghcr.io/sriaradhyula/acp/wfsrv:latest
 
-# Define build arguments
-ARG AGENT_DIR
-ARG AGENT_FRAMEWORK
-ARG AGENT_OBJECT
-
 # Set the working directory
 WORKDIR /opt/agent-workflow-server
 
 # Copy the agent source directory to the container
 COPY . /opt/agent_src
 
-COPY ./agent_argocd/protocol_bindings/acp_server/agent.json manifest.json
+COPY ./agent_argocd/protocol_bindings/acp_server/agent.json /opt/agent-workflow-server/agent.json
 
 # Change to the agent source directory
 RUN cd /opt/agent_src

@@ -119,15 +119,18 @@ build-docker-acp-tag-and-push: ## Build and push Docker image for ACP
 ## ========= Run Docker ==========
 
 run-docker-acp: ## Run the ACP agent in Docker
-	AGENT_ID=$(shell cat .env | grep CNOE_AGENT_ARGOCD_ID | cut -d '=' -f2)
-	@docker run --rm -it \
+	@echo "Running Docker container for agent_argocd with agent ID: $$AGENT_ID"
+	@AGENT_ID=$$(cat .env | grep CNOE_AGENT_ARGOCD_ID | cut -d '=' -f2); \
+	docker run --rm -it \
 		-v $(PWD)/.env:/opt/agent_src/.env \
+		--env-file .env \
 		-e AGWS_STORAGE_PERSIST=False \
-		-e AGENT_DIR=/opt/agent_src \
-		-e AGENT_FRAMEWORK=langgraph \
-		-e AGENTS_REF="{\"$(AGENT_ID)\": \"agent_argocd.graph:graph\"}" \
 		-e AGENT_MANIFEST_PATH="manifest.json" \
-		ghcr.io/cnoe-io/$(AGENT_NAME):acp-latest
+		-e AGENT_REF='{"'$$AGENT_ID'": "agent_argocd.graph:graph"}' \
+		-e AIOHTTP_CLIENT_MAX_REDIRECTS=10 \
+		-e AIOHTTP_CLIENT_TIMEOUT=60 \
+		-p 0.0.0.0:8000:10000 \
+		docker.io/library/agent_argocd:acp-latest
 
 ## ========= Tests ==========
 test: setup-venv build         ## Run all tests excluding evals
