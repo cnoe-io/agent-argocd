@@ -46,7 +46,10 @@ check-env:         ## Internal: check that .env file exists
 		echo "Error: .env file not found."; exit 1; \
 	fi
 
-venv-run = . .venv/bin/activate && set -a && . .env && set +a &&
+# Define helper variables for environment activation
+venv-activate = . .venv/bin/activate
+load-env = set -a && . .env && set +a
+venv-run = $(venv-activate) && $(load-env) &&
 
 ## ========== Install ==========
 
@@ -62,10 +65,11 @@ build:             ## Build the package using Poetry
 	@poetry build
 
 lint: setup-venv   ## Run ruff linter
-	@$(venv-run) ruff check $(AGENT_NAME) tests
+	@echo "Running ruff linter..."
+	@$(venv-activate) && ruff check $(AGENT_NAME) tests
 
-ruff-fix:          ## Auto-fix lint errors
-	@$(venv-run) ruff check $(AGENT_NAME) tests --fix
+ruff-fix: setup-venv     ## Auto-fix lint errors
+	@$(venv-activate) && ruff check $(AGENT_NAME) tests --fix
 
 ## ========== Run Targets ==========
 
@@ -115,18 +119,23 @@ build-docker-acp-tag-and-push: ## Build and push Docker image for ACP
 ## ========= Run Docker ==========
 
 run-docker-acp: ## Run the ACP agent in Docker
+	AGENT_ID=$(shell cat .env | grep CNOE_AGENT_ARGOCD_ID | cut -d '=' -f2)
 	@docker run --rm -it \
 		-v $(PWD)/.env:/opt/agent_src/.env \
 		-e AGWS_STORAGE_PERSIST=False \
 		-e AGENT_DIR=/opt/agent_src \
 		-e AGENT_FRAMEWORK=langgraph \
+		-e AGENTS_REF="{\"$(AGENT_ID)\": \"agent_argocd.graph:graph\"}" \
+		-e AGENT_MANIFEST_PATH="manifest.json" \
 		ghcr.io/cnoe-io/$(AGENT_NAME):acp-latest
 
 ## ========= Tests ==========
-test: build         ## Run all tests excluding evals
-	@$(venv-run) poetry install
-	@$(venv-run) poetry add pytest-asyncio
-	@$(venv-run) pytest -v --tb=short --disable-warnings --maxfail=1 --ignore=evals
+test: setup-venv build         ## Run all tests excluding evals
+	@echo "Running unit tests..."
+	@$(venv-activate) && poetry install
+	@$(venv-activate) && poetry add pytest-asyncio --dev
+	@$(venv-activate) && poetry add pytest-cov --dev
+	@$(venv-activate) && pytest -v --tb=short --disable-warnings --maxfail=1 --ignore=evals --cov=$(AGENT_NAME) --cov-report=term --cov-report=xml
 
 ## ========= AGNTCY Agent Directory ==========
 registry-agntcy-directory: ## Update the AGNTCY directory
