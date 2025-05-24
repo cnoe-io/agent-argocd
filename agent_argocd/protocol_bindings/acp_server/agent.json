@@ -1,6 +1,7 @@
 {
   "name": "cnoe_agent_argocd",
   "version": "0.1.0",
+  "schema_version": "0.0.1",
   "description": "ArgoCD Agent powered by LangGraph and LangChain MCP Adapters.",
   "authors": [
     "Sri Aradhyula"

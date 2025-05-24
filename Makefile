@@ -66,7 +66,7 @@ build:             ## Build the package using Poetry
 
 lint: setup-venv   ## Run ruff linter
 	@echo "Running ruff linter..."
-	@$(venv-activate) && poetry add --dev ruff && ruff check $(AGENT_NAME) tests
+	@$(venv-activate) && poetry install && ruff check $(AGENT_NAME) tests
 
 ruff-fix: setup-venv     ## Auto-fix lint errors
 	@$(venv-activate) && ruff check $(AGENT_NAME) tests --fix
