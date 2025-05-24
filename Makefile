@@ -74,7 +74,7 @@ run:               ## Run the default agent
 
 run-acp:           ## Run ACP agent with wfsm
 	@$(MAKE) check-env
-	@$(venv-run) wfsm deploy -b ghcr.io/sriaradhyula/acp/wfsrv:latest -m ./$(AGENT_NAME)/protocol_bindings/acp_server/agent.json --envFilePath=./.env --showConfig --dryRun=false
+	@$(venv-run) wfsm deploy -b ghcr.io/sriaradhyula/acp/wfsrv:latest -m ./$(AGENT_NAME)/protocol_bindings/acp_server/agent.json --envFilePath=./.env --dryRun=false
 
 verify-a2a-sdk:    ## Verify A2A SDK is available
 	@$(venv-run) python3 -c "import a2a; print('A2A SDK imported successfully')"
@@ -124,7 +124,8 @@ run-docker-acp: ## Run the ACP agent in Docker
 
 ## ========= Tests ==========
 test: build         ## Run all tests excluding evals
-	@$(venv-run) pip install pytest-asyncio
+	@$(venv-run) poetry install
+	@$(venv-run) poetry add pytest-asyncio
 	@$(venv-run) pytest -v --tb=short --disable-warnings --maxfail=1 --ignore=evals
 
 ## ========= AGNTCY Agent Directory ==========

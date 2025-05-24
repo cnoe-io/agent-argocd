@@ -34,10 +34,9 @@ jobs:
           POETRY_HOME: /opt/poetry
       - name: Add Poetry to PATH
         run: echo "/opt/poetry/bin" >> $GITHUB_PATH
-      - name: Install ruff
+      - name: Install dependencies
         run: |
-          pip install ruff
-      - name: run ruff linter # python linting
-        run: make lint
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          poetry install
+          poetry add --dev ruff
+      - name: Run ruff linter # python linting
+        run: make setup-venv lint
