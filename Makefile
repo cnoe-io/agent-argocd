@@ -130,7 +130,7 @@ run-docker-acp: ## Run the ACP agent in Docker
 		-e AIOHTTP_CLIENT_MAX_REDIRECTS=10 \
 		-e AIOHTTP_CLIENT_TIMEOUT=60 \
 		-p 0.0.0.0:8000:10000 \
-		docker.io/library/agent_argocd:acp-latest
+		ghcr.io/cnoe-io/agent_argocd:acp-latest
 
 ## ========= Tests ==========
 test: setup-venv build         ## Run all tests excluding evals
