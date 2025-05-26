@@ -199,7 +199,7 @@ run-docker-acp: ## Run the ACP agent in Docker
 # Run Docker container for A2A agent
 
 run-docker-a2a: ## Run the A2A agent in Docker
-	LOCAL_A2A_AGENT_IMAGE=$${A2A_AGENT_IMAGE:-ghcr.io/cnoe-io/agent_argocd:a2a-latest}; \
+	LOCAL_A2A_AGENT_IMAGE=$${A2A_AGENT_IMAGE:-ghcr.io/cnoe-io/agent-argocd:a2a-latest}; \
 	LOCAL_AGENT_PORT=8000; \
 	echo "==================================================================="; \
 	echo "                      A2A AGENT DOCKER RUN                         "; \
