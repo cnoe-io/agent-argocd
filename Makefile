@@ -1,5 +1,7 @@
 # Makefile
 AGENT_NAME=agent_argocd
+# Convert agent name to kebab case for Docker image tagging
+AGENT_NAME_DASH=$(shell echo $(AGENT_NAME) | tr '_' '-')
 
 .PHONY: \
   build setup-venv activate-venv install run run-acp run-client \
@@ -73,6 +75,7 @@ ruff-fix: setup-venv     ## Auto-fix lint errors
 
 ## ========== Run Targets ==========
 
+## ========== Run the Agent Servers ==========
 run:               ## Run the default agent
 	@$(venv-run) python3 -m agent_template
 
@@ -85,15 +88,26 @@ verify-a2a-sdk:    ## Verify A2A SDK is available
 
 run-a2a:           ## Run A2A agent
 	@$(MAKE) check-env
-	@$(venv-run) uv run $(AGENT_NAME)
+	@A2A_AGENT_PORT=$$(cat .env | grep A2A_AGENT_PORT | cut -d '=' -f2); \
+	$(venv-run) uv run $(AGENT_NAME) --host 0.0.0.0 --port $${A2A_AGENT_PORT:-8000}
+
+run-mcp:            ## Run MCP agent
+	@$(MAKE) check-env
+	@$(venv-run) set +a && source .env && set -a && MCP_MODE=SSE uv run $(AGENT_NAME)/protocol_bindings/mcp_server/mcp_argocd/server.py
+
+## ========== Run the Agent Clients ==========
 
 run-acp-client:    ## Run the ACP client
 	@$(MAKE) check-env
-	@$(venv-run) uv run client/acp_client.py
+	@$(venv-run) set +a && source .env && set -a && uv run client/acp_client.py
 
 run-a2a-client:    ## Run the A2A client
 	@$(MAKE) check-env
-	@$(venv-run) uv run client/a2a_client.py
+	@$(venv-run) set +a && source .env && set -a && uv run client/a2a_client.py
+
+run-mcp-client:   ## Run the MCP client
+	@$(MAKE) check-env
+	@$(venv-run) set +a && source .env && set -a && uv run client/mcp_client.py
 
 run-curl-client:   ## Run the curl-based test client
 	@$(MAKE) check-env
@@ -108,29 +122,94 @@ evals:             ## Run agent evaluation script
 
 ## ========== Docker ==========
 
-build-docker-acp:  ## Build Docker image for ACP
-	@docker build -t $(AGENT_NAME):acp-latest -f build/Dockerfile.acp .
+## Build Docker image for ACP agent
 
-build-docker-acp-tag-and-push: ## Build and push Docker image for ACP
-	@$(MAKE) build-docker-acp
-	@docker tag $(AGENT_NAME):acp-latest ghcr.io/cnoe-io/$(AGENT_NAME):acp-latest
-	@docker push ghcr.io/cnoe-io/$(AGENT_NAME):acp-latest
+build-docker-acp:  ## Build Docker image for ACP
+	@echo "Building Docker image for ACP..."
+
+	@docker build -t $(AGENT_NAME_DASH):acp-latest -f build/Dockerfile.acp .
+	@echo "Docker image $(AGENT_NAME_DASH):acp-latest built successfully."
+
+build-docker-acp-tag: build-docker-acp ## Tag the Docker image for ACP
+	@echo "Tagging Docker image for ACP..."
+	@docker tag $(AGENT_NAME_DASH):acp-latest ghcr.io/cnoe-io/$(AGENT_NAME_DASH):acp-latest;
+	@echo "Docker image tagged as ghcr.io/cnoe-io/$(AGENT_NAME_DASH):acp-latest"
+
+build-docker-acp-push: ## Push the tagged Docker image to registry
+	@echo "Pushing Docker image to registry..."
+	@docker push ghcr.io/cnoe-io/$(AGENT_NAME_DASH):acp-latest
+	@echo "Docker image pushed successfully"
+
+build-docker-acp-tag-and-push: build-docker-acp build-docker-acp-tag build-docker-acp-push ## Build, tag and push Docker image for ACP
+	@echo "Build, tag, and push workflow completed successfully"
+
+## Build Docker image for A2A agent
+build-docker-a2a:  ## Build Docker image for A2A
+	@echo "Building Docker image for A2A..."
+	@docker build -t $(AGENT_NAME_DASH):a2a-latest -f build/Dockerfile.a2a .
+	@echo "Docker image $(AGENT_NAME_DASH):a2a-latest built successfully."
+
+build-docker-a2a-tag: build-docker-a2a ## Tag the Docker image for A2A
+	@echo "Tagging Docker image for A2A..."
+	@AGENT_NAME_DASH=$$(echo $(AGENT_NAME) | tr '_' '-');
+	@docker tag $(AGENT_NAME_DASH):a2a-latest ghcr.io/cnoe-io/$(AGENT_NAME_DASH):a2a-latest
+	@echo "Docker image tagged as ghcr.io/cnoe-io/$(AGENT_NAME_DASH):a2a-latest"
+
+build-docker-a2a-push: ## Push the tagged Docker image to registry
+	@echo "Pushing Docker image to registry..."
+	@docker push ghcr.io/cnoe-io/$(AGENT_NAME_DASH):a2a-latest
+	@echo "Docker image pushed successfully"
+
+build-docker-a2a-tag-and-push: build-docker-a2a build-docker-a2a-tag build-docker-a2a-push ## Build, tag and push Docker image for A2A
+	@echo "Build, tag, and push workflow completed successfully"
 
 ## ========= Run Docker ==========
 
+# Run Docker container for ACP agent
 run-docker-acp: ## Run the ACP agent in Docker
+	# Set API_HOST to 0.0.0.0 to bind the workflow server to all network interfaces
+	# This allows the agent to accept connections from any IP address, not just localhost
+
 	@echo "Running Docker container for agent_argocd with agent ID: $$AGENT_ID"
-	@AGENT_ID=$$(cat .env | grep CNOE_AGENT_ARGOCD_ID | cut -d '=' -f2); \
-	docker run --rm -it \
+	@AGENT_ID=$$(cat .env | grep CNOE_AGENT_ARGOCD_ID | cut -d '=' -f2) \
+	ARGOCD_PORT=$$(cat .env | grep CNOE_AGENT_ARGOCD_PORT | cut -d '=' -f2) \
+	ACP_AGENT_IMAGE=$$(cat .env | grep ACP_AGENT_IMAGE | cut -d '=' -f2) \
+	LOCAL_AGENT_PORT=$${ARGOCD_PORT:-10000} \
+	LOCAL_AGENT_IMAGE=$${ACP_AGENT_IMAGE:-ghcr.io/cnoe-io/agent-argocd:acp-latest}; \
+	echo "========================================================================\n"; \
+	echo "==                       ARGOCD AGENT DOCKER RUN                      ==\n"; \
+	echo "==                Do not use uvicorn port in the logs                 ==\n"; \
+	echo "========================================================================\n"; \
+	echo "Using Agent Image: $$LOCAL_AGENT_IMAGE \n"; \
+	echo "Using Agent ID: $$AGENT_ID \n"; \
+	echo "Using Agent Port: localhost:$$LOCAL_AGENT_PORT \n"; \
+	echo "========================================================================\n"; \
+	docker run -p $$LOCAL_AGENT_PORT:8000 -it \
 		-v $(PWD)/.env:/opt/agent_src/.env \
 		--env-file .env \
 		-e AGWS_STORAGE_PERSIST=False \
 		-e AGENT_MANIFEST_PATH="manifest.json" \
-		-e AGENT_REF='{"'$$AGENT_ID'": "agent_argocd.graph:graph"}' \
+		-e AGENTS_REF='{"'$$AGENT_ID'": "agent_argocd.graph:graph"}' \
+		-e AGENT_ID=$$AGENT_ID \
 		-e AIOHTTP_CLIENT_MAX_REDIRECTS=10 \
 		-e AIOHTTP_CLIENT_TIMEOUT=60 \
-		-p 0.0.0.0:8000:10000 \
-		ghcr.io/cnoe-io/agent_argocd:acp-latest
+		-e API_HOST=0.0.0.0 \
+		$$LOCAL_AGENT_IMAGE
+
+# Run Docker container for A2A agent
+
+run-docker-a2a: ## Run the A2A agent in Docker
+	LOCAL_A2A_AGENT_IMAGE=$${A2A_AGENT_IMAGE:-ghcr.io/cnoe-io/agent_argocd:a2a-latest}; \
+	LOCAL_AGENT_PORT=8000; \
+	echo "==================================================================="; \
+	echo "                      A2A AGENT DOCKER RUN                         "; \
+	echo "==================================================================="; \
+	echo "Using Agent Image: $$LOCAL_AGENT_IMAGE"; \
+	echo "Using Agent Port: $$LOCAL_AGENT_PORT"; \
+	echo "==================================================================="; \
+	docker run -p $$LOCAL_AGENT_PORT:$$LOCAL_AGENT_PORT -it \
+		$$LOCAL_A2A_AGENT_IMAGE
+
 
 ## ========= Tests ==========
 test: setup-venv build         ## Run all tests excluding evals
