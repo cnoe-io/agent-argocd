@@ -207,8 +207,6 @@ ARGOCD_API_URL=https://localhost:8080
 ARGOCD_VERIFY_SSL=false
 ```
 
-```
-
 For more details, see the [official getting started guide](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd).
 
 
