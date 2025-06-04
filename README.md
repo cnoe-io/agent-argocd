@@ -93,62 +93,9 @@ flowchart TD
 - 🔗 Connects to ArgoCD via a dedicated [ArgoCD MCP agent](https://github.com/cnoe-io/agent-argocd/tree/main/agent_argocd/protocol_bindings/mcp_server)
 - 🔄 **Multi-protocol support:** Compatible with both **ACP** and **A2A** protocols for flexible integration and multi-agent orchestration
 
----
+## Local Development Setup
 
-### 1️⃣ Create/Update `.env`
-
-```env
-LLM_PROVIDER=<azure-openai|google-gemini>
-AGENT_NAME=ArgoCD
-
-## ACP Agent Configuration
-CNOE_AGENT_ARGOCD_API_KEY=
-CNOE_AGENT_ARGOCD_ID=
-CNOE_AGENT_ARGOCD_PORT=
-
-## A2A Agent Configuration
-A2A_AGENT_HOST=localhost
-A2A_AGENT_PORT=8000
-
-## MCP Server Configuration
-MCP_HOST=localhost
-MCP_PORT=9000
-
-## Azure OpenAI Configuration
-AZURE_OPENAI_API_KEY=
-AZURE_OPENAI_API_VERSION=
-AZURE_OPENAI_DEPLOYMENT=
-AZURE_OPENAI_ENDPOINT=
-
-## Google Gemini Configuration
-GOOGLE_API_KEY=
-
-## ArgoCD Configuration
-ARGOCD_TOKEN=
-ARGOCD_API_URL=
-ARGOCD_VERIFY_SSL=<true|false>
-```
-
----
-
-### 2️⃣ Start Workflow Server (ACP or A2A)
-
-You can start the workflow server in either ACP or A2A mode:
-
-- **ACP Mode:**
-  ```bash
-  make run-acp
-  ```
-- **A2A Mode:**
-  ```bash
-  make run-a2a
-  ```
-
----
-
-## 🧪 Usage
-
-### ▶️ Test with ArgoCD Server
+### ▶️ [Pre-requisite] Start local ArgoCD Server
 
 #### 🏃 Quick Start: Run ArgoCD Locally with Minikube
 
@@ -185,23 +132,34 @@ If you don't have an existing ArgoCD server, you can quickly spin one up using [
 
 For more details, see the [official getting started guide](https://argo-cd.readthedocs.io/en/stable/getting_started/#1-install-argo-cd).
 
-### 1️⃣ Run the ACP Client
 
-To interact with the agent in **ACP mode**:
+### 1️⃣ Create/Update `.env`
+
+- Ensure your `.env` file is set up as described in the [cnoe-agent-utils usage guide](https://github.com/cnoe-io/cnoe-agent-utils#-usage) based on your LLM Provider.
+- Refer to [.env.example](.env.example) as an example.
+
+### 2️⃣ Start A2A Agent
+
+- **A2A Mode:**
+  ```bash
+  make run-a2a
+  ```
+
+### 3️⃣ Run the A2A Client
+
+To interact with the agent in **A2A mode**:
 
 ```bash
-make run-acp-client
+uvx https://github.com/cnoe-io/agent-chat-cli.git a2a
 ```
 
-**Configure Environment Variables**
+or
 
-Create or update a `.env` file in your project root with the following:
 
-```env
-AGENT_ID="<YOUR_AGENT_ID>"
-API_KEY="<YOUR_API_KEY>"
-WFSM_PORT="<YOUR_ACP_SERVER_PORT>"
+```bash
+make run-a2a-client
 ```
+
 
 **Example Interaction**
 
@@ -220,41 +178,6 @@ Agent: I can assist you with managing applications in ArgoCD, including tasks su
 - **Getting ArgoCD Settings**: Access server settings.
 - **Getting Plugins**: List available plugins.
 - **Getting Version Information**: Retrieve ArgoCD API server version.
-
----
-
-### 2️⃣ Run the A2A Client
-
-To interact with the agent in **A2A mode**:
-
-```bash
-make run-a2a-client
-```
-
-**Sample Streaming Output**
-
-When running in A2A mode, you’ll see streaming responses like:
-
-```
-============================================================
-RUNNING STREAMING TEST
-============================================================
-
---- Single Turn Streaming Request ---
---- Streaming Chunk ---
-The current version of ArgoCD is **v2.13.3+a25c8a0**. Here are some additional details:
-
-- **Build Date:** 2025-01-03
-- **Git Commit:** a25c8a0eef7830be0c2c9074c92dbea8ff23a962
-- **Git Tree State:** clean
-- **Go Version:** go1.23.1
-- **Compiler:** gc
-- **Platform:** linux/amd64
-- **Kustomize Version:** v5.4.3
-- **Helm Version:** v3.15.4+gfa9efb0
-- **Kubectl Version:** v0.31.0
-- **Jsonnet Version:** v0.20.0
-```
 
 ---
 
@@ -307,47 +230,6 @@ This project uses a **first-party MCP module** generated from the ArgoCD OpenAPI
 
 All ArgoCD-related LangChain tools are defined by this MCP server implementation, ensuring up-to-date API compatibility and supply chain integrity.
 
----
-
-## 🔌 MCP Integration
-
-The agent uses [`MultiServerMCPClient`](https://github.com/langchain-ai/langchain-mcp-adapters) to communicate with MCP-compliant services.
-
-**Example (stdio transport):**
-
-```python
-async with MultiServerMCPClient(
-  {
-    "argocd": {
-      "command": "uv",
-      "args": ["run", "/abs/path/to/argocd_mcp/server.py"],
-      "env": {
-        "ARGOCD_TOKEN": argocd_token,
-        "ARGOCD_API_URL": argocd_api_url,
-        "ARGOCD_VERIFY_SSL": "false"
-      },
-      "transport": "stdio",
-    }
-  }
-) as client:
-  agent = create_react_agent(model, client.get_tools())
-```
-
-**Example (SSE transport):**
-
-```python
-async with MultiServerMCPClient(
-  {
-    "argocd": {
-      "transport": "sse",
-      "url": "http://localhost:8000"
-    }
-  }
-) as client:
-  ...
-```
-
----
 ## Evals
 
 ### Running Evals
