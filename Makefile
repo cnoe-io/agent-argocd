@@ -195,7 +195,7 @@ run-docker-a2a: ## Run the A2A agent in Docker
 	echo "Using Agent Port: $$LOCAL_A2A_AGENT_PORT"; \
 	echo "==================================================================="; \
 	docker run -p 0.0.0.0:$$LOCAL_A2A_AGENT_PORT:8000 -it \
-		--env-file .env \
+		-v $(PWD)/.env:/app/.env \
 		$$LOCAL_A2A_AGENT_IMAGE
 
 ## ========== Tests ==========
