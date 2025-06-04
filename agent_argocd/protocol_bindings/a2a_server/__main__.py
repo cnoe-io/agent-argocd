@@ -27,12 +27,16 @@ load_dotenv()
 
 
 @click.command()
-@click.option('--host', 'host', default='localhost')
-@click.option('--port', 'port', default=10000)
+@click.option('--host', 'host', default=None)
+@click.option('--port', 'port', default=None, type=int)
 def main(host: str, port: int):
-    if not os.getenv('GOOGLE_API_KEY'):
-        print('GOOGLE_API_KEY environment variable not set.')
-        sys.exit(1)
+    # Check environment variables for host and port if not provided via CLI
+    env_host = os.getenv('A2A_HOST')
+    env_port = os.getenv('A2A_PORT')
+
+    # Use CLI argument if provided, else environment variable, else default
+    host = host or env_host or 'localhost'
+    port = port or int(env_port) if env_port is not None else 8000
 
     client = httpx.AsyncClient()
     request_handler = DefaultRequestHandler(
