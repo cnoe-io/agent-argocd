@@ -80,7 +80,7 @@ async def run_chat_loop(handle_user_input: Callable[[str], Awaitable[None]], tit
               await spinner_task
             except asyncio.CancelledError:
               pass
-      except (KeyboardInterrupt, EOFError, asyncio.exceptions.CancelledError):
+      except (KeyboardInterrupt, EOFError):
         print("\n👋 Chat interrupted. Goodbye!")
         break
   finally:
