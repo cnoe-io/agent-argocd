@@ -29,10 +29,10 @@ async def gpgkeyservice_list(keyID: str = None) -> Dict[str, Any]:
     '''
     logger.debug("Making GET request to /api/v1/gpgkeys")
     params = {}
-    
+
     if keyID is not None:
       params["keyID"] = keyID
-    
+
     data = None
 
     success, response = await make_api_request(
@@ -63,13 +63,13 @@ async def gpgkeyservice_create(body: str, upsert: str = None) -> Dict[str, Any]:
     '''
     logger.debug("Making POST request to /api/v1/gpgkeys")
     params = {}
-    
+
     if body is not None:
       params["body"] = body
-    
+
     if upsert is not None:
       params["upsert"] = upsert
-    
+
     data = None
 
     # Add parameters to request
@@ -96,17 +96,18 @@ async def gpgkeyservice_delete(keyID: str = None) -> Dict[str, Any]:
         keyID (str, optional): The unique identifier of the GPG public key to delete. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The response from the server after attempting to delete the GPG key. Contains error information if the request fails.
+        Dict[str, Any]: The response from the server after attempting to delete the GPG key.
+                        Contains error information if the request fails.
 
     Raises:
         Exception: If there is an issue with the API request or server communication.
     '''
     logger.debug("Making DELETE request to /api/v1/gpgkeys")
     params = {}
-    
+
     if keyID is not None:
       params["keyID"] = keyID
-    
+
     data = None
 
     success, response = await make_api_request(

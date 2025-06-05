@@ -22,14 +22,15 @@ async def sessionservice_getuserinfo() -> Dict[str, Any]:
         None
 
     Returns:
-        Dict[str, Any]: A dictionary containing the current user's information. If the request fails, returns a dictionary with an 'error' key describing the failure.
+        Dict[str, Any]: A dictionary containing the current user's information.
+                        If the request fails, returns a dictionary with an 'error' key describing the failure.
 
     Raises:
         Exception: If there is an unexpected error during the API request.
     '''
     logger.debug("Making GET request to /api/v1/session/userinfo")
     params = {}
-    
+
     data = None
 
     success, response = await make_api_request(

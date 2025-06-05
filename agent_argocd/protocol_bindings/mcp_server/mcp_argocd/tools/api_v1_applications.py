@@ -14,7 +14,16 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def applicationservice_list(name: str = None, refresh: str = None, projects: str = None, resourceVersion: str = None, selector: str = None, repo: str = None, appNamespace: str = None, project: str = None) -> Dict[str, Any]:
+async def applicationservice_list(
+    name: str = None,
+    refresh: str = None,
+    projects: str = None,
+    resourceVersion: str = None,
+    selector: str = None,
+    repo: str = None,
+    appNamespace: str = None,
+    project: str = None
+  ) -> Dict[str, Any]:
     '''
     Retrieves a list of applications based on the provided filter criteria.
 
@@ -36,31 +45,31 @@ async def applicationservice_list(name: str = None, refresh: str = None, project
     '''
     logger.debug("Making GET request to /api/v1/applications")
     params = {}
-    
+
     if name is not None:
       params["name"] = name
-    
+
     if refresh is not None:
       params["refresh"] = refresh
-    
+
     if projects is not None:
       params["projects"] = projects
-    
+
     if resourceVersion is not None:
       params["resourceVersion"] = resourceVersion
-    
+
     if selector is not None:
       params["selector"] = selector
-    
+
     if repo is not None:
       params["repo"] = repo
-    
+
     if appNamespace is not None:
       params["appNamespace"] = appNamespace
-    
+
     if project is not None:
       params["project"] = project
-    
+
     data = None
 
     success, response = await make_api_request(
@@ -92,16 +101,16 @@ async def applicationservice_create(body: str, upsert: str = None, validate: str
     '''
     logger.debug("Making POST request to /api/v1/applications")
     params = {}
-    
+
     if body is not None:
       params["body"] = body
-    
+
     if upsert is not None:
       params["upsert"] = upsert
-    
+
     if validate is not None:
       params["validate"] = validate
-    
+
     data = None
 
     # Add parameters to request

@@ -14,7 +14,16 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def applicationservice_watch(name: str = None, refresh: str = None, projects: str = None, resourceVersion: str = None, selector: str = None, repo: str = None, appNamespace: str = None, project: str = None) -> Dict[str, Any]:
+async def applicationservice_watch(
+    name: str = None,
+    refresh: str = None,
+    projects: str = None,
+    resourceVersion: str = None,
+    selector: str = None,
+    repo: str = None,
+    appNamespace: str = None,
+    project: str = None
+  ) -> Dict[str, Any]:
     '''
     Watches and returns a stream of application change events.
 
@@ -36,31 +45,31 @@ async def applicationservice_watch(name: str = None, refresh: str = None, projec
     '''
     logger.debug("Making GET request to /api/v1/stream/applications")
     params = {}
-    
+
     if name is not None:
       params["name"] = name
-    
+
     if refresh is not None:
       params["refresh"] = refresh
-    
+
     if projects is not None:
       params["projects"] = projects
-    
+
     if resourceVersion is not None:
       params["resourceVersion"] = resourceVersion
-    
+
     if selector is not None:
       params["selector"] = selector
-    
+
     if repo is not None:
       params["repo"] = repo
-    
+
     if appNamespace is not None:
       params["appNamespace"] = appNamespace
-    
+
     if project is not None:
       params["project"] = project
-    
+
     data = None
 
     success, response = await make_api_request(

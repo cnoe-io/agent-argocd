@@ -22,17 +22,18 @@ async def repocredsservice_listwriterepositorycredentials(url: str = None) -> Di
         url (str, optional): The repository URL to filter credentials by. Defaults to None.
 
     Returns:
-        Dict[str, Any]: A dictionary containing the list of repository credential sets with write access, or an error message if the request fails.
+        Dict[str, Any]: A dictionary containing the list of repository credential sets with write access,
+                        or an error message if the request fails.
 
     Raises:
         Exception: If the API request encounters an unexpected error.
     '''
     logger.debug("Making GET request to /api/v1/write-repocreds")
     params = {}
-    
+
     if url is not None:
       params["url"] = url
-    
+
     data = None
 
     success, response = await make_api_request(
@@ -63,13 +64,13 @@ async def repocredsservice_createwriterepositorycredentials(body: str, upsert: s
     '''
     logger.debug("Making POST request to /api/v1/write-repocreds")
     params = {}
-    
+
     if body is not None:
       params["body"] = body
-    
+
     if upsert is not None:
       params["upsert"] = upsert
-    
+
     data = None
 
     # Add parameters to request

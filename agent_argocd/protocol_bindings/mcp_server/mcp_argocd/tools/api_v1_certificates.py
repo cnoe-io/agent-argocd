@@ -31,16 +31,16 @@ async def certificateservice_listcertificates(hostNamePattern: str = None, certT
     '''
     logger.debug("Making GET request to /api/v1/certificates")
     params = {}
-    
+
     if hostNamePattern is not None:
       params["hostNamePattern"] = hostNamePattern
-    
+
     if certType is not None:
       params["certType"] = certType
-    
+
     if certSubType is not None:
       params["certSubType"] = certSubType
-    
+
     data = None
 
     success, response = await make_api_request(
@@ -71,13 +71,13 @@ async def certificateservice_createcertificate(body: str, upsert: str = None) ->
     '''
     logger.debug("Making POST request to /api/v1/certificates")
     params = {}
-    
+
     if body is not None:
       params["body"] = body
-    
+
     if upsert is not None:
       params["upsert"] = upsert
-    
+
     data = None
 
     # Add parameters to request
@@ -96,7 +96,11 @@ async def certificateservice_createcertificate(body: str, upsert: str = None) ->
     return response
 
 
-async def certificateservice_deletecertificate(hostNamePattern: str = None, certType: str = None, certSubType: str = None) -> Dict[str, Any]:
+async def certificateservice_deletecertificate(
+    hostNamePattern: str = None,
+    certType: str = None,
+    certSubType: str = None
+  ) -> Dict[str, Any]:
     '''
     Deletes certificates that match the specified query parameters from the repository.
 
@@ -113,16 +117,16 @@ async def certificateservice_deletecertificate(hostNamePattern: str = None, cert
     '''
     logger.debug("Making DELETE request to /api/v1/certificates")
     params = {}
-    
+
     if hostNamePattern is not None:
       params["hostNamePattern"] = hostNamePattern
-    
+
     if certType is not None:
       params["certType"] = certType
-    
+
     if certSubType is not None:
       params["certSubType"] = certSubType
-    
+
     data = None
 
     success, response = await make_api_request(
