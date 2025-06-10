@@ -16,24 +16,20 @@ logger = logging.getLogger("mcp_tools")
 async def repository_service__list_repositories(
     param_repo: str = None, param_forceRefresh: str = None, param_appProject: str = None
 ) -> Dict[str, Any]:
-    """
-    ListRepositories gets a list of all configured repositories
-
-    OpenAPI Description:
-
+    '''
+    ListRepositories gets a list of all configured repositories.
 
     Args:
-    param_repo (str = None): OpenAPI parameter corresponding to 'param_repo'.
-    param_forceRefresh (str = None): OpenAPI parameter corresponding to 'param_forceRefresh'.
-    param_appProject (str = None): OpenAPI parameter corresponding to 'param_appProject'.
-
+        param_repo (str, optional): Repo URL for query. Defaults to None.
+        param_forceRefresh (str, optional): Whether to force a cache refresh on repo's connection state. Defaults to None.
+        param_appProject (str, optional): App project for query. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call containing the list of repositories.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/repositories")
 
     params = {}
@@ -54,23 +50,19 @@ async def repository_service__list_repositories(
 async def repository_service__create_repository(
     param_upsert: str = None, param_credsOnly: str = None
 ) -> Dict[str, Any]:
-    """
-    CreateRepository creates a new repository configuration
-
-    OpenAPI Description:
-
+    '''
+    Create a new repository configuration.
 
     Args:
-    param_upsert (str = None): OpenAPI parameter corresponding to 'param_upsert'.
-    param_credsOnly (str = None): OpenAPI parameter corresponding to 'param_credsOnly'.
-
+        param_upsert (str, optional): Whether to create in upsert mode. Defaults to None.
+        param_credsOnly (str, optional): Whether to operate on credential set instead of repository. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making POST request to /api/v1/repositories")
 
     params = {}

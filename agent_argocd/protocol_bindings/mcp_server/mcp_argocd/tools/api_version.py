@@ -14,21 +14,23 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def version_service__version() -> Dict[str, Any]:
-    """
-    Version returns version information of the API server
+    '''
+    Fetches version information of the API server.
 
-    OpenAPI Description:
-
+    This function makes an asynchronous GET request to the '/api/version' endpoint
+    to retrieve the version details of the API server.
 
     Args:
-
+        None
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: A dictionary containing the JSON response from the API call,
+        which includes version information of the API server.
 
     Raises:
-        Exception: If the API request fails or returns an error.
-    """
+        Exception: If the API request fails or returns an error, an exception is raised
+        with details of the failure.
+    '''
     logger.debug("Making GET request to /api/version")
 
     params = {}

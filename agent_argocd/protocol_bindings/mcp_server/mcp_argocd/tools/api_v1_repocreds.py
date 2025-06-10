@@ -14,22 +14,18 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def repo_creds_service__list_repository_credentials(param_url: str = None) -> Dict[str, Any]:
-    """
-    ListRepositoryCredentials gets a list of all configured repository credential sets
-
-    OpenAPI Description:
-
+    '''
+    ListRepositoryCredentials gets a list of all configured repository credential sets.
 
     Args:
-    param_url (str = None): OpenAPI parameter corresponding to 'param_url'.
-
+        param_url (str, optional): Repo URL for query. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call containing the list of repository credentials.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/repocreds")
 
     params = {}
@@ -46,22 +42,20 @@ async def repo_creds_service__list_repository_credentials(param_url: str = None)
 
 
 async def repo_creds_service__create_repository_credentials(param_upsert: str = None) -> Dict[str, Any]:
-    """
-    CreateRepositoryCredentials creates a new repository credential set
+    '''
+    Create a new repository credential set.
 
-    OpenAPI Description:
-
+    This function sends a POST request to the /api/v1/repocreds endpoint to create a new set of repository credentials. It can operate in upsert mode, which allows updating existing credentials if they already exist.
 
     Args:
-    param_upsert (str = None): OpenAPI parameter corresponding to 'param_upsert'.
-
+        param_upsert (str, optional): Specifies whether to create in upsert mode. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the details of the created or updated repository credentials.
 
     Raises:
-        Exception: If the API request fails or returns an error.
-    """
+        Exception: If the API request fails or returns an error, an exception is raised with the error details.
+    '''
     logger.debug("Making POST request to /api/v1/repocreds")
 
     params = {}

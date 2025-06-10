@@ -14,22 +14,18 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def repo_creds_service__update_repository_credentials(path_creds_url: str) -> Dict[str, Any]:
-    """
-    UpdateRepositoryCredentials updates a repository credential set
-
-    OpenAPI Description:
-
+    '''
+    Update a repository credential set.
 
     Args:
-    path_creds_url (str): OpenAPI parameter corresponding to 'path_creds_url'.
-
+        path_creds_url (str): The URL to which these credentials match.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making PUT request to /api/v1/repocreds/{creds.url}")
 
     params = {}

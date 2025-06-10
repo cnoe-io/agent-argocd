@@ -14,22 +14,18 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def project_service__get_detailed_project(path_name: str) -> Dict[str, Any]:
-    """
-    GetDetailedProject returns a project that include project, global project and scoped resources by name
-
-    OpenAPI Description:
-
+    '''
+    GetDetailedProject returns a project that includes project, global project, and scoped resources by name.
 
     Args:
-    path_name (str): OpenAPI parameter corresponding to 'path_name'.
-
+        path_name (str): The name of the project to retrieve detailed information for.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: A dictionary containing the detailed information of the project, including project, global project, and scoped resources.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/projects/{name}/detailed")
 
     params = {}

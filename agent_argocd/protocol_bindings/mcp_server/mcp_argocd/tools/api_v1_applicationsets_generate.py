@@ -14,21 +14,18 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def application_set_service__generate() -> Dict[str, Any]:
-    """
-    Generate generates
-
-    OpenAPI Description:
-
+    '''
+    Generates application set configurations by making a POST request to the specified API endpoint.
 
     Args:
-
+        None
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the generated application set configurations.
 
     Raises:
-        Exception: If the API request fails or returns an error.
-    """
+        Exception: If the API request fails or returns an error, an exception is raised with the error details.
+    '''
     logger.debug("Making POST request to /api/v1/applicationsets/generate")
 
     params = {}

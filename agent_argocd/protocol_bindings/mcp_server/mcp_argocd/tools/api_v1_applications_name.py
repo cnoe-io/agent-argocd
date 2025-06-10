@@ -23,29 +23,25 @@ async def application_service__get(
     param_appNamespace: str = None,
     param_project: str = None,
 ) -> Dict[str, Any]:
-    """
-    Get returns an application by name
-
-    OpenAPI Description:
-
+    '''
+    Get returns an application by name.
 
     Args:
-    path_name (str): OpenAPI parameter corresponding to 'path_name'.
-    param_refresh (str = None): OpenAPI parameter corresponding to 'param_refresh'.
-    param_projects (str = None): OpenAPI parameter corresponding to 'param_projects'.
-    param_resourceVersion (str = None): OpenAPI parameter corresponding to 'param_resourceVersion'.
-    param_selector (str = None): OpenAPI parameter corresponding to 'param_selector'.
-    param_repo (str = None): OpenAPI parameter corresponding to 'param_repo'.
-    param_appNamespace (str = None): OpenAPI parameter corresponding to 'param_appNamespace'.
-    param_project (str = None): OpenAPI parameter corresponding to 'param_project'.
-
+        path_name (str): The application's name.
+        param_refresh (str, optional): Forces application reconciliation if set to 'hard'. Defaults to None.
+        param_projects (str, optional): The project names to restrict returned list applications. Defaults to None.
+        param_resourceVersion (str, optional): When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to None.
+        param_selector (str, optional): The selector to restrict returned list to applications only with matched labels. Defaults to None.
+        param_repo (str, optional): The repoURL to restrict returned list applications. Defaults to None.
+        param_appNamespace (str, optional): The application's namespace. Defaults to None.
+        param_project (str, optional): The project names to restrict returned list applications (legacy name for backwards-compatibility). Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/applications/{name}")
 
     params = {}
@@ -76,26 +72,22 @@ async def application_service__delete(
     param_appNamespace: str = None,
     param_project: str = None,
 ) -> Dict[str, Any]:
-    """
-    Delete deletes an application
-
-    OpenAPI Description:
-
+    '''
+    Delete an application.
 
     Args:
-    path_name (str): OpenAPI parameter corresponding to 'path_name'.
-    param_cascade (str = None): OpenAPI parameter corresponding to 'param_cascade'.
-    param_propagationPolicy (str = None): OpenAPI parameter corresponding to 'param_propagationPolicy'.
-    param_appNamespace (str = None): OpenAPI parameter corresponding to 'param_appNamespace'.
-    param_project (str = None): OpenAPI parameter corresponding to 'param_project'.
-
+        path_name (str): The name of the application to delete.
+        param_cascade (str, optional): Determines if the deletion should cascade. Defaults to None.
+        param_propagationPolicy (str, optional): The propagation policy for the deletion. Defaults to None.
+        param_appNamespace (str, optional): The namespace of the application. Defaults to None.
+        param_project (str, optional): The project associated with the application. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making DELETE request to /api/v1/applications/{name}")
 
     params = {}

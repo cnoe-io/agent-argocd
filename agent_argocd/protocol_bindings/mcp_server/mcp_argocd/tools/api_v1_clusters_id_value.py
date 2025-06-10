@@ -16,25 +16,21 @@ logger = logging.getLogger("mcp_tools")
 async def cluster_service__get(
     path_id_value: str, param_server: str = None, param_name: str = None, param_id_type: str = None
 ) -> Dict[str, Any]:
-    """
-    Get returns a cluster by server address
-
-    OpenAPI Description:
-
+    '''
+    Get returns a cluster by server address.
 
     Args:
-    path_id_value (str): OpenAPI parameter corresponding to 'path_id_value'.
-    param_server (str = None): OpenAPI parameter corresponding to 'param_server'.
-    param_name (str = None): OpenAPI parameter corresponding to 'param_name'.
-    param_id_type (str = None): OpenAPI parameter corresponding to 'param_id_type'.
-
+        path_id_value (str): The cluster server URL or cluster name.
+        param_server (str, optional): OpenAPI parameter corresponding to 'param_server'. Defaults to None.
+        param_name (str, optional): OpenAPI parameter corresponding to 'param_name'. Defaults to None.
+        param_id_type (str, optional): The type of the specified cluster identifier ("server" - default, "name"). Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/clusters/{id.value}")
 
     params = {}
@@ -57,24 +53,20 @@ async def cluster_service__get(
 async def cluster_service__update(
     path_id_value: str, param_updatedFields: str = None, param_id_type: str = None
 ) -> Dict[str, Any]:
-    """
-    Update updates a cluster
-
-    OpenAPI Description:
-
+    '''
+    Updates a cluster with the specified parameters.
 
     Args:
-    path_id_value (str): OpenAPI parameter corresponding to 'path_id_value'.
-    param_updatedFields (str = None): OpenAPI parameter corresponding to 'param_updatedFields'.
-    param_id_type (str = None): OpenAPI parameter corresponding to 'param_id_type'.
-
+        path_id_value (str): The cluster server URL or cluster name.
+        param_updatedFields (str, optional): Specifies the fields to be updated in the cluster. Defaults to None.
+        param_id_type (str, optional): The type of the specified cluster identifier, either "server" (default) or "name". Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the result of the update operation.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making PUT request to /api/v1/clusters/{id.value}")
 
     params = {}
@@ -96,25 +88,21 @@ async def cluster_service__update(
 async def cluster_service__delete(
     path_id_value: str, param_server: str = None, param_name: str = None, param_id_type: str = None
 ) -> Dict[str, Any]:
-    """
-    Delete deletes a cluster
-
-    OpenAPI Description:
-
+    '''
+    Delete a cluster using the specified identifier.
 
     Args:
-    path_id_value (str): OpenAPI parameter corresponding to 'path_id_value'.
-    param_server (str = None): OpenAPI parameter corresponding to 'param_server'.
-    param_name (str = None): OpenAPI parameter corresponding to 'param_name'.
-    param_id_type (str = None): OpenAPI parameter corresponding to 'param_id_type'.
-
+        path_id_value (str): The cluster server URL or cluster name.
+        param_server (str, optional): OpenAPI parameter corresponding to 'param_server'. Defaults to None.
+        param_name (str, optional): OpenAPI parameter corresponding to 'param_name'. Defaults to None.
+        param_id_type (str, optional): The type of the specified cluster identifier ("server" - default, "name"). Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making DELETE request to /api/v1/clusters/{id.value}")
 
     params = {}

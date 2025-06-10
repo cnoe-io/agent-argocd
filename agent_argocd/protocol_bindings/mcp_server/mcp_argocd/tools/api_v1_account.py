@@ -14,21 +14,18 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def account_service__list_accounts() -> Dict[str, Any]:
-    """
-    ListAccounts returns the list of accounts
-
-    OpenAPI Description:
-
+    '''
+    ListAccounts returns the list of accounts.
 
     Args:
-
+        None
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call containing the list of accounts.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/account")
 
     params = {}

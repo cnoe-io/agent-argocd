@@ -14,22 +14,22 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def project_service__update(path_project_metadata_name: str) -> Dict[str, Any]:
-    """
-    Update updates a project
-
-    OpenAPI Description:
-
+    '''
+    Update a project with the specified metadata name.
 
     Args:
-    path_project_metadata_name (str): OpenAPI parameter corresponding to 'path_project_metadata_name'.
-
+        path_project_metadata_name (str): The unique name of the project within a namespace.
+            This name is required when creating resources, although some resources may allow
+            a client to request the generation of an appropriate name automatically. The name
+            is primarily intended for creation idempotence and configuration definition.
+            It cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the updated project details.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making PUT request to /api/v1/projects/{project.metadata.name}")
 
     params = {}

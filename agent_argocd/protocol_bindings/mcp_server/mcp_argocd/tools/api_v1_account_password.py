@@ -14,21 +14,21 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def account_service__update_password() -> Dict[str, Any]:
-    """
-    UpdatePassword updates an account's password to a new value
-
-    OpenAPI Description:
-
+    '''
+    Update an account's password to a new value.
 
     Args:
-
+        new_password (str): The new password to set for the account.
+        account_id (str): The unique identifier of the account whose password is being updated.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the status of the password update.
 
     Raises:
+        ValueError: If the new password does not meet security requirements.
+        ConnectionError: If there is a network issue preventing the API request.
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making PUT request to /api/v1/account/password")
 
     params = {}

@@ -14,24 +14,20 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def account_service__can_i(path_resource: str, path_action: str, path_subresource: str) -> Dict[str, Any]:
-    """
-    CanI checks if the current account has permission to perform an action
-
-    OpenAPI Description:
-
+    '''
+    CanI checks if the current account has permission to perform an action.
 
     Args:
-    path_resource (str): OpenAPI parameter corresponding to 'path_resource'.
-    path_action (str): OpenAPI parameter corresponding to 'path_action'.
-    path_subresource (str): OpenAPI parameter corresponding to 'path_subresource'.
-
+        path_resource (str): The resource path for which permission is being checked.
+        path_action (str): The action to be performed on the resource.
+        path_subresource (str): The subresource path related to the main resource.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call indicating whether the action is permitted.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/account/can-i/{resource}/{action}/{subresource}")
 
     params = {}

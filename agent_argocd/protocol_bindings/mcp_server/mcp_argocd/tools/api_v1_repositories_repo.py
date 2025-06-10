@@ -16,24 +16,20 @@ logger = logging.getLogger("mcp_tools")
 async def repository_service__get(
     path_repo: str, param_forceRefresh: str = None, param_appProject: str = None
 ) -> Dict[str, Any]:
-    """
-    Get returns a repository or its credentials
-
-    OpenAPI Description:
-
+    '''
+    Get returns a repository or its credentials.
 
     Args:
-    path_repo (str): OpenAPI parameter corresponding to 'path_repo'.
-    param_forceRefresh (str = None): OpenAPI parameter corresponding to 'param_forceRefresh'.
-    param_appProject (str = None): OpenAPI parameter corresponding to 'param_appProject'.
-
+        path_repo (str): The URL of the repository to query.
+        param_forceRefresh (str, optional): Indicates whether to force a cache refresh on the repository's connection state. Defaults to None.
+        param_appProject (str, optional): The application project associated with the query. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the repository details or credentials.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/repositories/{repo}")
 
     params = {}
@@ -55,24 +51,20 @@ async def repository_service__get(
 async def repository_service__delete_repository(
     path_repo: str, param_forceRefresh: str = None, param_appProject: str = None
 ) -> Dict[str, Any]:
-    """
-    DeleteRepository deletes a repository from the configuration
-
-    OpenAPI Description:
-
+    '''
+    DeleteRepository deletes a repository from the configuration.
 
     Args:
-    path_repo (str): OpenAPI parameter corresponding to 'path_repo'.
-    param_forceRefresh (str = None): OpenAPI parameter corresponding to 'param_forceRefresh'.
-    param_appProject (str = None): OpenAPI parameter corresponding to 'param_appProject'.
-
+        path_repo (str): Repo URL for query.
+        param_forceRefresh (str, optional): Whether to force a cache refresh on repo's connection state. Defaults to None.
+        param_appProject (str, optional): App project for query. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making DELETE request to /api/v1/repositories/{repo}")
 
     params = {}

@@ -21,27 +21,23 @@ async def application_service__revision_metadata(
     param_sourceIndex: str = None,
     param_versionId: str = None,
 ) -> Dict[str, Any]:
-    """
-    Get the meta-data (author, date, tags, message) for a specific revision of the application
-
-    OpenAPI Description:
-
+    '''
+    Get the meta-data (author, date, tags, message) for a specific revision of the application.
 
     Args:
-    path_name (str): OpenAPI parameter corresponding to 'path_name'.
-    path_revision (str): OpenAPI parameter corresponding to 'path_revision'.
-    param_appNamespace (str = None): OpenAPI parameter corresponding to 'param_appNamespace'.
-    param_project (str = None): OpenAPI parameter corresponding to 'param_project'.
-    param_sourceIndex (str = None): OpenAPI parameter corresponding to 'param_sourceIndex'.
-    param_versionId (str = None): OpenAPI parameter corresponding to 'param_versionId'.
-
+        path_name (str): The application's name.
+        path_revision (str): The revision of the application.
+        param_appNamespace (str, optional): The application's namespace. Defaults to None.
+        param_project (str, optional): OpenAPI parameter corresponding to 'param_project'. Defaults to None.
+        param_sourceIndex (str, optional): Source index for multi-source applications. Defaults to None.
+        param_versionId (str, optional): Version ID from historical data for multi-source applications. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call containing the metadata of the specified application revision.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making GET request to /api/v1/applications/{name}/revisions/{revision}/metadata")
 
     params = {}

@@ -14,22 +14,20 @@ logger = logging.getLogger("mcp_tools")
 
 
 async def cluster_service__invalidate_cache(path_id_value: str) -> Dict[str, Any]:
-    """
-    InvalidateCache invalidates cluster cache
+    '''
+    Invalidate the cache for a specified cluster.
 
-    OpenAPI Description:
-
+    This function sends a POST request to the cluster service to invalidate the cache associated with the given cluster identifier. The identifier can be either a cluster server URL or a cluster name.
 
     Args:
-    path_id_value (str): OpenAPI parameter corresponding to 'path_id_value'.
-
+        path_id_value (str): The cluster server URL or cluster name used to identify the cluster whose cache is to be invalidated.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, which includes the status of the cache invalidation request.
 
     Raises:
-        Exception: If the API request fails or returns an error.
-    """
+        Exception: If the API request fails or returns an error, an exception is raised with the error details.
+    '''
     logger.debug("Making POST request to /api/v1/clusters/{id.value}/invalidate-cache")
 
     params = {}

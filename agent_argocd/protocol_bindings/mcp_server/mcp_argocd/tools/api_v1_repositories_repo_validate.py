@@ -35,41 +35,37 @@ async def repository_service__validate_access(
     param_useAzureWorkloadIdentity: str = None,
     param_bearerToken: str = None,
 ) -> Dict[str, Any]:
-    """
-    ValidateAccess validates access to a repository with given parameters
-
-    OpenAPI Description:
-
+    '''
+    Validate access to a repository using the provided parameters.
 
     Args:
-    path_repo (str): OpenAPI parameter corresponding to 'path_repo'.
-    param_username (str = None): OpenAPI parameter corresponding to 'param_username'.
-    param_password (str = None): OpenAPI parameter corresponding to 'param_password'.
-    param_sshPrivateKey (str = None): OpenAPI parameter corresponding to 'param_sshPrivateKey'.
-    param_insecure (str = None): OpenAPI parameter corresponding to 'param_insecure'.
-    param_tlsClientCertData (str = None): OpenAPI parameter corresponding to 'param_tlsClientCertData'.
-    param_tlsClientCertKey (str = None): OpenAPI parameter corresponding to 'param_tlsClientCertKey'.
-    param_type (str = None): OpenAPI parameter corresponding to 'param_type'.
-    param_name (str = None): OpenAPI parameter corresponding to 'param_name'.
-    param_enableOci (str = None): OpenAPI parameter corresponding to 'param_enableOci'.
-    param_githubAppPrivateKey (str = None): OpenAPI parameter corresponding to 'param_githubAppPrivateKey'.
-    param_githubAppID (str = None): OpenAPI parameter corresponding to 'param_githubAppID'.
-    param_githubAppInstallationID (str = None): OpenAPI parameter corresponding to 'param_githubAppInstallationID'.
-    param_githubAppEnterpriseBaseUrl (str = None): OpenAPI parameter corresponding to 'param_githubAppEnterpriseBaseUrl'.
-    param_proxy (str = None): OpenAPI parameter corresponding to 'param_proxy'.
-    param_project (str = None): OpenAPI parameter corresponding to 'param_project'.
-    param_gcpServiceAccountKey (str = None): OpenAPI parameter corresponding to 'param_gcpServiceAccountKey'.
-    param_forceHttpBasicAuth (str = None): OpenAPI parameter corresponding to 'param_forceHttpBasicAuth'.
-    param_useAzureWorkloadIdentity (str = None): OpenAPI parameter corresponding to 'param_useAzureWorkloadIdentity'.
-    param_bearerToken (str = None): OpenAPI parameter corresponding to 'param_bearerToken'.
-
+        path_repo (str): The URL to the repository.
+        param_username (str, optional): Username for accessing the repository. Defaults to None.
+        param_password (str, optional): Password for accessing the repository. Defaults to None.
+        param_sshPrivateKey (str, optional): Private key data for accessing SSH repository. Defaults to None.
+        param_insecure (str, optional): Whether to skip certificate or host key validation. Defaults to None.
+        param_tlsClientCertData (str, optional): TLS client certificate data for accessing HTTPS repository. Defaults to None.
+        param_tlsClientCertKey (str, optional): TLS client certificate key for accessing HTTPS repository. Defaults to None.
+        param_type (str, optional): The type of the repository. Defaults to None.
+        param_name (str, optional): The name of the repository. Defaults to None.
+        param_enableOci (str, optional): Whether Helm-OCI support should be enabled for this repository. Defaults to None.
+        param_githubAppPrivateKey (str, optional): GitHub App Private Key PEM data. Defaults to None.
+        param_githubAppID (str, optional): GitHub App ID used to access the repository. Defaults to None.
+        param_githubAppInstallationID (str, optional): GitHub App Installation ID of the installed GitHub App. Defaults to None.
+        param_githubAppEnterpriseBaseUrl (str, optional): GitHub App Enterprise base URL. Defaults to 'https://api.github.com'.
+        param_proxy (str, optional): HTTP/HTTPS proxy to access the repository. Defaults to None.
+        param_project (str, optional): Reference between project and repository for automatic addition to SourceRepos project entity. Defaults to None.
+        param_gcpServiceAccountKey (str, optional): Google Cloud Platform service account key. Defaults to None.
+        param_forceHttpBasicAuth (str, optional): Whether to force HTTP basic authentication. Defaults to None.
+        param_useAzureWorkloadIdentity (str, optional): Whether to use Azure workload identity for authentication. Defaults to None.
+        param_bearerToken (str, optional): Bearer token used for Git authentication at the repository server. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.
-    """
+    '''
     logger.debug("Making POST request to /api/v1/repositories/{repo}/validate")
 
     params = {}

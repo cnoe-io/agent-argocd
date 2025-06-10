@@ -16,24 +16,20 @@ logger = logging.getLogger("mcp_tools")
 async def application_service__update(
     path_application_metadata_name: str, param_validate: str = None, param_project: str = None
 ) -> Dict[str, Any]:
-    """
-    Update updates an application
-
-    OpenAPI Description:
-
+    '''
+    Update an application using the specified metadata name.
 
     Args:
-    path_application_metadata_name (str): OpenAPI parameter corresponding to 'path_application_metadata_name'.
-    param_validate (str = None): OpenAPI parameter corresponding to 'param_validate'.
-    param_project (str = None): OpenAPI parameter corresponding to 'param_project'.
-
+        path_application_metadata_name (str): The unique name of the application within a namespace. This name is required for creating resources and is primarily used for creation idempotence and configuration definition. It cannot be updated. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names#names.
+        param_validate (str, optional): A parameter for validation purposes. Defaults to None.
+        param_project (str, optional): A parameter specifying the project context. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the result of the update operation.
 
     Raises:
-        Exception: If the API request fails or returns an error.
-    """
+        Exception: If the API request fails or returns an error, an exception is raised with the error details.
+    '''
     logger.debug("Making PUT request to /api/v1/applications/{application.metadata.name}")
 
     params = {}
