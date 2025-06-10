@@ -22,7 +22,7 @@ async def project_service__delete_token(
     Args:
         path_project (str): The project identifier in the API path.
         path_role (str): The role identifier in the API path.
-        path_iat (str): The issued-at timestamp identifier in the API path.
+        path_iat (str): The issued-at time identifier in the API path.
         param_id (str, optional): An optional parameter ID for the request. Defaults to None.
 
     Returns:

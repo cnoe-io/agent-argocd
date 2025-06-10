@@ -21,10 +21,10 @@ async def repo_creds_service__delete_write_repository_credentials(path_url: str)
         path_url (str): The URL path parameter specifying the repository credentials to delete.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call, containing the result of the deletion operation.
+        Dict[str, Any]: The JSON response from the API call, containing the result of the delete operation.
 
     Raises:
-        Exception: If the API request fails or returns an error, an exception is raised with the error details.
+        Exception: If the API request fails or returns an error.
     '''
     logger.debug("Making DELETE request to /api/v1/write-repocreds/{url}")
 

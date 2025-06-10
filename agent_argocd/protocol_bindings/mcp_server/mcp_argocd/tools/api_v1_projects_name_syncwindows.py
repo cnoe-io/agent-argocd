@@ -22,11 +22,11 @@ async def project_service__get_sync_windows_state(path_name: str) -> Dict[str, A
     retrieve the sync windows state.
 
     Args:
-        path_name (str): The name of the project path for which to retrieve the sync windows state.
+        path_name (str): The name of the project path for which to check the sync windows state.
 
     Returns:
         Dict[str, Any]: A dictionary containing the JSON response from the API call. The response
-        includes details about the sync windows state.
+        includes information about the sync windows state.
 
     Raises:
         Exception: If the API request fails or returns an error, an exception is raised with the

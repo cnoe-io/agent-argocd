@@ -45,16 +45,16 @@ async def application_service__pod_logs(
         param_sinceTime_seconds (str, optional): Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to 9999-12-31T23:59:59Z inclusive. Defaults to None.
         param_sinceTime_nanos (str, optional): Non-negative fractions of a second at nanosecond resolution. Must be from 0 to 999,999,999 inclusive. Defaults to None.
         param_tailLines (str, optional): The number of lines from the end of the logs to show. Defaults to None.
-        param_follow (str, optional): Whether to stream the logs. Defaults to None.
+        param_follow (str, optional): Whether to stream the logs continuously. Defaults to None.
         param_untilTime (str, optional): The time until which logs should be fetched. Defaults to None.
         param_filter (str, optional): Filter criteria for the logs. Defaults to None.
         param_kind (str, optional): The kind of resource. Defaults to None.
         param_group (str, optional): The group of the resource. Defaults to None.
         param_resourceName (str, optional): The name of the resource. Defaults to None.
-        param_previous (str, optional): Whether to fetch logs from the previous instance of the container. Defaults to None.
+        param_previous (str, optional): Whether to fetch logs from the previous instance of the pod. Defaults to None.
         param_appNamespace (str, optional): The namespace of the application. Defaults to None.
         param_project (str, optional): The project associated with the application. Defaults to None.
-        param_matchCase (str, optional): Whether to match case in the filter. Defaults to None.
+        param_matchCase (str, optional): Whether to match case in the filter criteria. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call containing the log entries.

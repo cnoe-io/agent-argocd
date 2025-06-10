@@ -37,7 +37,7 @@ async def application_service__list_resource_links(
         param_project (str, optional): The project associated with the resource. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call containing the list of resource links.
+        Dict[str, Any]: The JSON response from the API call containing the list of resource deep links.
 
     Raises:
         Exception: If the API request fails or returns an error.

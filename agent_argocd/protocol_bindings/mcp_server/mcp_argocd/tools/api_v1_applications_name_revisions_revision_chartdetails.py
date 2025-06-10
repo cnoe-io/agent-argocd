@@ -33,7 +33,7 @@ async def application_service__revision_chart_details(
         param_versionId (str, optional): Version ID from historical data for multi-source applications. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call containing the chart metadata.
+        Dict[str, Any]: The JSON response from the API call containing chart metadata.
 
     Raises:
         Exception: If the API request fails or returns an error.

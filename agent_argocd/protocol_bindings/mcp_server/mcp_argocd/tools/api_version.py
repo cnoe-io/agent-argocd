@@ -17,19 +17,19 @@ async def version_service__version() -> Dict[str, Any]:
     '''
     Fetches version information of the API server.
 
-    This function makes an asynchronous GET request to the '/api/version' endpoint
-    to retrieve the version details of the API server.
+    This function makes an asynchronous GET request to the API server's version endpoint
+    to retrieve version details.
 
     Args:
-        None
 
     Returns:
-        Dict[str, Any]: A dictionary containing the JSON response from the API call,
-        which includes version information of the API server.
+        Dict[str, Any]: A dictionary containing the JSON response from the API call, which
+        includes version information of the server. If the request fails, the dictionary
+        will contain an "error" key with the error message.
 
     Raises:
         Exception: If the API request fails or returns an error, an exception is raised
-        with details of the failure.
+        with the error details.
     '''
     logger.debug("Making GET request to /api/version")
 

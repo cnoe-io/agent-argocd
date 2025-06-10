@@ -23,7 +23,7 @@ async def cluster_service__rotate_auth(path_id_value: str) -> Dict[str, Any]:
         path_id_value (str): The identifier for the cluster, which can be either the cluster server URL or the cluster name.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call, which includes the status of the token rotation and any relevant data.
+        Dict[str, Any]: The JSON response from the API call, containing the result of the token rotation operation.
 
     Raises:
         Exception: If the API request fails or returns an error, an exception is raised with the error details.

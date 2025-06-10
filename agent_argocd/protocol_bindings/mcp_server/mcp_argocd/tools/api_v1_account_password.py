@@ -13,26 +13,34 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
-async def account_service__update_password() -> Dict[str, Any]:
+async def account_service__update_password(
+    body_current_password: str = None, body_name: str = None, body_new_password: str = None
+) -> Dict[str, Any]:
     '''
-    Update an account's password to a new value.
+    UpdatePassword updates an account's password to a new value.
 
     Args:
-        new_password (str): The new password to set for the account.
-        account_id (str): The unique identifier of the account whose password is being updated.
+        body_current_password (str): The current password of the account.
+        body_name (str): The name associated with the account.
+        body_new_password (str): The new password to be set for the account.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call, containing the status of the password update.
+        Dict[str, Any]: The JSON response from the API call, containing the result of the password update operation.
 
     Raises:
-        ValueError: If the new password does not meet security requirements.
-        ConnectionError: If there is a network issue preventing the API request.
-        Exception: If the API request fails or returns an error.
+        Exception: If the API request fails or returns an error, an exception is raised with the error details.
     '''
     logger.debug("Making PUT request to /api/v1/account/password")
 
     params = {}
     data = {}
+
+    if body_current_password:
+        data["current_password"] = body_current_password
+    if body_name:
+        data["name"] = body_name
+    if body_new_password:
+        data["new_password"] = body_new_password
 
     success, response = await make_api_request("/api/v1/account/password", method="PUT", params=params, data=data)
 

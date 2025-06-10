@@ -19,14 +19,14 @@ async def notification_service__list_services() -> Dict[str, Any]:
 
     This function makes an asynchronous GET request to the notification service API
     endpoint to retrieve a list of all available services. It returns the JSON response
-    containing the service details.
+    from the API call, which includes details about each service.
 
     Args:
         None
 
     Returns:
         Dict[str, Any]: A dictionary containing the JSON response from the API call,
-        which includes details of the notification services.
+        which includes a list of notification services and their details.
 
     Raises:
         Exception: If the API request fails or returns an error, an exception is raised

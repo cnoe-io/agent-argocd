@@ -37,7 +37,7 @@ async def application_service__watch(
         param_project (str, optional): The project names to restrict returned list applications (legacy name for backwards-compatibility). Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call containing application change events.
+        Dict[str, Any]: The JSON response from the API call.
 
     Raises:
         Exception: If the API request fails or returns an error.

@@ -22,13 +22,13 @@ async def application_service__get_manifests(
     param_revisions: str = None,
 ) -> Dict[str, Any]:
     '''
-    GetManifests returns application manifests.
+    Get application manifests.
 
     Args:
-        path_name (str): The name of the path for the application manifests.
-        param_revision (str, optional): The revision of the application. Defaults to None.
+        path_name (str): The path name of the application.
+        param_revision (str, optional): The specific revision of the application. Defaults to None.
         param_appNamespace (str, optional): The namespace of the application. Defaults to None.
-        param_project (str, optional): The project associated with the application. Defaults to None.
+        param_project (str, optional): The project to which the application belongs. Defaults to None.
         param_sourcePositions (str, optional): The source positions for the application. Defaults to None.
         param_revisions (str, optional): The revisions of the application. Defaults to None.
 
