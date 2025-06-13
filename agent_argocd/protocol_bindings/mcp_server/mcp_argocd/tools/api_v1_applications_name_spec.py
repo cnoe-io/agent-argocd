@@ -8,6 +8,30 @@ import logging
 from typing import Dict, Any, List
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains invalid keys that cannot be split into parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
@@ -18,46 +42,46 @@ async def application_service__update_spec(
     body_destination_name: str = None,
     body_destination_namespace: str = None,
     body_destination_server: str = None,
-    body_ignore_differences: List[str] = None,
+    body_ignoreDifferences: List[str] = None,
     body_info: List[str] = None,
     body_project: str = None,
-    body_revision_history_limit: int = None,
+    body_revisionHistoryLimit: int = None,
     body_source_chart: str = None,
     body_source_directory_exclude: str = None,
     body_source_directory_include: str = None,
-    body_source_directory_jsonnet_ext_vars: List[str] = None,
+    body_source_directory_jsonnet_extVars: List[str] = None,
     body_source_directory_jsonnet_libs: List[str] = None,
     body_source_directory_jsonnet_tlas: List[str] = None,
     body_source_directory_recurse: bool = None,
-    body_source_helm_api_versions: List[str] = None,
-    body_source_helm_file_parameters: List[str] = None,
-    body_source_helm_ignore_missing_value_files: bool = None,
-    body_source_helm_kube_version: str = None,
+    body_source_helm_apiVersions: List[str] = None,
+    body_source_helm_fileParameters: List[str] = None,
+    body_source_helm_ignoreMissingValueFiles: bool = None,
+    body_source_helm_kubeVersion: str = None,
     body_source_helm_namespace: str = None,
     body_source_helm_parameters: List[str] = None,
-    body_source_helm_pass_credentials: bool = None,
-    body_source_helm_release_name: str = None,
-    body_source_helm_skip_crds: bool = None,
-    body_source_helm_skip_schema_validation: bool = None,
-    body_source_helm_skip_tests: bool = None,
-    body_source_helm_value_files: List[str] = None,
+    body_source_helm_passCredentials: bool = None,
+    body_source_helm_releaseName: str = None,
+    body_source_helm_skipCrds: bool = None,
+    body_source_helm_skipSchemaValidation: bool = None,
+    body_source_helm_skipTests: bool = None,
+    body_source_helm_valueFiles: List[str] = None,
     body_source_helm_values: str = None,
-    body_source_helm_values_object_raw: str = None,
+    body_source_helm_valuesObject_raw: str = None,
     body_source_helm_version: str = None,
-    body_source_kustomize_api_versions: List[str] = None,
-    body_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_source_kustomize_common_annotations_envsubst: bool = None,
-    body_source_kustomize_common_labels: Dict[str, Any] = None,
+    body_source_kustomize_apiVersions: List[str] = None,
+    body_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_source_kustomize_commonLabels: Dict[str, Any] = None,
     body_source_kustomize_components: List[str] = None,
-    body_source_kustomize_force_common_annotations: bool = None,
-    body_source_kustomize_force_common_labels: bool = None,
-    body_source_kustomize_ignore_missing_components: bool = None,
+    body_source_kustomize_forceCommonAnnotations: bool = None,
+    body_source_kustomize_forceCommonLabels: bool = None,
+    body_source_kustomize_ignoreMissingComponents: bool = None,
     body_source_kustomize_images: List[str] = None,
-    body_source_kustomize_kube_version: str = None,
-    body_source_kustomize_label_include_templates: bool = None,
-    body_source_kustomize_label_without_selector: bool = None,
-    body_source_kustomize_name_prefix: str = None,
-    body_source_kustomize_name_suffix: str = None,
+    body_source_kustomize_kubeVersion: str = None,
+    body_source_kustomize_labelIncludeTemplates: bool = None,
+    body_source_kustomize_labelWithoutSelector: bool = None,
+    body_source_kustomize_namePrefix: str = None,
+    body_source_kustomize_nameSuffix: str = None,
     body_source_kustomize_namespace: str = None,
     body_source_kustomize_patches: List[str] = None,
     body_source_kustomize_replicas: List[str] = None,
@@ -68,27 +92,27 @@ async def application_service__update_spec(
     body_source_plugin_name: str = None,
     body_source_plugin_parameters: List[str] = None,
     body_source_ref: str = None,
-    body_source_repo_url: str = None,
-    body_source_target_revision: str = None,
-    body_source_hydrator_dry_source_path: str = None,
-    body_source_hydrator_dry_source_repo_url: str = None,
-    body_source_hydrator_dry_source_target_revision: str = None,
-    body_source_hydrator_hydrate_to_target_branch: str = None,
-    body_source_hydrator_sync_source_path: str = None,
-    body_source_hydrator_sync_source_target_branch: str = None,
+    body_source_repoURL: str = None,
+    body_source_targetRevision: str = None,
+    body_sourceHydrator_drySource_path: str = None,
+    body_sourceHydrator_drySource_repoURL: str = None,
+    body_sourceHydrator_drySource_targetRevision: str = None,
+    body_sourceHydrator_hydrateTo_targetBranch: str = None,
+    body_sourceHydrator_syncSource_path: str = None,
+    body_sourceHydrator_syncSource_targetBranch: str = None,
     body_sources: List[str] = None,
-    body_sync_policy_automated_allow_empty: bool = None,
-    body_sync_policy_automated_enable: bool = None,
-    body_sync_policy_automated_prune: bool = None,
-    body_sync_policy_automated_self_heal: bool = None,
-    body_sync_policy_managed_namespace_metadata_annotations: Dict[str, Any] = None,
-    body_sync_policy_managed_namespace_metadata_labels: Dict[str, Any] = None,
-    body_sync_policy_retry_backoff_duration: str = None,
-    body_sync_policy_retry_backoff_factor: int = None,
-    body_sync_policy_retry_backoff_max_duration: str = None,
-    body_sync_policy_retry_limit: int = None,
-    body_sync_policy_sync_options: List[str] = None,
-    param_validate: str = None,
+    body_syncPolicy_automated_allowEmpty: bool = None,
+    body_syncPolicy_automated_enable: bool = None,
+    body_syncPolicy_automated_prune: bool = None,
+    body_syncPolicy_automated_selfHeal: bool = None,
+    body_syncPolicy_managedNamespaceMetadata_annotations: Dict[str, Any] = None,
+    body_syncPolicy_managedNamespaceMetadata_labels: Dict[str, Any] = None,
+    body_syncPolicy_retry_backoff_duration: str = None,
+    body_syncPolicy_retry_backoff_factor: int = None,
+    body_syncPolicy_retry_backoff_maxDuration: str = None,
+    body_syncPolicy_retry_limit: int = None,
+    body_syncPolicy_syncOptions: List[str] = None,
+    param_validate: bool = False,
     param_appNamespace: str = None,
     param_project: str = None,
 ) -> Dict[str, Any]:
@@ -98,79 +122,79 @@ async def application_service__update_spec(
     Args:
         path_name (str): The name of the path for the application spec.
         body_destination_name (str, optional): Name is an alternate way of specifying the target cluster by its symbolic name. This must be set if Server is not set. Defaults to None.
-        body_destination_namespace (str, optional): The namespace for the destination. Defaults to None.
+        body_destination_namespace (str, optional): The namespace of the destination cluster. Defaults to None.
         body_destination_server (str, optional): Server specifies the URL of the target cluster's Kubernetes control plane API. This must be set if Name is not set. Defaults to None.
-        body_ignore_differences (List[str], optional): List of differences to ignore. Defaults to None.
+        body_ignoreDifferences (List[str], optional): List of differences to ignore during sync. Defaults to None.
         body_info (List[str], optional): Additional information about the application. Defaults to None.
         body_project (str, optional): Project is a reference to the project this application belongs to. The empty string means that application belongs to the 'default' project. Defaults to None.
-        body_revision_history_limit (int, optional): Limits the number of items kept in the application's revision history. Defaults to None.
+        body_revisionHistoryLimit (int, optional): Limits the number of items kept in the application's revision history. Defaults to None.
         body_source_chart (str, optional): Chart is a Helm chart name, and must be specified for applications sourced from a Helm repo. Defaults to None.
         body_source_directory_exclude (str, optional): Directory paths to exclude. Defaults to None.
         body_source_directory_include (str, optional): Directory paths to include. Defaults to None.
-        body_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables. Defaults to None.
-        body_source_directory_jsonnet_libs (List[str], optional): Jsonnet library paths. Defaults to None.
-        body_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments. Defaults to None.
+        body_source_directory_jsonnet_extVars (List[str], optional): External variables for Jsonnet. Defaults to None.
+        body_source_directory_jsonnet_libs (List[str], optional): Libraries for Jsonnet. Defaults to None.
+        body_source_directory_jsonnet_tlas (List[str], optional): Top-level arguments for Jsonnet. Defaults to None.
         body_source_directory_recurse (bool, optional): Whether to recurse into directories. Defaults to None.
-        body_source_helm_api_versions (List[str], optional): Kubernetes resource API versions to pass to Helm. Defaults to None.
-        body_source_helm_file_parameters (List[str], optional): Helm file parameters. Defaults to None.
-        body_source_helm_ignore_missing_value_files (bool, optional): Whether to ignore missing value files in Helm. Defaults to None.
-        body_source_helm_kube_version (str, optional): Kubernetes API version to pass to Helm. Defaults to None.
-        body_source_helm_namespace (str, optional): Namespace to template with. Defaults to None.
-        body_source_helm_parameters (List[str], optional): Helm parameters. Defaults to None.
-        body_source_helm_pass_credentials (bool, optional): Whether to pass credentials to Helm. Defaults to None.
-        body_source_helm_release_name (str, optional): Helm release name. Defaults to None.
-        body_source_helm_skip_crds (bool, optional): Whether to skip CRDs in Helm. Defaults to None.
-        body_source_helm_skip_schema_validation (bool, optional): Whether to skip schema validation in Helm. Defaults to None.
-        body_source_helm_skip_tests (bool, optional): Whether to skip tests in Helm. Defaults to None.
-        body_source_helm_value_files (List[str], optional): Helm value files. Defaults to None.
-        body_source_helm_values (str, optional): Helm values. Defaults to None.
-        body_source_helm_values_object_raw (str, optional): Raw serialization of Helm values object. Defaults to None.
-        body_source_helm_version (str, optional): Helm version. Defaults to None.
-        body_source_kustomize_api_versions (List[str], optional): Kubernetes resource API versions for Kustomize. Defaults to None.
-        body_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations for Kustomize. Defaults to None.
-        body_source_kustomize_common_annotations_envsubst (bool, optional): Whether to substitute environment variables in common annotations. Defaults to None.
-        body_source_kustomize_common_labels (Dict[str, Any], optional): Common labels for Kustomize. Defaults to None.
-        body_source_kustomize_components (List[str], optional): Kustomize components. Defaults to None.
-        body_source_kustomize_force_common_annotations (bool, optional): Whether to force common annotations in Kustomize. Defaults to None.
-        body_source_kustomize_force_common_labels (bool, optional): Whether to force common labels in Kustomize. Defaults to None.
-        body_source_kustomize_ignore_missing_components (bool, optional): Whether to ignore missing components in Kustomize. Defaults to None.
-        body_source_kustomize_images (List[str], optional): Kustomize images. Defaults to None.
-        body_source_kustomize_kube_version (str, optional): Kubernetes API version for Kustomize. Defaults to None.
-        body_source_kustomize_label_include_templates (bool, optional): Whether to include templates in labels for Kustomize. Defaults to None.
-        body_source_kustomize_label_without_selector (bool, optional): Whether to label without selector in Kustomize. Defaults to None.
-        body_source_kustomize_name_prefix (str, optional): Name prefix for Kustomize. Defaults to None.
-        body_source_kustomize_name_suffix (str, optional): Name suffix for Kustomize. Defaults to None.
+        body_source_helm_apiVersions (List[str], optional): Kubernetes resource API versions to pass to Helm. Defaults to None.
+        body_source_helm_fileParameters (List[str], optional): File parameters for Helm. Defaults to None.
+        body_source_helm_ignoreMissingValueFiles (bool, optional): Whether to ignore missing value files in Helm. Defaults to None.
+        body_source_helm_kubeVersion (str, optional): Kubernetes API version to pass to Helm. Defaults to None.
+        body_source_helm_namespace (str, optional): Namespace to template with Helm. Defaults to None.
+        body_source_helm_parameters (List[str], optional): Parameters for Helm. Defaults to None.
+        body_source_helm_passCredentials (bool, optional): Whether to pass credentials to Helm. Defaults to None.
+        body_source_helm_releaseName (str, optional): Release name for Helm. Defaults to None.
+        body_source_helm_skipCrds (bool, optional): Whether to skip CRDs in Helm. Defaults to None.
+        body_source_helm_skipSchemaValidation (bool, optional): Whether to skip schema validation in Helm. Defaults to None.
+        body_source_helm_skipTests (bool, optional): Whether to skip tests in Helm. Defaults to None.
+        body_source_helm_valueFiles (List[str], optional): Value files for Helm. Defaults to None.
+        body_source_helm_values (str, optional): Values for Helm. Defaults to None.
+        body_source_helm_valuesObject_raw (str, optional): Raw serialization of Helm values object. Defaults to None.
+        body_source_helm_version (str, optional): Version of Helm. Defaults to None.
+        body_source_kustomize_apiVersions (List[str], optional): Kubernetes resource API versions for Kustomize. Defaults to None.
+        body_source_kustomize_commonAnnotations (Dict[str, Any], optional): Common annotations for Kustomize. Defaults to None.
+        body_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Whether to substitute environment variables in common annotations for Kustomize. Defaults to None.
+        body_source_kustomize_commonLabels (Dict[str, Any], optional): Common labels for Kustomize. Defaults to None.
+        body_source_kustomize_components (List[str], optional): Components for Kustomize. Defaults to None.
+        body_source_kustomize_forceCommonAnnotations (bool, optional): Whether to force common annotations in Kustomize. Defaults to None.
+        body_source_kustomize_forceCommonLabels (bool, optional): Whether to force common labels in Kustomize. Defaults to None.
+        body_source_kustomize_ignoreMissingComponents (bool, optional): Whether to ignore missing components in Kustomize. Defaults to None.
+        body_source_kustomize_images (List[str], optional): Images for Kustomize. Defaults to None.
+        body_source_kustomize_kubeVersion (str, optional): Kubernetes API version for Kustomize. Defaults to None.
+        body_source_kustomize_labelIncludeTemplates (bool, optional): Whether to include templates in labels for Kustomize. Defaults to None.
+        body_source_kustomize_labelWithoutSelector (bool, optional): Whether to label without selector in Kustomize. Defaults to None.
+        body_source_kustomize_namePrefix (str, optional): Name prefix for Kustomize. Defaults to None.
+        body_source_kustomize_nameSuffix (str, optional): Name suffix for Kustomize. Defaults to None.
         body_source_kustomize_namespace (str, optional): Namespace for Kustomize. Defaults to None.
         body_source_kustomize_patches (List[str], optional): Patches for Kustomize. Defaults to None.
         body_source_kustomize_replicas (List[str], optional): Replicas for Kustomize. Defaults to None.
-        body_source_kustomize_version (str, optional): Kustomize version. Defaults to None.
-        body_source_name (str, optional): Name used to refer to a source. Defaults to None.
+        body_source_kustomize_version (str, optional): Version of Kustomize. Defaults to None.
+        body_source_name (str, optional): Name used to refer to a source and displayed in the UI. Defaults to None.
         body_source_path (str, optional): Directory path within the Git repository. Defaults to None.
-        body_source_plugin_env (List[str], optional): Plugin environment variables. Defaults to None.
-        body_source_plugin_name (str, optional): Plugin name. Defaults to None.
-        body_source_plugin_parameters (List[str], optional): Plugin parameters. Defaults to None.
-        body_source_ref (str, optional): Reference to another source. Defaults to None.
-        body_source_repo_url (str, optional): Repository URL for the source. Defaults to None.
-        body_source_target_revision (str, optional): Target revision for the source. Defaults to None.
-        body_source_hydrator_dry_source_path (str, optional): Dry source path for hydrator. Defaults to None.
-        body_source_hydrator_dry_source_repo_url (str, optional): Dry source repository URL for hydrator. Defaults to None.
-        body_source_hydrator_dry_source_target_revision (str, optional): Dry source target revision for hydrator. Defaults to None.
-        body_source_hydrator_hydrate_to_target_branch (str, optional): Target branch for hydrator. Defaults to None.
-        body_source_hydrator_sync_source_path (str, optional): Sync source path for hydrator. Defaults to None.
-        body_source_hydrator_sync_source_target_branch (str, optional): Sync source target branch for hydrator. Defaults to None.
+        body_source_plugin_env (List[str], optional): Environment variables for source plugin. Defaults to None.
+        body_source_plugin_name (str, optional): Name of the source plugin. Defaults to None.
+        body_source_plugin_parameters (List[str], optional): Parameters for source plugin. Defaults to None.
+        body_source_ref (str, optional): Reference to another source within sources field. Defaults to None.
+        body_source_repoURL (str, optional): Repository URL for the source. Defaults to None.
+        body_source_targetRevision (str, optional): Revision of the source to sync the application to. Defaults to None.
+        body_sourceHydrator_drySource_path (str, optional): Path for dry source hydrator. Defaults to None.
+        body_sourceHydrator_drySource_repoURL (str, optional): Repository URL for dry source hydrator. Defaults to None.
+        body_sourceHydrator_drySource_targetRevision (str, optional): Target revision for dry source hydrator. Defaults to None.
+        body_sourceHydrator_hydrateTo_targetBranch (str, optional): Target branch for hydrate-to operation. Defaults to None.
+        body_sourceHydrator_syncSource_path (str, optional): Path for sync source hydrator. Defaults to None.
+        body_sourceHydrator_syncSource_targetBranch (str, optional): Target branch for sync source hydrator. Defaults to None.
         body_sources (List[str], optional): List of sources. Defaults to None.
-        body_sync_policy_automated_allow_empty (bool, optional): Whether to allow empty sync policy. Defaults to None.
-        body_sync_policy_automated_enable (bool, optional): Whether to enable automated sync policy. Defaults to None.
-        body_sync_policy_automated_prune (bool, optional): Whether to prune in automated sync policy. Defaults to None.
-        body_sync_policy_automated_self_heal (bool, optional): Whether to self-heal in automated sync policy. Defaults to None.
-        body_sync_policy_managed_namespace_metadata_annotations (Dict[str, Any], optional): Metadata annotations for managed namespace. Defaults to None.
-        body_sync_policy_managed_namespace_metadata_labels (Dict[str, Any], optional): Metadata labels for managed namespace. Defaults to None.
-        body_sync_policy_retry_backoff_duration (str, optional): Retry backoff duration. Defaults to None.
-        body_sync_policy_retry_backoff_factor (int, optional): Retry backoff factor. Defaults to None.
-        body_sync_policy_retry_backoff_max_duration (str, optional): Maximum retry backoff duration. Defaults to None.
-        body_sync_policy_retry_limit (int, optional): Maximum number of retry attempts. Defaults to None.
-        body_sync_policy_sync_options (List[str], optional): Sync options. Defaults to None.
-        param_validate (str, optional): Validation parameter. Defaults to None.
+        body_syncPolicy_automated_allowEmpty (bool, optional): Whether to allow empty sync policy. Defaults to None.
+        body_syncPolicy_automated_enable (bool, optional): Whether to enable automated sync policy. Defaults to None.
+        body_syncPolicy_automated_prune (bool, optional): Whether to prune during automated sync policy. Defaults to None.
+        body_syncPolicy_automated_selfHeal (bool, optional): Whether to self-heal during automated sync policy. Defaults to None.
+        body_syncPolicy_managedNamespaceMetadata_annotations (Dict[str, Any], optional): Annotations for managed namespace metadata. Defaults to None.
+        body_syncPolicy_managedNamespaceMetadata_labels (Dict[str, Any], optional): Labels for managed namespace metadata. Defaults to None.
+        body_syncPolicy_retry_backoff_duration (str, optional): Duration for retry backoff. Defaults to None.
+        body_syncPolicy_retry_backoff_factor (int, optional): Factor for retry backoff. Defaults to None.
+        body_syncPolicy_retry_backoff_maxDuration (str, optional): Maximum duration for retry backoff. Defaults to None.
+        body_syncPolicy_retry_limit (int, optional): Limit for retry attempts. Defaults to None.
+        body_syncPolicy_syncOptions (List[str], optional): Sync options for the policy. Defaults to None.
+        param_validate (bool, optional): Whether to validate the parameters. Defaults to False.
         param_appNamespace (str, optional): Application namespace parameter. Defaults to None.
         param_project (str, optional): Project parameter. Defaults to None.
 
@@ -185,158 +209,164 @@ async def application_service__update_spec(
     params = {}
     data = {}
 
-    params["validate"] = param_validate
-    params["appNamespace"] = param_appNamespace
-    params["project"] = param_project
+    params["validate"] = str(param_validate).lower() if isinstance(param_validate, bool) else param_validate
 
-    if body_destination_name:
-        data["destination_name"] = body_destination_name
-    if body_destination_namespace:
-        data["destination_namespace"] = body_destination_namespace
-    if body_destination_server:
-        data["destination_server"] = body_destination_server
-    if body_ignore_differences:
-        data["ignore_differences"] = body_ignore_differences
-    if body_info:
-        data["info"] = body_info
-    if body_project:
-        data["project"] = body_project
-    if body_revision_history_limit:
-        data["revision_history_limit"] = body_revision_history_limit
-    if body_source_chart:
-        data["source_chart"] = body_source_chart
-    if body_source_directory_exclude:
-        data["source_directory_exclude"] = body_source_directory_exclude
-    if body_source_directory_include:
-        data["source_directory_include"] = body_source_directory_include
-    if body_source_directory_jsonnet_ext_vars:
-        data["source_directory_jsonnet_ext_vars"] = body_source_directory_jsonnet_ext_vars
-    if body_source_directory_jsonnet_libs:
-        data["source_directory_jsonnet_libs"] = body_source_directory_jsonnet_libs
-    if body_source_directory_jsonnet_tlas:
-        data["source_directory_jsonnet_tlas"] = body_source_directory_jsonnet_tlas
-    if body_source_directory_recurse:
-        data["source_directory_recurse"] = body_source_directory_recurse
-    if body_source_helm_api_versions:
-        data["source_helm_api_versions"] = body_source_helm_api_versions
-    if body_source_helm_file_parameters:
-        data["source_helm_file_parameters"] = body_source_helm_file_parameters
-    if body_source_helm_ignore_missing_value_files:
-        data["source_helm_ignore_missing_value_files"] = body_source_helm_ignore_missing_value_files
-    if body_source_helm_kube_version:
-        data["source_helm_kube_version"] = body_source_helm_kube_version
-    if body_source_helm_namespace:
-        data["source_helm_namespace"] = body_source_helm_namespace
-    if body_source_helm_parameters:
-        data["source_helm_parameters"] = body_source_helm_parameters
-    if body_source_helm_pass_credentials:
-        data["source_helm_pass_credentials"] = body_source_helm_pass_credentials
-    if body_source_helm_release_name:
-        data["source_helm_release_name"] = body_source_helm_release_name
-    if body_source_helm_skip_crds:
-        data["source_helm_skip_crds"] = body_source_helm_skip_crds
-    if body_source_helm_skip_schema_validation:
-        data["source_helm_skip_schema_validation"] = body_source_helm_skip_schema_validation
-    if body_source_helm_skip_tests:
-        data["source_helm_skip_tests"] = body_source_helm_skip_tests
-    if body_source_helm_value_files:
-        data["source_helm_value_files"] = body_source_helm_value_files
-    if body_source_helm_values:
-        data["source_helm_values"] = body_source_helm_values
-    if body_source_helm_values_object_raw:
-        data["source_helm_values_object_raw"] = body_source_helm_values_object_raw
-    if body_source_helm_version:
-        data["source_helm_version"] = body_source_helm_version
-    if body_source_kustomize_api_versions:
-        data["source_kustomize_api_versions"] = body_source_kustomize_api_versions
-    if body_source_kustomize_common_annotations:
-        data["source_kustomize_common_annotations"] = body_source_kustomize_common_annotations
-    if body_source_kustomize_common_annotations_envsubst:
-        data["source_kustomize_common_annotations_envsubst"] = body_source_kustomize_common_annotations_envsubst
-    if body_source_kustomize_common_labels:
-        data["source_kustomize_common_labels"] = body_source_kustomize_common_labels
-    if body_source_kustomize_components:
-        data["source_kustomize_components"] = body_source_kustomize_components
-    if body_source_kustomize_force_common_annotations:
-        data["source_kustomize_force_common_annotations"] = body_source_kustomize_force_common_annotations
-    if body_source_kustomize_force_common_labels:
-        data["source_kustomize_force_common_labels"] = body_source_kustomize_force_common_labels
-    if body_source_kustomize_ignore_missing_components:
-        data["source_kustomize_ignore_missing_components"] = body_source_kustomize_ignore_missing_components
-    if body_source_kustomize_images:
-        data["source_kustomize_images"] = body_source_kustomize_images
-    if body_source_kustomize_kube_version:
-        data["source_kustomize_kube_version"] = body_source_kustomize_kube_version
-    if body_source_kustomize_label_include_templates:
-        data["source_kustomize_label_include_templates"] = body_source_kustomize_label_include_templates
-    if body_source_kustomize_label_without_selector:
-        data["source_kustomize_label_without_selector"] = body_source_kustomize_label_without_selector
-    if body_source_kustomize_name_prefix:
-        data["source_kustomize_name_prefix"] = body_source_kustomize_name_prefix
-    if body_source_kustomize_name_suffix:
-        data["source_kustomize_name_suffix"] = body_source_kustomize_name_suffix
-    if body_source_kustomize_namespace:
-        data["source_kustomize_namespace"] = body_source_kustomize_namespace
-    if body_source_kustomize_patches:
-        data["source_kustomize_patches"] = body_source_kustomize_patches
-    if body_source_kustomize_replicas:
-        data["source_kustomize_replicas"] = body_source_kustomize_replicas
-    if body_source_kustomize_version:
-        data["source_kustomize_version"] = body_source_kustomize_version
-    if body_source_name:
-        data["source_name"] = body_source_name
-    if body_source_path:
-        data["source_path"] = body_source_path
-    if body_source_plugin_env:
-        data["source_plugin_env"] = body_source_plugin_env
-    if body_source_plugin_name:
-        data["source_plugin_name"] = body_source_plugin_name
-    if body_source_plugin_parameters:
-        data["source_plugin_parameters"] = body_source_plugin_parameters
-    if body_source_ref:
-        data["source_ref"] = body_source_ref
-    if body_source_repo_url:
-        data["source_repo_url"] = body_source_repo_url
-    if body_source_target_revision:
-        data["source_target_revision"] = body_source_target_revision
-    if body_source_hydrator_dry_source_path:
-        data["source_hydrator_dry_source_path"] = body_source_hydrator_dry_source_path
-    if body_source_hydrator_dry_source_repo_url:
-        data["source_hydrator_dry_source_repo_url"] = body_source_hydrator_dry_source_repo_url
-    if body_source_hydrator_dry_source_target_revision:
-        data["source_hydrator_dry_source_target_revision"] = body_source_hydrator_dry_source_target_revision
-    if body_source_hydrator_hydrate_to_target_branch:
-        data["source_hydrator_hydrate_to_target_branch"] = body_source_hydrator_hydrate_to_target_branch
-    if body_source_hydrator_sync_source_path:
-        data["source_hydrator_sync_source_path"] = body_source_hydrator_sync_source_path
-    if body_source_hydrator_sync_source_target_branch:
-        data["source_hydrator_sync_source_target_branch"] = body_source_hydrator_sync_source_target_branch
-    if body_sources:
-        data["sources"] = body_sources
-    if body_sync_policy_automated_allow_empty:
-        data["sync_policy_automated_allow_empty"] = body_sync_policy_automated_allow_empty
-    if body_sync_policy_automated_enable:
-        data["sync_policy_automated_enable"] = body_sync_policy_automated_enable
-    if body_sync_policy_automated_prune:
-        data["sync_policy_automated_prune"] = body_sync_policy_automated_prune
-    if body_sync_policy_automated_self_heal:
-        data["sync_policy_automated_self_heal"] = body_sync_policy_automated_self_heal
-    if body_sync_policy_managed_namespace_metadata_annotations:
-        data["sync_policy_managed_namespace_metadata_annotations"] = (
-            body_sync_policy_managed_namespace_metadata_annotations
+    params["appNamespace"] = (
+        str(param_appNamespace).lower() if isinstance(param_appNamespace, bool) else param_appNamespace
+    )
+
+    params["project"] = str(param_project).lower() if isinstance(param_project, bool) else param_project
+
+    flat_body = {}
+    if body_destination_name is not None:
+        flat_body["destination_name"] = body_destination_name
+    if body_destination_namespace is not None:
+        flat_body["destination_namespace"] = body_destination_namespace
+    if body_destination_server is not None:
+        flat_body["destination_server"] = body_destination_server
+    if body_ignoreDifferences is not None:
+        flat_body["ignoreDifferences"] = body_ignoreDifferences
+    if body_info is not None:
+        flat_body["info"] = body_info
+    if body_project is not None:
+        flat_body["project"] = body_project
+    if body_revisionHistoryLimit is not None:
+        flat_body["revisionHistoryLimit"] = body_revisionHistoryLimit
+    if body_source_chart is not None:
+        flat_body["source_chart"] = body_source_chart
+    if body_source_directory_exclude is not None:
+        flat_body["source_directory_exclude"] = body_source_directory_exclude
+    if body_source_directory_include is not None:
+        flat_body["source_directory_include"] = body_source_directory_include
+    if body_source_directory_jsonnet_extVars is not None:
+        flat_body["source_directory_jsonnet_extVars"] = body_source_directory_jsonnet_extVars
+    if body_source_directory_jsonnet_libs is not None:
+        flat_body["source_directory_jsonnet_libs"] = body_source_directory_jsonnet_libs
+    if body_source_directory_jsonnet_tlas is not None:
+        flat_body["source_directory_jsonnet_tlas"] = body_source_directory_jsonnet_tlas
+    if body_source_directory_recurse is not None:
+        flat_body["source_directory_recurse"] = body_source_directory_recurse
+    if body_source_helm_apiVersions is not None:
+        flat_body["source_helm_apiVersions"] = body_source_helm_apiVersions
+    if body_source_helm_fileParameters is not None:
+        flat_body["source_helm_fileParameters"] = body_source_helm_fileParameters
+    if body_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["source_helm_ignoreMissingValueFiles"] = body_source_helm_ignoreMissingValueFiles
+    if body_source_helm_kubeVersion is not None:
+        flat_body["source_helm_kubeVersion"] = body_source_helm_kubeVersion
+    if body_source_helm_namespace is not None:
+        flat_body["source_helm_namespace"] = body_source_helm_namespace
+    if body_source_helm_parameters is not None:
+        flat_body["source_helm_parameters"] = body_source_helm_parameters
+    if body_source_helm_passCredentials is not None:
+        flat_body["source_helm_passCredentials"] = body_source_helm_passCredentials
+    if body_source_helm_releaseName is not None:
+        flat_body["source_helm_releaseName"] = body_source_helm_releaseName
+    if body_source_helm_skipCrds is not None:
+        flat_body["source_helm_skipCrds"] = body_source_helm_skipCrds
+    if body_source_helm_skipSchemaValidation is not None:
+        flat_body["source_helm_skipSchemaValidation"] = body_source_helm_skipSchemaValidation
+    if body_source_helm_skipTests is not None:
+        flat_body["source_helm_skipTests"] = body_source_helm_skipTests
+    if body_source_helm_valueFiles is not None:
+        flat_body["source_helm_valueFiles"] = body_source_helm_valueFiles
+    if body_source_helm_values is not None:
+        flat_body["source_helm_values"] = body_source_helm_values
+    if body_source_helm_valuesObject_raw is not None:
+        flat_body["source_helm_valuesObject_raw"] = body_source_helm_valuesObject_raw
+    if body_source_helm_version is not None:
+        flat_body["source_helm_version"] = body_source_helm_version
+    if body_source_kustomize_apiVersions is not None:
+        flat_body["source_kustomize_apiVersions"] = body_source_kustomize_apiVersions
+    if body_source_kustomize_commonAnnotations is not None:
+        flat_body["source_kustomize_commonAnnotations"] = body_source_kustomize_commonAnnotations
+    if body_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["source_kustomize_commonAnnotationsEnvsubst"] = body_source_kustomize_commonAnnotationsEnvsubst
+    if body_source_kustomize_commonLabels is not None:
+        flat_body["source_kustomize_commonLabels"] = body_source_kustomize_commonLabels
+    if body_source_kustomize_components is not None:
+        flat_body["source_kustomize_components"] = body_source_kustomize_components
+    if body_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["source_kustomize_forceCommonAnnotations"] = body_source_kustomize_forceCommonAnnotations
+    if body_source_kustomize_forceCommonLabels is not None:
+        flat_body["source_kustomize_forceCommonLabels"] = body_source_kustomize_forceCommonLabels
+    if body_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["source_kustomize_ignoreMissingComponents"] = body_source_kustomize_ignoreMissingComponents
+    if body_source_kustomize_images is not None:
+        flat_body["source_kustomize_images"] = body_source_kustomize_images
+    if body_source_kustomize_kubeVersion is not None:
+        flat_body["source_kustomize_kubeVersion"] = body_source_kustomize_kubeVersion
+    if body_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["source_kustomize_labelIncludeTemplates"] = body_source_kustomize_labelIncludeTemplates
+    if body_source_kustomize_labelWithoutSelector is not None:
+        flat_body["source_kustomize_labelWithoutSelector"] = body_source_kustomize_labelWithoutSelector
+    if body_source_kustomize_namePrefix is not None:
+        flat_body["source_kustomize_namePrefix"] = body_source_kustomize_namePrefix
+    if body_source_kustomize_nameSuffix is not None:
+        flat_body["source_kustomize_nameSuffix"] = body_source_kustomize_nameSuffix
+    if body_source_kustomize_namespace is not None:
+        flat_body["source_kustomize_namespace"] = body_source_kustomize_namespace
+    if body_source_kustomize_patches is not None:
+        flat_body["source_kustomize_patches"] = body_source_kustomize_patches
+    if body_source_kustomize_replicas is not None:
+        flat_body["source_kustomize_replicas"] = body_source_kustomize_replicas
+    if body_source_kustomize_version is not None:
+        flat_body["source_kustomize_version"] = body_source_kustomize_version
+    if body_source_name is not None:
+        flat_body["source_name"] = body_source_name
+    if body_source_path is not None:
+        flat_body["source_path"] = body_source_path
+    if body_source_plugin_env is not None:
+        flat_body["source_plugin_env"] = body_source_plugin_env
+    if body_source_plugin_name is not None:
+        flat_body["source_plugin_name"] = body_source_plugin_name
+    if body_source_plugin_parameters is not None:
+        flat_body["source_plugin_parameters"] = body_source_plugin_parameters
+    if body_source_ref is not None:
+        flat_body["source_ref"] = body_source_ref
+    if body_source_repoURL is not None:
+        flat_body["source_repoURL"] = body_source_repoURL
+    if body_source_targetRevision is not None:
+        flat_body["source_targetRevision"] = body_source_targetRevision
+    if body_sourceHydrator_drySource_path is not None:
+        flat_body["sourceHydrator_drySource_path"] = body_sourceHydrator_drySource_path
+    if body_sourceHydrator_drySource_repoURL is not None:
+        flat_body["sourceHydrator_drySource_repoURL"] = body_sourceHydrator_drySource_repoURL
+    if body_sourceHydrator_drySource_targetRevision is not None:
+        flat_body["sourceHydrator_drySource_targetRevision"] = body_sourceHydrator_drySource_targetRevision
+    if body_sourceHydrator_hydrateTo_targetBranch is not None:
+        flat_body["sourceHydrator_hydrateTo_targetBranch"] = body_sourceHydrator_hydrateTo_targetBranch
+    if body_sourceHydrator_syncSource_path is not None:
+        flat_body["sourceHydrator_syncSource_path"] = body_sourceHydrator_syncSource_path
+    if body_sourceHydrator_syncSource_targetBranch is not None:
+        flat_body["sourceHydrator_syncSource_targetBranch"] = body_sourceHydrator_syncSource_targetBranch
+    if body_sources is not None:
+        flat_body["sources"] = body_sources
+    if body_syncPolicy_automated_allowEmpty is not None:
+        flat_body["syncPolicy_automated_allowEmpty"] = body_syncPolicy_automated_allowEmpty
+    if body_syncPolicy_automated_enable is not None:
+        flat_body["syncPolicy_automated_enable"] = body_syncPolicy_automated_enable
+    if body_syncPolicy_automated_prune is not None:
+        flat_body["syncPolicy_automated_prune"] = body_syncPolicy_automated_prune
+    if body_syncPolicy_automated_selfHeal is not None:
+        flat_body["syncPolicy_automated_selfHeal"] = body_syncPolicy_automated_selfHeal
+    if body_syncPolicy_managedNamespaceMetadata_annotations is not None:
+        flat_body["syncPolicy_managedNamespaceMetadata_annotations"] = (
+            body_syncPolicy_managedNamespaceMetadata_annotations
         )
-    if body_sync_policy_managed_namespace_metadata_labels:
-        data["sync_policy_managed_namespace_metadata_labels"] = body_sync_policy_managed_namespace_metadata_labels
-    if body_sync_policy_retry_backoff_duration:
-        data["sync_policy_retry_backoff_duration"] = body_sync_policy_retry_backoff_duration
-    if body_sync_policy_retry_backoff_factor:
-        data["sync_policy_retry_backoff_factor"] = body_sync_policy_retry_backoff_factor
-    if body_sync_policy_retry_backoff_max_duration:
-        data["sync_policy_retry_backoff_max_duration"] = body_sync_policy_retry_backoff_max_duration
-    if body_sync_policy_retry_limit:
-        data["sync_policy_retry_limit"] = body_sync_policy_retry_limit
-    if body_sync_policy_sync_options:
-        data["sync_policy_sync_options"] = body_sync_policy_sync_options
+    if body_syncPolicy_managedNamespaceMetadata_labels is not None:
+        flat_body["syncPolicy_managedNamespaceMetadata_labels"] = body_syncPolicy_managedNamespaceMetadata_labels
+    if body_syncPolicy_retry_backoff_duration is not None:
+        flat_body["syncPolicy_retry_backoff_duration"] = body_syncPolicy_retry_backoff_duration
+    if body_syncPolicy_retry_backoff_factor is not None:
+        flat_body["syncPolicy_retry_backoff_factor"] = body_syncPolicy_retry_backoff_factor
+    if body_syncPolicy_retry_backoff_maxDuration is not None:
+        flat_body["syncPolicy_retry_backoff_maxDuration"] = body_syncPolicy_retry_backoff_maxDuration
+    if body_syncPolicy_retry_limit is not None:
+        flat_body["syncPolicy_retry_limit"] = body_syncPolicy_retry_limit
+    if body_syncPolicy_syncOptions is not None:
+        flat_body["syncPolicy_syncOptions"] = body_syncPolicy_syncOptions
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request(
         f"/api/v1/applications/{path_name}/spec", method="PUT", params=params, data=data

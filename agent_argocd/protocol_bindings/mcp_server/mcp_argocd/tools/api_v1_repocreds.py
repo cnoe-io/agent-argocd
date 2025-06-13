@@ -8,6 +8,30 @@ import logging
 from typing import Dict, Any
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains keys that cannot be split into valid parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
@@ -15,10 +39,10 @@ logger = logging.getLogger("mcp_tools")
 
 async def repo_creds_service__list_repository_credentials(param_url: str = None) -> Dict[str, Any]:
     '''
-    ListRepositoryCredentials gets a list of all configured repository credential sets.
+    List all configured repository credential sets.
 
     Args:
-        param_url (str, optional): Repo URL for query. Defaults to None.
+        param_url (str, optional): The repository URL for the query. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call containing the list of repository credentials.
@@ -31,7 +55,10 @@ async def repo_creds_service__list_repository_credentials(param_url: str = None)
     params = {}
     data = {}
 
-    params["url"] = param_url
+    params["url"] = str(param_url).lower() if isinstance(param_url, bool) else param_url
+
+    flat_body = {}
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/repocreds", method="GET", params=params, data=data)
 
@@ -42,49 +69,49 @@ async def repo_creds_service__list_repository_credentials(param_url: str = None)
 
 
 async def repo_creds_service__create_repository_credentials(
-    body_bearer_token: str = None,
-    body_enable_oci: bool = None,
-    body_force_http_basic_auth: bool = None,
-    body_gcp_service_account_key: str = None,
-    body_github_app_enterprise_base_url: str = None,
-    body_github_app_id: int = None,
-    body_github_app_installation_id: int = None,
-    body_github_app_private_key: str = None,
-    body_no_proxy: str = None,
+    body_bearerToken: str = None,
+    body_enableOCI: bool = None,
+    body_forceHttpBasicAuth: bool = None,
+    body_gcpServiceAccountKey: str = None,
+    body_githubAppEnterpriseBaseUrl: str = None,
+    body_githubAppID: int = None,
+    body_githubAppInstallationID: int = None,
+    body_githubAppPrivateKey: str = None,
+    body_noProxy: str = None,
     body_password: str = None,
     body_proxy: str = None,
-    body_ssh_private_key: str = None,
-    body_tls_client_cert_data: str = None,
-    body_tls_client_cert_key: str = None,
+    body_sshPrivateKey: str = None,
+    body_tlsClientCertData: str = None,
+    body_tlsClientCertKey: str = None,
     body_type: str = None,
     body_url: str = None,
-    body_use_azure_workload_identity: bool = None,
+    body_useAzureWorkloadIdentity: bool = None,
     body_username: str = None,
-    param_upsert: str = None,
+    param_upsert: bool = False,
 ) -> Dict[str, Any]:
     '''
-    CreateRepositoryCredentials creates a new repository credential set.
+    Create a new repository credential set.
 
     Args:
-        body_bearer_token (str, optional): The bearer token for authentication. Defaults to None.
-        body_enable_oci (bool, optional): Flag to enable OCI support. Defaults to None.
-        body_force_http_basic_auth (bool, optional): Flag to force HTTP basic authentication. Defaults to None.
-        body_gcp_service_account_key (str, optional): The GCP service account key. Defaults to None.
-        body_github_app_enterprise_base_url (str, optional): The base URL for GitHub App Enterprise. Defaults to None.
-        body_github_app_id (int, optional): The GitHub App ID. Defaults to None.
-        body_github_app_installation_id (int, optional): The GitHub App installation ID. Defaults to None.
-        body_github_app_private_key (str, optional): The private key for the GitHub App. Defaults to None.
-        body_no_proxy (str, optional): The no-proxy setting. Defaults to None.
-        body_password (str, optional): The password for authentication. Defaults to None.
-        body_proxy (str, optional): The proxy setting. Defaults to None.
-        body_ssh_private_key (str, optional): The SSH private key. Defaults to None.
-        body_tls_client_cert_data (str, optional): The TLS client certificate data. Defaults to None.
-        body_tls_client_cert_key (str, optional): The TLS client certificate key. Defaults to None.
-        body_type (str, optional): Specifies the type of the repository credentials, either "git" or "helm". Defaults to "git" if empty or absent. Defaults to None.
-        body_url (str, optional): The URL of the repository. Defaults to None.
-        body_use_azure_workload_identity (bool, optional): Flag to use Azure workload identity. Defaults to None.
-        body_username (str, optional): The username for authentication. Defaults to None.
-        param_upsert (str, optional): Specifies whether to create in upsert mode. Defaults to None.
+        body_bearerToken (str, optional): The bearer token for authentication. Defaults to None.
+        body_enableOCI (bool, optional): Flag to enable OCI. Defaults to None.
+        body_forceHttpBasicAuth (bool, optional): Flag to force HTTP basic authentication. Defaults to None.
+        body_gcpServiceAccountKey (str, optional): GCP service account key. Defaults to None.
+        body_githubAppEnterpriseBaseUrl (str, optional): GitHub App Enterprise base URL. Defaults to None.
+        body_githubAppID (int, optional): GitHub App ID. Defaults to None.
+        body_githubAppInstallationID (int, optional): GitHub App Installation ID. Defaults to None.
+        body_githubAppPrivateKey (str, optional): GitHub App private key. Defaults to None.
+        body_noProxy (str, optional): No proxy setting. Defaults to None.
+        body_password (str, optional): Password for authentication. Defaults to None.
+        body_proxy (str, optional): Proxy setting. Defaults to None.
+        body_sshPrivateKey (str, optional): SSH private key. Defaults to None.
+        body_tlsClientCertData (str, optional): TLS client certificate data. Defaults to None.
+        body_tlsClientCertKey (str, optional): TLS client certificate key. Defaults to None.
+        body_type (str, optional): Type of the repository credentials, either "git" or "helm". Defaults to "git" if empty or absent.
+        body_url (str, optional): URL of the repository. Defaults to None.
+        body_useAzureWorkloadIdentity (bool, optional): Flag to use Azure Workload Identity. Defaults to None.
+        body_username (str, optional): Username for authentication. Defaults to None.
+        param_upsert (bool): Whether to create in upsert mode. Defaults to False.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
@@ -97,44 +124,46 @@ async def repo_creds_service__create_repository_credentials(
     params = {}
     data = {}
 
-    params["upsert"] = param_upsert
+    params["upsert"] = str(param_upsert).lower() if isinstance(param_upsert, bool) else param_upsert
 
-    if body_bearer_token:
-        data["bearer_token"] = body_bearer_token
-    if body_enable_oci:
-        data["enable_oci"] = body_enable_oci
-    if body_force_http_basic_auth:
-        data["force_http_basic_auth"] = body_force_http_basic_auth
-    if body_gcp_service_account_key:
-        data["gcp_service_account_key"] = body_gcp_service_account_key
-    if body_github_app_enterprise_base_url:
-        data["github_app_enterprise_base_url"] = body_github_app_enterprise_base_url
-    if body_github_app_id:
-        data["github_app_id"] = body_github_app_id
-    if body_github_app_installation_id:
-        data["github_app_installation_id"] = body_github_app_installation_id
-    if body_github_app_private_key:
-        data["github_app_private_key"] = body_github_app_private_key
-    if body_no_proxy:
-        data["no_proxy"] = body_no_proxy
-    if body_password:
-        data["password"] = body_password
-    if body_proxy:
-        data["proxy"] = body_proxy
-    if body_ssh_private_key:
-        data["ssh_private_key"] = body_ssh_private_key
-    if body_tls_client_cert_data:
-        data["tls_client_cert_data"] = body_tls_client_cert_data
-    if body_tls_client_cert_key:
-        data["tls_client_cert_key"] = body_tls_client_cert_key
-    if body_type:
-        data["type"] = body_type
-    if body_url:
-        data["url"] = body_url
-    if body_use_azure_workload_identity:
-        data["use_azure_workload_identity"] = body_use_azure_workload_identity
-    if body_username:
-        data["username"] = body_username
+    flat_body = {}
+    if body_bearerToken is not None:
+        flat_body["bearerToken"] = body_bearerToken
+    if body_enableOCI is not None:
+        flat_body["enableOCI"] = body_enableOCI
+    if body_forceHttpBasicAuth is not None:
+        flat_body["forceHttpBasicAuth"] = body_forceHttpBasicAuth
+    if body_gcpServiceAccountKey is not None:
+        flat_body["gcpServiceAccountKey"] = body_gcpServiceAccountKey
+    if body_githubAppEnterpriseBaseUrl is not None:
+        flat_body["githubAppEnterpriseBaseUrl"] = body_githubAppEnterpriseBaseUrl
+    if body_githubAppID is not None:
+        flat_body["githubAppID"] = body_githubAppID
+    if body_githubAppInstallationID is not None:
+        flat_body["githubAppInstallationID"] = body_githubAppInstallationID
+    if body_githubAppPrivateKey is not None:
+        flat_body["githubAppPrivateKey"] = body_githubAppPrivateKey
+    if body_noProxy is not None:
+        flat_body["noProxy"] = body_noProxy
+    if body_password is not None:
+        flat_body["password"] = body_password
+    if body_proxy is not None:
+        flat_body["proxy"] = body_proxy
+    if body_sshPrivateKey is not None:
+        flat_body["sshPrivateKey"] = body_sshPrivateKey
+    if body_tlsClientCertData is not None:
+        flat_body["tlsClientCertData"] = body_tlsClientCertData
+    if body_tlsClientCertKey is not None:
+        flat_body["tlsClientCertKey"] = body_tlsClientCertKey
+    if body_type is not None:
+        flat_body["type"] = body_type
+    if body_url is not None:
+        flat_body["url"] = body_url
+    if body_useAzureWorkloadIdentity is not None:
+        flat_body["useAzureWorkloadIdentity"] = body_useAzureWorkloadIdentity
+    if body_username is not None:
+        flat_body["username"] = body_username
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/repocreds", method="POST", params=params, data=data)
 

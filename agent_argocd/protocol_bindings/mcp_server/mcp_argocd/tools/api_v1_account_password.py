@@ -8,21 +8,45 @@ import logging
 from typing import Dict, Any
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains invalid keys that cannot be split into parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
 async def account_service__update_password(
-    body_current_password: str = None, body_name: str = None, body_new_password: str = None
+    body_currentPassword: str = None, body_name: str = None, body_newPassword: str = None
 ) -> Dict[str, Any]:
     '''
-    UpdatePassword updates an account's password to a new value.
+    Update an account's password to a new value.
 
     Args:
-        body_current_password (str): The current password of the account.
+        body_currentPassword (str): The current password of the account.
         body_name (str): The name associated with the account.
-        body_new_password (str): The new password to be set for the account.
+        body_newPassword (str): The new password to be set for the account.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call, containing the result of the password update operation.
@@ -35,12 +59,14 @@ async def account_service__update_password(
     params = {}
     data = {}
 
-    if body_current_password:
-        data["current_password"] = body_current_password
-    if body_name:
-        data["name"] = body_name
-    if body_new_password:
-        data["new_password"] = body_new_password
+    flat_body = {}
+    if body_currentPassword is not None:
+        flat_body["currentPassword"] = body_currentPassword
+    if body_name is not None:
+        flat_body["name"] = body_name
+    if body_newPassword is not None:
+        flat_body["newPassword"] = body_newPassword
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/account/password", method="PUT", params=params, data=data)
 

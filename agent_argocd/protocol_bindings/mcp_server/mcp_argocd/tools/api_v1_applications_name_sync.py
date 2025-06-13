@@ -8,6 +8,30 @@ import logging
 from typing import Dict, Any, List
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains invalid keys that cannot be split into parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
@@ -15,48 +39,48 @@ logger = logging.getLogger("mcp_tools")
 
 async def application_service__sync(
     path_name: str,
-    body_app_namespace: str = None,
-    body_dry_run: bool = None,
+    body_appNamespace: str = None,
+    body_dryRun: bool = None,
     body_infos: List[str] = None,
     body_manifests: List[str] = None,
     body_name: str = None,
     body_project: str = None,
     body_prune: bool = None,
     body_resources: List[str] = None,
-    body_retry_strategy_backoff_duration: str = None,
-    body_retry_strategy_backoff_factor: int = None,
-    body_retry_strategy_backoff_max_duration: str = None,
-    body_retry_strategy_limit: int = None,
+    body_retryStrategy_backoff_duration: str = None,
+    body_retryStrategy_backoff_factor: int = None,
+    body_retryStrategy_backoff_maxDuration: str = None,
+    body_retryStrategy_limit: int = None,
     body_revision: str = None,
     body_revisions: List[str] = None,
-    body_source_positions: List[str] = None,
+    body_sourcePositions: List[str] = None,
     body_strategy_apply_force: bool = None,
-    body_strategy_hook_sync_strategy_apply_force: bool = None,
-    body_sync_options_items: List[str] = None,
+    body_strategy_hook_syncStrategyApply_force: bool = None,
+    body_syncOptions_items: List[str] = None,
 ) -> Dict[str, Any]:
     '''
     Syncs an application to its target state.
 
     Args:
-        path_name (str): The name of the path for the application.
-        body_app_namespace (str, optional): The namespace of the application. Defaults to None.
-        body_dry_run (bool, optional): Indicates if the sync should be a dry run. Defaults to None.
-        body_infos (List[str], optional): Additional information for the sync operation. Defaults to None.
+        path_name (str): The name of the application path.
+        body_appNamespace (str, optional): The namespace of the application. Defaults to None.
+        body_dryRun (bool, optional): Indicates whether the sync should be a dry run. Defaults to None.
+        body_infos (List[str], optional): Additional information related to the sync process. Defaults to None.
         body_manifests (List[str], optional): The manifests to be applied during the sync. Defaults to None.
         body_name (str, optional): The name of the application. Defaults to None.
         body_project (str, optional): The project associated with the application. Defaults to None.
-        body_prune (bool, optional): Indicates if resources should be pruned during the sync. Defaults to None.
+        body_prune (bool, optional): Indicates whether resources should be pruned during the sync. Defaults to None.
         body_resources (List[str], optional): Specific resources to be synced. Defaults to None.
-        body_retry_strategy_backoff_duration (str, optional): Duration for retry strategy backoff. Defaults to None.
-        body_retry_strategy_backoff_factor (int, optional): Factor for retry strategy backoff. Defaults to None.
-        body_retry_strategy_backoff_max_duration (str, optional): Maximum duration for retry strategy backoff. Defaults to None.
-        body_retry_strategy_limit (int, optional): Maximum number of retry attempts for a failed sync. Defaults to None.
+        body_retryStrategy_backoff_duration (str, optional): Duration for backoff in retry strategy. Defaults to None.
+        body_retryStrategy_backoff_factor (int, optional): Factor for backoff in retry strategy. Defaults to None.
+        body_retryStrategy_backoff_maxDuration (str, optional): Maximum duration for backoff in retry strategy. Defaults to None.
+        body_retryStrategy_limit (int, optional): Maximum number of attempts for retrying a failed sync. Defaults to None.
         body_revision (str, optional): The revision to be synced. Defaults to None.
-        body_revisions (List[str], optional): List of revisions to be synced. Defaults to None.
-        body_source_positions (List[str], optional): Source positions for the sync operation. Defaults to None.
-        body_strategy_apply_force (bool, optional): Indicates if the --force flag should be used for `kubectl apply`. Defaults to None.
-        body_strategy_hook_sync_strategy_apply_force (bool, optional): Indicates if the --force flag should be used for hook sync strategy. Defaults to None.
-        body_sync_options_items (List[str], optional): Additional sync options. Defaults to None.
+        body_revisions (List[str], optional): List of revisions to be considered during sync. Defaults to None.
+        body_sourcePositions (List[str], optional): Positions of sources involved in the sync. Defaults to None.
+        body_strategy_apply_force (bool, optional): Indicates whether to use the --force flag with `kubectl apply`. Defaults to None.
+        body_strategy_hook_syncStrategyApply_force (bool, optional): Indicates whether to use the --force flag with `kubectl apply` for hooks. Defaults to None.
+        body_syncOptions_items (List[str], optional): Additional sync options. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
@@ -69,42 +93,44 @@ async def application_service__sync(
     params = {}
     data = {}
 
-    if body_app_namespace:
-        data["app_namespace"] = body_app_namespace
-    if body_dry_run:
-        data["dry_run"] = body_dry_run
-    if body_infos:
-        data["infos"] = body_infos
-    if body_manifests:
-        data["manifests"] = body_manifests
-    if body_name:
-        data["name"] = body_name
-    if body_project:
-        data["project"] = body_project
-    if body_prune:
-        data["prune"] = body_prune
-    if body_resources:
-        data["resources"] = body_resources
-    if body_retry_strategy_backoff_duration:
-        data["retry_strategy_backoff_duration"] = body_retry_strategy_backoff_duration
-    if body_retry_strategy_backoff_factor:
-        data["retry_strategy_backoff_factor"] = body_retry_strategy_backoff_factor
-    if body_retry_strategy_backoff_max_duration:
-        data["retry_strategy_backoff_max_duration"] = body_retry_strategy_backoff_max_duration
-    if body_retry_strategy_limit:
-        data["retry_strategy_limit"] = body_retry_strategy_limit
-    if body_revision:
-        data["revision"] = body_revision
-    if body_revisions:
-        data["revisions"] = body_revisions
-    if body_source_positions:
-        data["source_positions"] = body_source_positions
-    if body_strategy_apply_force:
-        data["strategy_apply_force"] = body_strategy_apply_force
-    if body_strategy_hook_sync_strategy_apply_force:
-        data["strategy_hook_sync_strategy_apply_force"] = body_strategy_hook_sync_strategy_apply_force
-    if body_sync_options_items:
-        data["sync_options_items"] = body_sync_options_items
+    flat_body = {}
+    if body_appNamespace is not None:
+        flat_body["appNamespace"] = body_appNamespace
+    if body_dryRun is not None:
+        flat_body["dryRun"] = body_dryRun
+    if body_infos is not None:
+        flat_body["infos"] = body_infos
+    if body_manifests is not None:
+        flat_body["manifests"] = body_manifests
+    if body_name is not None:
+        flat_body["name"] = body_name
+    if body_project is not None:
+        flat_body["project"] = body_project
+    if body_prune is not None:
+        flat_body["prune"] = body_prune
+    if body_resources is not None:
+        flat_body["resources"] = body_resources
+    if body_retryStrategy_backoff_duration is not None:
+        flat_body["retryStrategy_backoff_duration"] = body_retryStrategy_backoff_duration
+    if body_retryStrategy_backoff_factor is not None:
+        flat_body["retryStrategy_backoff_factor"] = body_retryStrategy_backoff_factor
+    if body_retryStrategy_backoff_maxDuration is not None:
+        flat_body["retryStrategy_backoff_maxDuration"] = body_retryStrategy_backoff_maxDuration
+    if body_retryStrategy_limit is not None:
+        flat_body["retryStrategy_limit"] = body_retryStrategy_limit
+    if body_revision is not None:
+        flat_body["revision"] = body_revision
+    if body_revisions is not None:
+        flat_body["revisions"] = body_revisions
+    if body_sourcePositions is not None:
+        flat_body["sourcePositions"] = body_sourcePositions
+    if body_strategy_apply_force is not None:
+        flat_body["strategy_apply_force"] = body_strategy_apply_force
+    if body_strategy_hook_syncStrategyApply_force is not None:
+        flat_body["strategy_hook_syncStrategyApply_force"] = body_strategy_hook_syncStrategyApply_force
+    if body_syncOptions_items is not None:
+        flat_body["syncOptions_items"] = body_syncOptions_items
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request(
         f"/api/v1/applications/{path_name}/sync", method="POST", params=params, data=data

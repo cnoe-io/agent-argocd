@@ -8,6 +8,30 @@ import logging
 from typing import Dict, Any, List
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains keys that cannot be split into valid parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
@@ -20,10 +44,10 @@ async def cluster_service__list(
     List returns a list of clusters.
 
     Args:
-        param_server (str, optional): The server URL for the cluster. Defaults to None.
-        param_name (str, optional): The name of the cluster. Defaults to None.
-        param_id_type (str, optional): The type of the specified cluster identifier, either "server" or "name". Defaults to None.
-        param_id_value (str, optional): The value of the cluster identifier, which can be a server URL or cluster name. Defaults to None.
+        param_server (str, optional): OpenAPI parameter corresponding to 'param_server'. Defaults to None.
+        param_name (str, optional): OpenAPI parameter corresponding to 'param_name'. Defaults to None.
+        param_id_type (str, optional): Type of the specified cluster identifier ("server" - default, "name"). Defaults to None.
+        param_id_value (str, optional): Value holds the cluster server URL or cluster name. Defaults to None.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call containing the list of clusters.
@@ -36,10 +60,16 @@ async def cluster_service__list(
     params = {}
     data = {}
 
-    params["server"] = param_server
-    params["name"] = param_name
-    params["id_type"] = param_id_type
-    params["id_value"] = param_id_value
+    params["server"] = str(param_server).lower() if isinstance(param_server, bool) else param_server
+
+    params["name"] = str(param_name).lower() if isinstance(param_name, bool) else param_name
+
+    params["id_type"] = str(param_id_type).lower() if isinstance(param_id_type, bool) else param_id_type
+
+    params["id_value"] = str(param_id_value).lower() if isinstance(param_id_value, bool) else param_id_value
+
+    flat_body = {}
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/clusters", method="GET", params=params, data=data)
 
@@ -51,92 +81,92 @@ async def cluster_service__list(
 
 async def cluster_service__create(
     body_annotations: Dict[str, Any] = None,
-    body_cluster_resources: bool = None,
-    body_config_aws_auth_config_cluster_name: str = None,
-    body_config_aws_auth_config_profile: str = None,
-    body_config_aws_auth_config_role_arn: str = None,
-    body_config_bearer_token: str = None,
-    body_config_disable_compression: bool = None,
-    body_config_exec_provider_config_api_version: str = None,
-    body_config_exec_provider_config_args: List[str] = None,
-    body_config_exec_provider_config_command: str = None,
-    body_config_exec_provider_config_env: Dict[str, Any] = None,
-    body_config_exec_provider_config_install_hint: str = None,
+    body_clusterResources: bool = None,
+    body_config_awsAuthConfig_clusterName: str = None,
+    body_config_awsAuthConfig_profile: str = None,
+    body_config_awsAuthConfig_roleARN: str = None,
+    body_config_bearerToken: str = None,
+    body_config_disableCompression: bool = None,
+    body_config_execProviderConfig_apiVersion: str = None,
+    body_config_execProviderConfig_args: List[str] = None,
+    body_config_execProviderConfig_command: str = None,
+    body_config_execProviderConfig_env: Dict[str, Any] = None,
+    body_config_execProviderConfig_installHint: str = None,
     body_config_password: str = None,
-    body_config_proxy_url: str = None,
-    body_config_tls_client_config_ca_data: str = None,
-    body_config_tls_client_config_cert_data: str = None,
-    body_config_tls_client_config_insecure: bool = None,
-    body_config_tls_client_config_key_data: str = None,
-    body_config_tls_client_config_server_name: str = None,
+    body_config_proxyUrl: str = None,
+    body_config_tlsClientConfig_caData: str = None,
+    body_config_tlsClientConfig_certData: str = None,
+    body_config_tlsClientConfig_insecure: bool = None,
+    body_config_tlsClientConfig_keyData: str = None,
+    body_config_tlsClientConfig_serverName: str = None,
     body_config_username: str = None,
-    body_connection_state_attempted_at: str = None,
-    body_connection_state_message: str = None,
-    body_connection_state_status: str = None,
-    body_info_api_versions: List[str] = None,
-    body_info_applications_count: int = None,
-    body_info_cache_info_apis_count: int = None,
-    body_info_cache_info_last_cache_sync_time: str = None,
-    body_info_cache_info_resources_count: int = None,
-    body_info_connection_state_attempted_at: str = None,
-    body_info_connection_state_message: str = None,
-    body_info_connection_state_status: str = None,
-    body_info_server_version: str = None,
+    body_connectionState_attemptedAt: str = None,
+    body_connectionState_message: str = None,
+    body_connectionState_status: str = None,
+    body_info_apiVersions: List[str] = None,
+    body_info_applicationsCount: int = None,
+    body_info_cacheInfo_apisCount: int = None,
+    body_info_cacheInfo_lastCacheSyncTime: str = None,
+    body_info_cacheInfo_resourcesCount: int = None,
+    body_info_connectionState_attemptedAt: str = None,
+    body_info_connectionState_message: str = None,
+    body_info_connectionState_status: str = None,
+    body_info_serverVersion: str = None,
     body_labels: Dict[str, Any] = None,
     body_name: str = None,
     body_namespaces: List[str] = None,
     body_project: str = None,
-    body_refresh_requested_at: str = None,
+    body_refreshRequestedAt: str = None,
     body_server: str = None,
-    body_server_version: str = None,
+    body_serverVersion: str = None,
     body_shard: int = None,
-    param_upsert: str = None,
+    param_upsert: bool = False,
 ) -> Dict[str, Any]:
     '''
     Create a cluster with the specified configuration and parameters.
 
     Args:
         body_annotations (Dict[str, Any], optional): Annotations for the cluster. Defaults to None.
-        body_cluster_resources (bool, optional): Indicates if cluster-level resources should be managed. Used only if the cluster is connected in a namespaced mode. Defaults to None.
-        body_config_aws_auth_config_cluster_name (str, optional): AWS Authenticator cluster name. Defaults to None.
-        body_config_aws_auth_config_profile (str, optional): AWS IAM Authenticator profile containing optional role ARN. Defaults to None.
-        body_config_aws_auth_config_role_arn (str, optional): AWS IAM Authenticator role ARN for assuming a role. Defaults to None.
-        body_config_bearer_token (str, optional): Bearer token for server authentication. Defaults to None.
-        body_config_disable_compression (bool, optional): Disable automatic GZip compression requests to the server. Defaults to None.
-        body_config_exec_provider_config_api_version (str, optional): API version for exec provider configuration. Defaults to None.
-        body_config_exec_provider_config_args (List[str], optional): Arguments for exec provider configuration. Defaults to None.
-        body_config_exec_provider_config_command (str, optional): Command for exec provider configuration. Defaults to None.
-        body_config_exec_provider_config_env (Dict[str, Any], optional): Environment variables for exec provider configuration. Defaults to None.
-        body_config_exec_provider_config_install_hint (str, optional): Installation hint for exec provider configuration. Defaults to None.
+        body_clusterResources (bool, optional): Indicates if cluster-level resources should be managed. Used only if the cluster is connected in a namespaced mode. Defaults to None.
+        body_config_awsAuthConfig_clusterName (str, optional): The name of the AWS Auth Config cluster. Defaults to None.
+        body_config_awsAuthConfig_profile (str, optional): Optional profile containing role ARN for AWS IAM Authenticator. Defaults to None.
+        body_config_awsAuthConfig_roleARN (str, optional): Optional role ARN for AWS IAM Authenticator to assume a role for cluster operations. Defaults to None.
+        body_config_bearerToken (str, optional): Bearer token for server authentication. Defaults to None.
+        body_config_disableCompression (bool, optional): If True, disables automatic GZip compression requests to the server. Defaults to None.
+        body_config_execProviderConfig_apiVersion (str, optional): API version for the exec provider configuration. Defaults to None.
+        body_config_execProviderConfig_args (List[str], optional): Arguments for the exec provider configuration. Defaults to None.
+        body_config_execProviderConfig_command (str, optional): Command for the exec provider configuration. Defaults to None.
+        body_config_execProviderConfig_env (Dict[str, Any], optional): Environment variables for the exec provider configuration. Defaults to None.
+        body_config_execProviderConfig_installHint (str, optional): Installation hint for the exec provider configuration. Defaults to None.
         body_config_password (str, optional): Password for authentication. Defaults to None.
-        body_config_proxy_url (str, optional): Proxy URL for server connection. Defaults to None.
-        body_config_tls_client_config_ca_data (str, optional): CA data for TLS client configuration. Defaults to None.
-        body_config_tls_client_config_cert_data (str, optional): Certificate data for TLS client configuration. Defaults to None.
-        body_config_tls_client_config_insecure (bool, optional): Access server without verifying TLS certificate. For testing only. Defaults to None.
-        body_config_tls_client_config_key_data (str, optional): Key data for TLS client configuration. Defaults to None.
-        body_config_tls_client_config_server_name (str, optional): Server name for SNI and certificate verification. Defaults to None.
+        body_config_proxyUrl (str, optional): Proxy URL for the server connection. Defaults to None.
+        body_config_tlsClientConfig_caData (str, optional): CA data for TLS client configuration. Defaults to None.
+        body_config_tlsClientConfig_certData (str, optional): Certificate data for TLS client configuration. Defaults to None.
+        body_config_tlsClientConfig_insecure (bool, optional): If True, accesses the server without verifying the TLS certificate. For testing only. Defaults to None.
+        body_config_tlsClientConfig_keyData (str, optional): Key data for TLS client configuration. Defaults to None.
+        body_config_tlsClientConfig_serverName (str, optional): Server name for SNI and certificate verification. Defaults to None.
         body_config_username (str, optional): Username for authentication. Defaults to None.
-        body_connection_state_attempted_at (str, optional): Timestamp of the last connection attempt. Defaults to None.
-        body_connection_state_message (str, optional): Message describing the connection state. Defaults to None.
-        body_connection_state_status (str, optional): Status of the connection state. Defaults to None.
-        body_info_api_versions (List[str], optional): List of API versions supported by the server. Defaults to None.
-        body_info_applications_count (int, optional): Count of applications in the cluster. Defaults to None.
-        body_info_cache_info_apis_count (int, optional): Count of cached APIs. Defaults to None.
-        body_info_cache_info_last_cache_sync_time (str, optional): Timestamp of the last cache synchronization. Defaults to None.
-        body_info_cache_info_resources_count (int, optional): Count of cached resources. Defaults to None.
-        body_info_connection_state_attempted_at (str, optional): Timestamp of the last connection state attempt. Defaults to None.
-        body_info_connection_state_message (str, optional): Message describing the connection state. Defaults to None.
-        body_info_connection_state_status (str, optional): Status of the connection state. Defaults to None.
-        body_info_server_version (str, optional): Version of the server. Defaults to None.
+        body_connectionState_attemptedAt (str, optional): Timestamp of the last connection attempt. Defaults to None.
+        body_connectionState_message (str, optional): Message describing the connection state. Defaults to None.
+        body_connectionState_status (str, optional): Status of the connection state. Defaults to None.
+        body_info_apiVersions (List[str], optional): List of API versions supported by the server. Defaults to None.
+        body_info_applicationsCount (int, optional): Count of applications in the cluster. Defaults to None.
+        body_info_cacheInfo_apisCount (int, optional): Count of APIs in the cache. Defaults to None.
+        body_info_cacheInfo_lastCacheSyncTime (str, optional): Timestamp of the last cache synchronization. Defaults to None.
+        body_info_cacheInfo_resourcesCount (int, optional): Count of resources in the cache. Defaults to None.
+        body_info_connectionState_attemptedAt (str, optional): Timestamp of the last connection state attempt. Defaults to None.
+        body_info_connectionState_message (str, optional): Message describing the connection state. Defaults to None.
+        body_info_connectionState_status (str, optional): Status of the connection state. Defaults to None.
+        body_info_serverVersion (str, optional): Version of the server. Defaults to None.
         body_labels (Dict[str, Any], optional): Labels for the cluster. Defaults to None.
         body_name (str, optional): Name of the cluster. Defaults to None.
-        body_namespaces (List[str], optional): List of accessible namespaces in the cluster. Defaults to None.
+        body_namespaces (List[str], optional): List of namespaces accessible in the cluster. Defaults to None.
         body_project (str, optional): Project associated with the cluster. Defaults to None.
-        body_refresh_requested_at (str, optional): Timestamp of the last refresh request. Defaults to None.
+        body_refreshRequestedAt (str, optional): Timestamp when a refresh was requested. Defaults to None.
         body_server (str, optional): Server URL for the cluster. Defaults to None.
-        body_server_version (str, optional): Version of the server. Defaults to None.
+        body_serverVersion (str, optional): Version of the server. Defaults to None.
         body_shard (int, optional): Optional shard number for the cluster. Defaults to None.
-        param_upsert (str, optional): Parameter for upsert operation. Defaults to None.
+        param_upsert (bool, optional): If True, upserts the cluster configuration. Defaults to False.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
@@ -149,88 +179,90 @@ async def cluster_service__create(
     params = {}
     data = {}
 
-    params["upsert"] = param_upsert
+    params["upsert"] = str(param_upsert).lower() if isinstance(param_upsert, bool) else param_upsert
 
-    if body_annotations:
-        data["annotations"] = body_annotations
-    if body_cluster_resources:
-        data["cluster_resources"] = body_cluster_resources
-    if body_config_aws_auth_config_cluster_name:
-        data["config_aws_auth_config_cluster_name"] = body_config_aws_auth_config_cluster_name
-    if body_config_aws_auth_config_profile:
-        data["config_aws_auth_config_profile"] = body_config_aws_auth_config_profile
-    if body_config_aws_auth_config_role_arn:
-        data["config_aws_auth_config_role_arn"] = body_config_aws_auth_config_role_arn
-    if body_config_bearer_token:
-        data["config_bearer_token"] = body_config_bearer_token
-    if body_config_disable_compression:
-        data["config_disable_compression"] = body_config_disable_compression
-    if body_config_exec_provider_config_api_version:
-        data["config_exec_provider_config_api_version"] = body_config_exec_provider_config_api_version
-    if body_config_exec_provider_config_args:
-        data["config_exec_provider_config_args"] = body_config_exec_provider_config_args
-    if body_config_exec_provider_config_command:
-        data["config_exec_provider_config_command"] = body_config_exec_provider_config_command
-    if body_config_exec_provider_config_env:
-        data["config_exec_provider_config_env"] = body_config_exec_provider_config_env
-    if body_config_exec_provider_config_install_hint:
-        data["config_exec_provider_config_install_hint"] = body_config_exec_provider_config_install_hint
-    if body_config_password:
-        data["config_password"] = body_config_password
-    if body_config_proxy_url:
-        data["config_proxy_url"] = body_config_proxy_url
-    if body_config_tls_client_config_ca_data:
-        data["config_tls_client_config_ca_data"] = body_config_tls_client_config_ca_data
-    if body_config_tls_client_config_cert_data:
-        data["config_tls_client_config_cert_data"] = body_config_tls_client_config_cert_data
-    if body_config_tls_client_config_insecure:
-        data["config_tls_client_config_insecure"] = body_config_tls_client_config_insecure
-    if body_config_tls_client_config_key_data:
-        data["config_tls_client_config_key_data"] = body_config_tls_client_config_key_data
-    if body_config_tls_client_config_server_name:
-        data["config_tls_client_config_server_name"] = body_config_tls_client_config_server_name
-    if body_config_username:
-        data["config_username"] = body_config_username
-    if body_connection_state_attempted_at:
-        data["connection_state_attempted_at"] = body_connection_state_attempted_at
-    if body_connection_state_message:
-        data["connection_state_message"] = body_connection_state_message
-    if body_connection_state_status:
-        data["connection_state_status"] = body_connection_state_status
-    if body_info_api_versions:
-        data["info_api_versions"] = body_info_api_versions
-    if body_info_applications_count:
-        data["info_applications_count"] = body_info_applications_count
-    if body_info_cache_info_apis_count:
-        data["info_cache_info_apis_count"] = body_info_cache_info_apis_count
-    if body_info_cache_info_last_cache_sync_time:
-        data["info_cache_info_last_cache_sync_time"] = body_info_cache_info_last_cache_sync_time
-    if body_info_cache_info_resources_count:
-        data["info_cache_info_resources_count"] = body_info_cache_info_resources_count
-    if body_info_connection_state_attempted_at:
-        data["info_connection_state_attempted_at"] = body_info_connection_state_attempted_at
-    if body_info_connection_state_message:
-        data["info_connection_state_message"] = body_info_connection_state_message
-    if body_info_connection_state_status:
-        data["info_connection_state_status"] = body_info_connection_state_status
-    if body_info_server_version:
-        data["info_server_version"] = body_info_server_version
-    if body_labels:
-        data["labels"] = body_labels
-    if body_name:
-        data["name"] = body_name
-    if body_namespaces:
-        data["namespaces"] = body_namespaces
-    if body_project:
-        data["project"] = body_project
-    if body_refresh_requested_at:
-        data["refresh_requested_at"] = body_refresh_requested_at
-    if body_server:
-        data["server"] = body_server
-    if body_server_version:
-        data["server_version"] = body_server_version
-    if body_shard:
-        data["shard"] = body_shard
+    flat_body = {}
+    if body_annotations is not None:
+        flat_body["annotations"] = body_annotations
+    if body_clusterResources is not None:
+        flat_body["clusterResources"] = body_clusterResources
+    if body_config_awsAuthConfig_clusterName is not None:
+        flat_body["config_awsAuthConfig_clusterName"] = body_config_awsAuthConfig_clusterName
+    if body_config_awsAuthConfig_profile is not None:
+        flat_body["config_awsAuthConfig_profile"] = body_config_awsAuthConfig_profile
+    if body_config_awsAuthConfig_roleARN is not None:
+        flat_body["config_awsAuthConfig_roleARN"] = body_config_awsAuthConfig_roleARN
+    if body_config_bearerToken is not None:
+        flat_body["config_bearerToken"] = body_config_bearerToken
+    if body_config_disableCompression is not None:
+        flat_body["config_disableCompression"] = body_config_disableCompression
+    if body_config_execProviderConfig_apiVersion is not None:
+        flat_body["config_execProviderConfig_apiVersion"] = body_config_execProviderConfig_apiVersion
+    if body_config_execProviderConfig_args is not None:
+        flat_body["config_execProviderConfig_args"] = body_config_execProviderConfig_args
+    if body_config_execProviderConfig_command is not None:
+        flat_body["config_execProviderConfig_command"] = body_config_execProviderConfig_command
+    if body_config_execProviderConfig_env is not None:
+        flat_body["config_execProviderConfig_env"] = body_config_execProviderConfig_env
+    if body_config_execProviderConfig_installHint is not None:
+        flat_body["config_execProviderConfig_installHint"] = body_config_execProviderConfig_installHint
+    if body_config_password is not None:
+        flat_body["config_password"] = body_config_password
+    if body_config_proxyUrl is not None:
+        flat_body["config_proxyUrl"] = body_config_proxyUrl
+    if body_config_tlsClientConfig_caData is not None:
+        flat_body["config_tlsClientConfig_caData"] = body_config_tlsClientConfig_caData
+    if body_config_tlsClientConfig_certData is not None:
+        flat_body["config_tlsClientConfig_certData"] = body_config_tlsClientConfig_certData
+    if body_config_tlsClientConfig_insecure is not None:
+        flat_body["config_tlsClientConfig_insecure"] = body_config_tlsClientConfig_insecure
+    if body_config_tlsClientConfig_keyData is not None:
+        flat_body["config_tlsClientConfig_keyData"] = body_config_tlsClientConfig_keyData
+    if body_config_tlsClientConfig_serverName is not None:
+        flat_body["config_tlsClientConfig_serverName"] = body_config_tlsClientConfig_serverName
+    if body_config_username is not None:
+        flat_body["config_username"] = body_config_username
+    if body_connectionState_attemptedAt is not None:
+        flat_body["connectionState_attemptedAt"] = body_connectionState_attemptedAt
+    if body_connectionState_message is not None:
+        flat_body["connectionState_message"] = body_connectionState_message
+    if body_connectionState_status is not None:
+        flat_body["connectionState_status"] = body_connectionState_status
+    if body_info_apiVersions is not None:
+        flat_body["info_apiVersions"] = body_info_apiVersions
+    if body_info_applicationsCount is not None:
+        flat_body["info_applicationsCount"] = body_info_applicationsCount
+    if body_info_cacheInfo_apisCount is not None:
+        flat_body["info_cacheInfo_apisCount"] = body_info_cacheInfo_apisCount
+    if body_info_cacheInfo_lastCacheSyncTime is not None:
+        flat_body["info_cacheInfo_lastCacheSyncTime"] = body_info_cacheInfo_lastCacheSyncTime
+    if body_info_cacheInfo_resourcesCount is not None:
+        flat_body["info_cacheInfo_resourcesCount"] = body_info_cacheInfo_resourcesCount
+    if body_info_connectionState_attemptedAt is not None:
+        flat_body["info_connectionState_attemptedAt"] = body_info_connectionState_attemptedAt
+    if body_info_connectionState_message is not None:
+        flat_body["info_connectionState_message"] = body_info_connectionState_message
+    if body_info_connectionState_status is not None:
+        flat_body["info_connectionState_status"] = body_info_connectionState_status
+    if body_info_serverVersion is not None:
+        flat_body["info_serverVersion"] = body_info_serverVersion
+    if body_labels is not None:
+        flat_body["labels"] = body_labels
+    if body_name is not None:
+        flat_body["name"] = body_name
+    if body_namespaces is not None:
+        flat_body["namespaces"] = body_namespaces
+    if body_project is not None:
+        flat_body["project"] = body_project
+    if body_refreshRequestedAt is not None:
+        flat_body["refreshRequestedAt"] = body_refreshRequestedAt
+    if body_server is not None:
+        flat_body["server"] = body_server
+    if body_serverVersion is not None:
+        flat_body["serverVersion"] = body_serverVersion
+    if body_shard is not None:
+        flat_body["shard"] = body_shard
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/clusters", method="POST", params=params, data=data)
 

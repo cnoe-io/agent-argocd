@@ -8,6 +8,30 @@ import logging
 from typing import Dict, Any, List
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains keys that cannot be split into valid parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
@@ -16,29 +40,29 @@ logger = logging.getLogger("mcp_tools")
 async def application_service__update(
     path_application_metadata_name: str,
     body_metadata_annotations: Dict[str, Any] = None,
-    body_metadata_creation_timestamp: str = None,
-    body_metadata_deletion_grace_period_seconds: int = None,
-    body_metadata_deletion_timestamp: str = None,
+    body_metadata_creationTimestamp: str = None,
+    body_metadata_deletionGracePeriodSeconds: int = None,
+    body_metadata_deletionTimestamp: str = None,
     body_metadata_finalizers: List[str] = None,
-    body_metadata_generate_name: str = None,
+    body_metadata_generateName: str = None,
     body_metadata_generation: int = None,
     body_metadata_labels: Dict[str, Any] = None,
-    body_metadata_managed_fields: List[str] = None,
+    body_metadata_managedFields: List[str] = None,
     body_metadata_name: str = None,
     body_metadata_namespace: str = None,
-    body_metadata_owner_references: List[str] = None,
-    body_metadata_resource_version: str = None,
-    body_metadata_self_link: str = None,
+    body_metadata_ownerReferences: List[str] = None,
+    body_metadata_resourceVersion: str = None,
+    body_metadata_selfLink: str = None,
     body_metadata_uid: str = None,
     body_operation_info: List[str] = None,
-    body_operation_initiated_by_automated: bool = None,
-    body_operation_initiated_by_username: str = None,
+    body_operation_initiatedBy_automated: bool = None,
+    body_operation_initiatedBy_username: str = None,
     body_operation_retry_backoff_duration: str = None,
     body_operation_retry_backoff_factor: int = None,
-    body_operation_retry_backoff_max_duration: str = None,
+    body_operation_retry_backoff_maxDuration: str = None,
     body_operation_retry_limit: int = None,
-    body_operation_sync_auto_heal_attempts_count: int = None,
-    body_operation_sync_dry_run: bool = None,
+    body_operation_sync_autoHealAttemptsCount: int = None,
+    body_operation_sync_dryRun: bool = None,
     body_operation_sync_manifests: List[str] = None,
     body_operation_sync_prune: bool = None,
     body_operation_sync_resources: List[str] = None,
@@ -47,39 +71,39 @@ async def application_service__update(
     body_operation_sync_source_chart: str = None,
     body_operation_sync_source_directory_exclude: str = None,
     body_operation_sync_source_directory_include: str = None,
-    body_operation_sync_source_directory_jsonnet_ext_vars: List[str] = None,
+    body_operation_sync_source_directory_jsonnet_extVars: List[str] = None,
     body_operation_sync_source_directory_jsonnet_libs: List[str] = None,
     body_operation_sync_source_directory_jsonnet_tlas: List[str] = None,
     body_operation_sync_source_directory_recurse: bool = None,
-    body_operation_sync_source_helm_api_versions: List[str] = None,
-    body_operation_sync_source_helm_file_parameters: List[str] = None,
-    body_operation_sync_source_helm_ignore_missing_value_files: bool = None,
-    body_operation_sync_source_helm_kube_version: str = None,
+    body_operation_sync_source_helm_apiVersions: List[str] = None,
+    body_operation_sync_source_helm_fileParameters: List[str] = None,
+    body_operation_sync_source_helm_ignoreMissingValueFiles: bool = None,
+    body_operation_sync_source_helm_kubeVersion: str = None,
     body_operation_sync_source_helm_namespace: str = None,
     body_operation_sync_source_helm_parameters: List[str] = None,
-    body_operation_sync_source_helm_pass_credentials: bool = None,
-    body_operation_sync_source_helm_release_name: str = None,
-    body_operation_sync_source_helm_skip_crds: bool = None,
-    body_operation_sync_source_helm_skip_schema_validation: bool = None,
-    body_operation_sync_source_helm_skip_tests: bool = None,
-    body_operation_sync_source_helm_value_files: List[str] = None,
+    body_operation_sync_source_helm_passCredentials: bool = None,
+    body_operation_sync_source_helm_releaseName: str = None,
+    body_operation_sync_source_helm_skipCrds: bool = None,
+    body_operation_sync_source_helm_skipSchemaValidation: bool = None,
+    body_operation_sync_source_helm_skipTests: bool = None,
+    body_operation_sync_source_helm_valueFiles: List[str] = None,
     body_operation_sync_source_helm_values: str = None,
-    body_operation_sync_source_helm_values_object_raw: str = None,
+    body_operation_sync_source_helm_valuesObject_raw: str = None,
     body_operation_sync_source_helm_version: str = None,
-    body_operation_sync_source_kustomize_api_versions: List[str] = None,
-    body_operation_sync_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_operation_sync_source_kustomize_common_annotations_envsubst: bool = None,
-    body_operation_sync_source_kustomize_common_labels: Dict[str, Any] = None,
+    body_operation_sync_source_kustomize_apiVersions: List[str] = None,
+    body_operation_sync_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_operation_sync_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_operation_sync_source_kustomize_commonLabels: Dict[str, Any] = None,
     body_operation_sync_source_kustomize_components: List[str] = None,
-    body_operation_sync_source_kustomize_force_common_annotations: bool = None,
-    body_operation_sync_source_kustomize_force_common_labels: bool = None,
-    body_operation_sync_source_kustomize_ignore_missing_components: bool = None,
+    body_operation_sync_source_kustomize_forceCommonAnnotations: bool = None,
+    body_operation_sync_source_kustomize_forceCommonLabels: bool = None,
+    body_operation_sync_source_kustomize_ignoreMissingComponents: bool = None,
     body_operation_sync_source_kustomize_images: List[str] = None,
-    body_operation_sync_source_kustomize_kube_version: str = None,
-    body_operation_sync_source_kustomize_label_include_templates: bool = None,
-    body_operation_sync_source_kustomize_label_without_selector: bool = None,
-    body_operation_sync_source_kustomize_name_prefix: str = None,
-    body_operation_sync_source_kustomize_name_suffix: str = None,
+    body_operation_sync_source_kustomize_kubeVersion: str = None,
+    body_operation_sync_source_kustomize_labelIncludeTemplates: bool = None,
+    body_operation_sync_source_kustomize_labelWithoutSelector: bool = None,
+    body_operation_sync_source_kustomize_namePrefix: str = None,
+    body_operation_sync_source_kustomize_nameSuffix: str = None,
     body_operation_sync_source_kustomize_namespace: str = None,
     body_operation_sync_source_kustomize_patches: List[str] = None,
     body_operation_sync_source_kustomize_replicas: List[str] = None,
@@ -90,55 +114,55 @@ async def application_service__update(
     body_operation_sync_source_plugin_name: str = None,
     body_operation_sync_source_plugin_parameters: List[str] = None,
     body_operation_sync_source_ref: str = None,
-    body_operation_sync_source_repo_url: str = None,
-    body_operation_sync_source_target_revision: str = None,
+    body_operation_sync_source_repoURL: str = None,
+    body_operation_sync_source_targetRevision: str = None,
     body_operation_sync_sources: List[str] = None,
-    body_operation_sync_sync_options: List[str] = None,
-    body_operation_sync_sync_strategy_apply_force: bool = None,
-    body_operation_sync_sync_strategy_hook_sync_strategy_apply_force: bool = None,
+    body_operation_sync_syncOptions: List[str] = None,
+    body_operation_sync_syncStrategy_apply_force: bool = None,
+    body_operation_sync_syncStrategy_hook_syncStrategyApply_force: bool = None,
     body_spec_destination_name: str = None,
     body_spec_destination_namespace: str = None,
     body_spec_destination_server: str = None,
-    body_spec_ignore_differences: List[str] = None,
+    body_spec_ignoreDifferences: List[str] = None,
     body_spec_info: List[str] = None,
     body_spec_project: str = None,
-    body_spec_revision_history_limit: int = None,
+    body_spec_revisionHistoryLimit: int = None,
     body_spec_source_chart: str = None,
     body_spec_source_directory_exclude: str = None,
     body_spec_source_directory_include: str = None,
-    body_spec_source_directory_jsonnet_ext_vars: List[str] = None,
+    body_spec_source_directory_jsonnet_extVars: List[str] = None,
     body_spec_source_directory_jsonnet_libs: List[str] = None,
     body_spec_source_directory_jsonnet_tlas: List[str] = None,
     body_spec_source_directory_recurse: bool = None,
-    body_spec_source_helm_api_versions: List[str] = None,
-    body_spec_source_helm_file_parameters: List[str] = None,
-    body_spec_source_helm_ignore_missing_value_files: bool = None,
-    body_spec_source_helm_kube_version: str = None,
+    body_spec_source_helm_apiVersions: List[str] = None,
+    body_spec_source_helm_fileParameters: List[str] = None,
+    body_spec_source_helm_ignoreMissingValueFiles: bool = None,
+    body_spec_source_helm_kubeVersion: str = None,
     body_spec_source_helm_namespace: str = None,
     body_spec_source_helm_parameters: List[str] = None,
-    body_spec_source_helm_pass_credentials: bool = None,
-    body_spec_source_helm_release_name: str = None,
-    body_spec_source_helm_skip_crds: bool = None,
-    body_spec_source_helm_skip_schema_validation: bool = None,
-    body_spec_source_helm_skip_tests: bool = None,
-    body_spec_source_helm_value_files: List[str] = None,
+    body_spec_source_helm_passCredentials: bool = None,
+    body_spec_source_helm_releaseName: str = None,
+    body_spec_source_helm_skipCrds: bool = None,
+    body_spec_source_helm_skipSchemaValidation: bool = None,
+    body_spec_source_helm_skipTests: bool = None,
+    body_spec_source_helm_valueFiles: List[str] = None,
     body_spec_source_helm_values: str = None,
-    body_spec_source_helm_values_object_raw: str = None,
+    body_spec_source_helm_valuesObject_raw: str = None,
     body_spec_source_helm_version: str = None,
-    body_spec_source_kustomize_api_versions: List[str] = None,
-    body_spec_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_spec_source_kustomize_common_annotations_envsubst: bool = None,
-    body_spec_source_kustomize_common_labels: Dict[str, Any] = None,
+    body_spec_source_kustomize_apiVersions: List[str] = None,
+    body_spec_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_spec_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_spec_source_kustomize_commonLabels: Dict[str, Any] = None,
     body_spec_source_kustomize_components: List[str] = None,
-    body_spec_source_kustomize_force_common_annotations: bool = None,
-    body_spec_source_kustomize_force_common_labels: bool = None,
-    body_spec_source_kustomize_ignore_missing_components: bool = None,
+    body_spec_source_kustomize_forceCommonAnnotations: bool = None,
+    body_spec_source_kustomize_forceCommonLabels: bool = None,
+    body_spec_source_kustomize_ignoreMissingComponents: bool = None,
     body_spec_source_kustomize_images: List[str] = None,
-    body_spec_source_kustomize_kube_version: str = None,
-    body_spec_source_kustomize_label_include_templates: bool = None,
-    body_spec_source_kustomize_label_without_selector: bool = None,
-    body_spec_source_kustomize_name_prefix: str = None,
-    body_spec_source_kustomize_name_suffix: str = None,
+    body_spec_source_kustomize_kubeVersion: str = None,
+    body_spec_source_kustomize_labelIncludeTemplates: bool = None,
+    body_spec_source_kustomize_labelWithoutSelector: bool = None,
+    body_spec_source_kustomize_namePrefix: str = None,
+    body_spec_source_kustomize_nameSuffix: str = None,
     body_spec_source_kustomize_namespace: str = None,
     body_spec_source_kustomize_patches: List[str] = None,
     body_spec_source_kustomize_replicas: List[str] = None,
@@ -149,620 +173,620 @@ async def application_service__update(
     body_spec_source_plugin_name: str = None,
     body_spec_source_plugin_parameters: List[str] = None,
     body_spec_source_ref: str = None,
-    body_spec_source_repo_url: str = None,
-    body_spec_source_target_revision: str = None,
-    body_spec_source_hydrator_dry_source_path: str = None,
-    body_spec_source_hydrator_dry_source_repo_url: str = None,
-    body_spec_source_hydrator_dry_source_target_revision: str = None,
-    body_spec_source_hydrator_hydrate_to_target_branch: str = None,
-    body_spec_source_hydrator_sync_source_path: str = None,
-    body_spec_source_hydrator_sync_source_target_branch: str = None,
+    body_spec_source_repoURL: str = None,
+    body_spec_source_targetRevision: str = None,
+    body_spec_sourceHydrator_drySource_path: str = None,
+    body_spec_sourceHydrator_drySource_repoURL: str = None,
+    body_spec_sourceHydrator_drySource_targetRevision: str = None,
+    body_spec_sourceHydrator_hydrateTo_targetBranch: str = None,
+    body_spec_sourceHydrator_syncSource_path: str = None,
+    body_spec_sourceHydrator_syncSource_targetBranch: str = None,
     body_spec_sources: List[str] = None,
-    body_spec_sync_policy_automated_allow_empty: bool = None,
-    body_spec_sync_policy_automated_enable: bool = None,
-    body_spec_sync_policy_automated_prune: bool = None,
-    body_spec_sync_policy_automated_self_heal: bool = None,
-    body_spec_sync_policy_managed_namespace_metadata_annotations: Dict[str, Any] = None,
-    body_spec_sync_policy_managed_namespace_metadata_labels: Dict[str, Any] = None,
-    body_spec_sync_policy_retry_backoff_duration: str = None,
-    body_spec_sync_policy_retry_backoff_factor: int = None,
-    body_spec_sync_policy_retry_backoff_max_duration: str = None,
-    body_spec_sync_policy_retry_limit: int = None,
-    body_spec_sync_policy_sync_options: List[str] = None,
+    body_spec_syncPolicy_automated_allowEmpty: bool = None,
+    body_spec_syncPolicy_automated_enable: bool = None,
+    body_spec_syncPolicy_automated_prune: bool = None,
+    body_spec_syncPolicy_automated_selfHeal: bool = None,
+    body_spec_syncPolicy_managedNamespaceMetadata_annotations: Dict[str, Any] = None,
+    body_spec_syncPolicy_managedNamespaceMetadata_labels: Dict[str, Any] = None,
+    body_spec_syncPolicy_retry_backoff_duration: str = None,
+    body_spec_syncPolicy_retry_backoff_factor: int = None,
+    body_spec_syncPolicy_retry_backoff_maxDuration: str = None,
+    body_spec_syncPolicy_retry_limit: int = None,
+    body_spec_syncPolicy_syncOptions: List[str] = None,
     body_status_conditions: List[str] = None,
-    body_status_controller_namespace: str = None,
-    body_status_health_last_transition_time: str = None,
+    body_status_controllerNamespace: str = None,
+    body_status_health_lastTransitionTime: str = None,
     body_status_health_message: str = None,
     body_status_health_status: str = None,
     body_status_history: List[str] = None,
-    body_status_observed_at: str = None,
-    body_status_operation_state_finished_at: str = None,
-    body_status_operation_state_message: str = None,
-    body_status_operation_state_operation_info: List[str] = None,
-    body_status_operation_state_operation_initiated_by_automated: bool = None,
-    body_status_operation_state_operation_initiated_by_username: str = None,
-    body_status_operation_state_operation_retry_backoff_duration: str = None,
-    body_status_operation_state_operation_retry_backoff_factor: int = None,
-    body_status_operation_state_operation_retry_backoff_max_duration: str = None,
-    body_status_operation_state_operation_retry_limit: int = None,
-    body_status_operation_state_operation_sync_auto_heal_attempts_count: int = None,
-    body_status_operation_state_operation_sync_dry_run: bool = None,
-    body_status_operation_state_operation_sync_manifests: List[str] = None,
-    body_status_operation_state_operation_sync_prune: bool = None,
-    body_status_operation_state_operation_sync_resources: List[str] = None,
-    body_status_operation_state_operation_sync_revision: str = None,
-    body_status_operation_state_operation_sync_revisions: List[str] = None,
-    body_status_operation_state_operation_sync_source_chart: str = None,
-    body_status_operation_state_operation_sync_source_directory_exclude: str = None,
-    body_status_operation_state_operation_sync_source_directory_include: str = None,
-    body_status_operation_state_operation_sync_source_directory_jsonnet_ext_vars: List[str] = None,
-    body_status_operation_state_operation_sync_source_directory_jsonnet_libs: List[str] = None,
-    body_status_operation_state_operation_sync_source_directory_jsonnet_tlas: List[str] = None,
-    body_status_operation_state_operation_sync_source_directory_recurse: bool = None,
-    body_status_operation_state_operation_sync_source_helm_api_versions: List[str] = None,
-    body_status_operation_state_operation_sync_source_helm_file_parameters: List[str] = None,
-    body_status_operation_state_operation_sync_source_helm_ignore_missing_value_files: bool = None,
-    body_status_operation_state_operation_sync_source_helm_kube_version: str = None,
-    body_status_operation_state_operation_sync_source_helm_namespace: str = None,
-    body_status_operation_state_operation_sync_source_helm_parameters: List[str] = None,
-    body_status_operation_state_operation_sync_source_helm_pass_credentials: bool = None,
-    body_status_operation_state_operation_sync_source_helm_release_name: str = None,
-    body_status_operation_state_operation_sync_source_helm_skip_crds: bool = None,
-    body_status_operation_state_operation_sync_source_helm_skip_schema_validation: bool = None,
-    body_status_operation_state_operation_sync_source_helm_skip_tests: bool = None,
-    body_status_operation_state_operation_sync_source_helm_value_files: List[str] = None,
-    body_status_operation_state_operation_sync_source_helm_values: str = None,
-    body_status_operation_state_operation_sync_source_helm_values_object_raw: str = None,
-    body_status_operation_state_operation_sync_source_helm_version: str = None,
-    body_status_operation_state_operation_sync_source_kustomize_api_versions: List[str] = None,
-    body_status_operation_state_operation_sync_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_status_operation_state_operation_sync_source_kustomize_common_annotations_envsubst: bool = None,
-    body_status_operation_state_operation_sync_source_kustomize_common_labels: Dict[str, Any] = None,
-    body_status_operation_state_operation_sync_source_kustomize_components: List[str] = None,
-    body_status_operation_state_operation_sync_source_kustomize_force_common_annotations: bool = None,
-    body_status_operation_state_operation_sync_source_kustomize_force_common_labels: bool = None,
-    body_status_operation_state_operation_sync_source_kustomize_ignore_missing_components: bool = None,
-    body_status_operation_state_operation_sync_source_kustomize_images: List[str] = None,
-    body_status_operation_state_operation_sync_source_kustomize_kube_version: str = None,
-    body_status_operation_state_operation_sync_source_kustomize_label_include_templates: bool = None,
-    body_status_operation_state_operation_sync_source_kustomize_label_without_selector: bool = None,
-    body_status_operation_state_operation_sync_source_kustomize_name_prefix: str = None,
-    body_status_operation_state_operation_sync_source_kustomize_name_suffix: str = None,
-    body_status_operation_state_operation_sync_source_kustomize_namespace: str = None,
-    body_status_operation_state_operation_sync_source_kustomize_patches: List[str] = None,
-    body_status_operation_state_operation_sync_source_kustomize_replicas: List[str] = None,
-    body_status_operation_state_operation_sync_source_kustomize_version: str = None,
-    body_status_operation_state_operation_sync_source_name: str = None,
-    body_status_operation_state_operation_sync_source_path: str = None,
-    body_status_operation_state_operation_sync_source_plugin_env: List[str] = None,
-    body_status_operation_state_operation_sync_source_plugin_name: str = None,
-    body_status_operation_state_operation_sync_source_plugin_parameters: List[str] = None,
-    body_status_operation_state_operation_sync_source_ref: str = None,
-    body_status_operation_state_operation_sync_source_repo_url: str = None,
-    body_status_operation_state_operation_sync_source_target_revision: str = None,
-    body_status_operation_state_operation_sync_sources: List[str] = None,
-    body_status_operation_state_operation_sync_sync_options: List[str] = None,
-    body_status_operation_state_operation_sync_sync_strategy_apply_force: bool = None,
-    body_status_operation_state_operation_sync_sync_strategy_hook_sync_strategy_apply_force: bool = None,
-    body_status_operation_state_phase: str = None,
-    body_status_operation_state_retry_count: int = None,
-    body_status_operation_state_started_at: str = None,
-    body_status_operation_state_sync_result_managed_namespace_metadata_annotations: Dict[str, Any] = None,
-    body_status_operation_state_sync_result_managed_namespace_metadata_labels: Dict[str, Any] = None,
-    body_status_operation_state_sync_result_resources: List[str] = None,
-    body_status_operation_state_sync_result_revision: str = None,
-    body_status_operation_state_sync_result_revisions: List[str] = None,
-    body_status_operation_state_sync_result_source_chart: str = None,
-    body_status_operation_state_sync_result_source_directory_exclude: str = None,
-    body_status_operation_state_sync_result_source_directory_include: str = None,
-    body_status_operation_state_sync_result_source_directory_jsonnet_ext_vars: List[str] = None,
-    body_status_operation_state_sync_result_source_directory_jsonnet_libs: List[str] = None,
-    body_status_operation_state_sync_result_source_directory_jsonnet_tlas: List[str] = None,
-    body_status_operation_state_sync_result_source_directory_recurse: bool = None,
-    body_status_operation_state_sync_result_source_helm_api_versions: List[str] = None,
-    body_status_operation_state_sync_result_source_helm_file_parameters: List[str] = None,
-    body_status_operation_state_sync_result_source_helm_ignore_missing_value_files: bool = None,
-    body_status_operation_state_sync_result_source_helm_kube_version: str = None,
-    body_status_operation_state_sync_result_source_helm_namespace: str = None,
-    body_status_operation_state_sync_result_source_helm_parameters: List[str] = None,
-    body_status_operation_state_sync_result_source_helm_pass_credentials: bool = None,
-    body_status_operation_state_sync_result_source_helm_release_name: str = None,
-    body_status_operation_state_sync_result_source_helm_skip_crds: bool = None,
-    body_status_operation_state_sync_result_source_helm_skip_schema_validation: bool = None,
-    body_status_operation_state_sync_result_source_helm_skip_tests: bool = None,
-    body_status_operation_state_sync_result_source_helm_value_files: List[str] = None,
-    body_status_operation_state_sync_result_source_helm_values: str = None,
-    body_status_operation_state_sync_result_source_helm_values_object_raw: str = None,
-    body_status_operation_state_sync_result_source_helm_version: str = None,
-    body_status_operation_state_sync_result_source_kustomize_api_versions: List[str] = None,
-    body_status_operation_state_sync_result_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_status_operation_state_sync_result_source_kustomize_common_annotations_envsubst: bool = None,
-    body_status_operation_state_sync_result_source_kustomize_common_labels: Dict[str, Any] = None,
-    body_status_operation_state_sync_result_source_kustomize_components: List[str] = None,
-    body_status_operation_state_sync_result_source_kustomize_force_common_annotations: bool = None,
-    body_status_operation_state_sync_result_source_kustomize_force_common_labels: bool = None,
-    body_status_operation_state_sync_result_source_kustomize_ignore_missing_components: bool = None,
-    body_status_operation_state_sync_result_source_kustomize_images: List[str] = None,
-    body_status_operation_state_sync_result_source_kustomize_kube_version: str = None,
-    body_status_operation_state_sync_result_source_kustomize_label_include_templates: bool = None,
-    body_status_operation_state_sync_result_source_kustomize_label_without_selector: bool = None,
-    body_status_operation_state_sync_result_source_kustomize_name_prefix: str = None,
-    body_status_operation_state_sync_result_source_kustomize_name_suffix: str = None,
-    body_status_operation_state_sync_result_source_kustomize_namespace: str = None,
-    body_status_operation_state_sync_result_source_kustomize_patches: List[str] = None,
-    body_status_operation_state_sync_result_source_kustomize_replicas: List[str] = None,
-    body_status_operation_state_sync_result_source_kustomize_version: str = None,
-    body_status_operation_state_sync_result_source_name: str = None,
-    body_status_operation_state_sync_result_source_path: str = None,
-    body_status_operation_state_sync_result_source_plugin_env: List[str] = None,
-    body_status_operation_state_sync_result_source_plugin_name: str = None,
-    body_status_operation_state_sync_result_source_plugin_parameters: List[str] = None,
-    body_status_operation_state_sync_result_source_ref: str = None,
-    body_status_operation_state_sync_result_source_repo_url: str = None,
-    body_status_operation_state_sync_result_source_target_revision: str = None,
-    body_status_operation_state_sync_result_sources: List[str] = None,
-    body_status_reconciled_at: str = None,
-    body_status_resource_health_source: str = None,
+    body_status_observedAt: str = None,
+    body_status_operationState_finishedAt: str = None,
+    body_status_operationState_message: str = None,
+    body_status_operationState_operation_info: List[str] = None,
+    body_status_operationState_operation_initiatedBy_automated: bool = None,
+    body_status_operationState_operation_initiatedBy_username: str = None,
+    body_status_operationState_operation_retry_backoff_duration: str = None,
+    body_status_operationState_operation_retry_backoff_factor: int = None,
+    body_status_operationState_operation_retry_backoff_maxDuration: str = None,
+    body_status_operationState_operation_retry_limit: int = None,
+    body_status_operationState_operation_sync_autoHealAttemptsCount: int = None,
+    body_status_operationState_operation_sync_dryRun: bool = None,
+    body_status_operationState_operation_sync_manifests: List[str] = None,
+    body_status_operationState_operation_sync_prune: bool = None,
+    body_status_operationState_operation_sync_resources: List[str] = None,
+    body_status_operationState_operation_sync_revision: str = None,
+    body_status_operationState_operation_sync_revisions: List[str] = None,
+    body_status_operationState_operation_sync_source_chart: str = None,
+    body_status_operationState_operation_sync_source_directory_exclude: str = None,
+    body_status_operationState_operation_sync_source_directory_include: str = None,
+    body_status_operationState_operation_sync_source_directory_jsonnet_extVars: List[str] = None,
+    body_status_operationState_operation_sync_source_directory_jsonnet_libs: List[str] = None,
+    body_status_operationState_operation_sync_source_directory_jsonnet_tlas: List[str] = None,
+    body_status_operationState_operation_sync_source_directory_recurse: bool = None,
+    body_status_operationState_operation_sync_source_helm_apiVersions: List[str] = None,
+    body_status_operationState_operation_sync_source_helm_fileParameters: List[str] = None,
+    body_status_operationState_operation_sync_source_helm_ignoreMissingValueFiles: bool = None,
+    body_status_operationState_operation_sync_source_helm_kubeVersion: str = None,
+    body_status_operationState_operation_sync_source_helm_namespace: str = None,
+    body_status_operationState_operation_sync_source_helm_parameters: List[str] = None,
+    body_status_operationState_operation_sync_source_helm_passCredentials: bool = None,
+    body_status_operationState_operation_sync_source_helm_releaseName: str = None,
+    body_status_operationState_operation_sync_source_helm_skipCrds: bool = None,
+    body_status_operationState_operation_sync_source_helm_skipSchemaValidation: bool = None,
+    body_status_operationState_operation_sync_source_helm_skipTests: bool = None,
+    body_status_operationState_operation_sync_source_helm_valueFiles: List[str] = None,
+    body_status_operationState_operation_sync_source_helm_values: str = None,
+    body_status_operationState_operation_sync_source_helm_valuesObject_raw: str = None,
+    body_status_operationState_operation_sync_source_helm_version: str = None,
+    body_status_operationState_operation_sync_source_kustomize_apiVersions: List[str] = None,
+    body_status_operationState_operation_sync_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_status_operationState_operation_sync_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_status_operationState_operation_sync_source_kustomize_commonLabels: Dict[str, Any] = None,
+    body_status_operationState_operation_sync_source_kustomize_components: List[str] = None,
+    body_status_operationState_operation_sync_source_kustomize_forceCommonAnnotations: bool = None,
+    body_status_operationState_operation_sync_source_kustomize_forceCommonLabels: bool = None,
+    body_status_operationState_operation_sync_source_kustomize_ignoreMissingComponents: bool = None,
+    body_status_operationState_operation_sync_source_kustomize_images: List[str] = None,
+    body_status_operationState_operation_sync_source_kustomize_kubeVersion: str = None,
+    body_status_operationState_operation_sync_source_kustomize_labelIncludeTemplates: bool = None,
+    body_status_operationState_operation_sync_source_kustomize_labelWithoutSelector: bool = None,
+    body_status_operationState_operation_sync_source_kustomize_namePrefix: str = None,
+    body_status_operationState_operation_sync_source_kustomize_nameSuffix: str = None,
+    body_status_operationState_operation_sync_source_kustomize_namespace: str = None,
+    body_status_operationState_operation_sync_source_kustomize_patches: List[str] = None,
+    body_status_operationState_operation_sync_source_kustomize_replicas: List[str] = None,
+    body_status_operationState_operation_sync_source_kustomize_version: str = None,
+    body_status_operationState_operation_sync_source_name: str = None,
+    body_status_operationState_operation_sync_source_path: str = None,
+    body_status_operationState_operation_sync_source_plugin_env: List[str] = None,
+    body_status_operationState_operation_sync_source_plugin_name: str = None,
+    body_status_operationState_operation_sync_source_plugin_parameters: List[str] = None,
+    body_status_operationState_operation_sync_source_ref: str = None,
+    body_status_operationState_operation_sync_source_repoURL: str = None,
+    body_status_operationState_operation_sync_source_targetRevision: str = None,
+    body_status_operationState_operation_sync_sources: List[str] = None,
+    body_status_operationState_operation_sync_syncOptions: List[str] = None,
+    body_status_operationState_operation_sync_syncStrategy_apply_force: bool = None,
+    body_status_operationState_operation_sync_syncStrategy_hook_syncStrategyApply_force: bool = None,
+    body_status_operationState_phase: str = None,
+    body_status_operationState_retryCount: int = None,
+    body_status_operationState_startedAt: str = None,
+    body_status_operationState_syncResult_managedNamespaceMetadata_annotations: Dict[str, Any] = None,
+    body_status_operationState_syncResult_managedNamespaceMetadata_labels: Dict[str, Any] = None,
+    body_status_operationState_syncResult_resources: List[str] = None,
+    body_status_operationState_syncResult_revision: str = None,
+    body_status_operationState_syncResult_revisions: List[str] = None,
+    body_status_operationState_syncResult_source_chart: str = None,
+    body_status_operationState_syncResult_source_directory_exclude: str = None,
+    body_status_operationState_syncResult_source_directory_include: str = None,
+    body_status_operationState_syncResult_source_directory_jsonnet_extVars: List[str] = None,
+    body_status_operationState_syncResult_source_directory_jsonnet_libs: List[str] = None,
+    body_status_operationState_syncResult_source_directory_jsonnet_tlas: List[str] = None,
+    body_status_operationState_syncResult_source_directory_recurse: bool = None,
+    body_status_operationState_syncResult_source_helm_apiVersions: List[str] = None,
+    body_status_operationState_syncResult_source_helm_fileParameters: List[str] = None,
+    body_status_operationState_syncResult_source_helm_ignoreMissingValueFiles: bool = None,
+    body_status_operationState_syncResult_source_helm_kubeVersion: str = None,
+    body_status_operationState_syncResult_source_helm_namespace: str = None,
+    body_status_operationState_syncResult_source_helm_parameters: List[str] = None,
+    body_status_operationState_syncResult_source_helm_passCredentials: bool = None,
+    body_status_operationState_syncResult_source_helm_releaseName: str = None,
+    body_status_operationState_syncResult_source_helm_skipCrds: bool = None,
+    body_status_operationState_syncResult_source_helm_skipSchemaValidation: bool = None,
+    body_status_operationState_syncResult_source_helm_skipTests: bool = None,
+    body_status_operationState_syncResult_source_helm_valueFiles: List[str] = None,
+    body_status_operationState_syncResult_source_helm_values: str = None,
+    body_status_operationState_syncResult_source_helm_valuesObject_raw: str = None,
+    body_status_operationState_syncResult_source_helm_version: str = None,
+    body_status_operationState_syncResult_source_kustomize_apiVersions: List[str] = None,
+    body_status_operationState_syncResult_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_status_operationState_syncResult_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_status_operationState_syncResult_source_kustomize_commonLabels: Dict[str, Any] = None,
+    body_status_operationState_syncResult_source_kustomize_components: List[str] = None,
+    body_status_operationState_syncResult_source_kustomize_forceCommonAnnotations: bool = None,
+    body_status_operationState_syncResult_source_kustomize_forceCommonLabels: bool = None,
+    body_status_operationState_syncResult_source_kustomize_ignoreMissingComponents: bool = None,
+    body_status_operationState_syncResult_source_kustomize_images: List[str] = None,
+    body_status_operationState_syncResult_source_kustomize_kubeVersion: str = None,
+    body_status_operationState_syncResult_source_kustomize_labelIncludeTemplates: bool = None,
+    body_status_operationState_syncResult_source_kustomize_labelWithoutSelector: bool = None,
+    body_status_operationState_syncResult_source_kustomize_namePrefix: str = None,
+    body_status_operationState_syncResult_source_kustomize_nameSuffix: str = None,
+    body_status_operationState_syncResult_source_kustomize_namespace: str = None,
+    body_status_operationState_syncResult_source_kustomize_patches: List[str] = None,
+    body_status_operationState_syncResult_source_kustomize_replicas: List[str] = None,
+    body_status_operationState_syncResult_source_kustomize_version: str = None,
+    body_status_operationState_syncResult_source_name: str = None,
+    body_status_operationState_syncResult_source_path: str = None,
+    body_status_operationState_syncResult_source_plugin_env: List[str] = None,
+    body_status_operationState_syncResult_source_plugin_name: str = None,
+    body_status_operationState_syncResult_source_plugin_parameters: List[str] = None,
+    body_status_operationState_syncResult_source_ref: str = None,
+    body_status_operationState_syncResult_source_repoURL: str = None,
+    body_status_operationState_syncResult_source_targetRevision: str = None,
+    body_status_operationState_syncResult_sources: List[str] = None,
+    body_status_reconciledAt: str = None,
+    body_status_resourceHealthSource: str = None,
     body_status_resources: List[str] = None,
-    body_status_source_hydrator_current_operation_dry_sha: str = None,
-    body_status_source_hydrator_current_operation_finished_at: str = None,
-    body_status_source_hydrator_current_operation_hydrated_sha: str = None,
-    body_status_source_hydrator_current_operation_message: str = None,
-    body_status_source_hydrator_current_operation_phase: str = None,
-    body_status_source_hydrator_current_operation_source_hydrator_dry_source_path: str = None,
-    body_status_source_hydrator_current_operation_source_hydrator_dry_source_repo_url: str = None,
-    body_status_source_hydrator_current_operation_source_hydrator_dry_source_target_revision: str = None,
-    body_status_source_hydrator_current_operation_source_hydrator_hydrate_to_target_branch: str = None,
-    body_status_source_hydrator_current_operation_source_hydrator_sync_source_path: str = None,
-    body_status_source_hydrator_current_operation_source_hydrator_sync_source_target_branch: str = None,
-    body_status_source_hydrator_current_operation_started_at: str = None,
-    body_status_source_hydrator_last_successful_operation_dry_sha: str = None,
-    body_status_source_hydrator_last_successful_operation_hydrated_sha: str = None,
-    body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_path: str = None,
-    body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_repo_url: str = None,
-    body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_target_revision: str = None,
-    body_status_source_hydrator_last_successful_operation_source_hydrator_hydrate_to_target_branch: str = None,
-    body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_path: str = None,
-    body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_target_branch: str = None,
-    body_status_source_type: str = None,
-    body_status_source_types: List[str] = None,
-    body_status_summary_external_ur_ls: List[str] = None,
+    body_status_sourceHydrator_currentOperation_drySHA: str = None,
+    body_status_sourceHydrator_currentOperation_finishedAt: str = None,
+    body_status_sourceHydrator_currentOperation_hydratedSHA: str = None,
+    body_status_sourceHydrator_currentOperation_message: str = None,
+    body_status_sourceHydrator_currentOperation_phase: str = None,
+    body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_path: str = None,
+    body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_repoURL: str = None,
+    body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_targetRevision: str = None,
+    body_status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo_targetBranch: str = None,
+    body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_path: str = None,
+    body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_targetBranch: str = None,
+    body_status_sourceHydrator_currentOperation_startedAt: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_drySHA: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_hydratedSHA: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_path: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_repoURL: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_targetRevision: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo_targetBranch: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_path: str = None,
+    body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_targetBranch: str = None,
+    body_status_sourceType: str = None,
+    body_status_sourceTypes: List[str] = None,
+    body_status_summary_externalURLs: List[str] = None,
     body_status_summary_images: List[str] = None,
-    body_status_sync_compared_to_destination_name: str = None,
-    body_status_sync_compared_to_destination_namespace: str = None,
-    body_status_sync_compared_to_destination_server: str = None,
-    body_status_sync_compared_to_ignore_differences: List[str] = None,
-    body_status_sync_compared_to_source_chart: str = None,
-    body_status_sync_compared_to_source_directory_exclude: str = None,
-    body_status_sync_compared_to_source_directory_include: str = None,
-    body_status_sync_compared_to_source_directory_jsonnet_ext_vars: List[str] = None,
-    body_status_sync_compared_to_source_directory_jsonnet_libs: List[str] = None,
-    body_status_sync_compared_to_source_directory_jsonnet_tlas: List[str] = None,
-    body_status_sync_compared_to_source_directory_recurse: bool = None,
-    body_status_sync_compared_to_source_helm_api_versions: List[str] = None,
-    body_status_sync_compared_to_source_helm_file_parameters: List[str] = None,
-    body_status_sync_compared_to_source_helm_ignore_missing_value_files: bool = None,
-    body_status_sync_compared_to_source_helm_kube_version: str = None,
-    body_status_sync_compared_to_source_helm_namespace: str = None,
-    body_status_sync_compared_to_source_helm_parameters: List[str] = None,
-    body_status_sync_compared_to_source_helm_pass_credentials: bool = None,
-    body_status_sync_compared_to_source_helm_release_name: str = None,
-    body_status_sync_compared_to_source_helm_skip_crds: bool = None,
-    body_status_sync_compared_to_source_helm_skip_schema_validation: bool = None,
-    body_status_sync_compared_to_source_helm_skip_tests: bool = None,
-    body_status_sync_compared_to_source_helm_value_files: List[str] = None,
-    body_status_sync_compared_to_source_helm_values: str = None,
-    body_status_sync_compared_to_source_helm_values_object_raw: str = None,
-    body_status_sync_compared_to_source_helm_version: str = None,
-    body_status_sync_compared_to_source_kustomize_api_versions: List[str] = None,
-    body_status_sync_compared_to_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_status_sync_compared_to_source_kustomize_common_annotations_envsubst: bool = None,
-    body_status_sync_compared_to_source_kustomize_common_labels: Dict[str, Any] = None,
-    body_status_sync_compared_to_source_kustomize_components: List[str] = None,
-    body_status_sync_compared_to_source_kustomize_force_common_annotations: bool = None,
-    body_status_sync_compared_to_source_kustomize_force_common_labels: bool = None,
-    body_status_sync_compared_to_source_kustomize_ignore_missing_components: bool = None,
-    body_status_sync_compared_to_source_kustomize_images: List[str] = None,
-    body_status_sync_compared_to_source_kustomize_kube_version: str = None,
-    body_status_sync_compared_to_source_kustomize_label_include_templates: bool = None,
-    body_status_sync_compared_to_source_kustomize_label_without_selector: bool = None,
-    body_status_sync_compared_to_source_kustomize_name_prefix: str = None,
-    body_status_sync_compared_to_source_kustomize_name_suffix: str = None,
-    body_status_sync_compared_to_source_kustomize_namespace: str = None,
-    body_status_sync_compared_to_source_kustomize_patches: List[str] = None,
-    body_status_sync_compared_to_source_kustomize_replicas: List[str] = None,
-    body_status_sync_compared_to_source_kustomize_version: str = None,
-    body_status_sync_compared_to_source_name: str = None,
-    body_status_sync_compared_to_source_path: str = None,
-    body_status_sync_compared_to_source_plugin_env: List[str] = None,
-    body_status_sync_compared_to_source_plugin_name: str = None,
-    body_status_sync_compared_to_source_plugin_parameters: List[str] = None,
-    body_status_sync_compared_to_source_ref: str = None,
-    body_status_sync_compared_to_source_repo_url: str = None,
-    body_status_sync_compared_to_source_target_revision: str = None,
-    body_status_sync_compared_to_sources: List[str] = None,
+    body_status_sync_comparedTo_destination_name: str = None,
+    body_status_sync_comparedTo_destination_namespace: str = None,
+    body_status_sync_comparedTo_destination_server: str = None,
+    body_status_sync_comparedTo_ignoreDifferences: List[str] = None,
+    body_status_sync_comparedTo_source_chart: str = None,
+    body_status_sync_comparedTo_source_directory_exclude: str = None,
+    body_status_sync_comparedTo_source_directory_include: str = None,
+    body_status_sync_comparedTo_source_directory_jsonnet_extVars: List[str] = None,
+    body_status_sync_comparedTo_source_directory_jsonnet_libs: List[str] = None,
+    body_status_sync_comparedTo_source_directory_jsonnet_tlas: List[str] = None,
+    body_status_sync_comparedTo_source_directory_recurse: bool = None,
+    body_status_sync_comparedTo_source_helm_apiVersions: List[str] = None,
+    body_status_sync_comparedTo_source_helm_fileParameters: List[str] = None,
+    body_status_sync_comparedTo_source_helm_ignoreMissingValueFiles: bool = None,
+    body_status_sync_comparedTo_source_helm_kubeVersion: str = None,
+    body_status_sync_comparedTo_source_helm_namespace: str = None,
+    body_status_sync_comparedTo_source_helm_parameters: List[str] = None,
+    body_status_sync_comparedTo_source_helm_passCredentials: bool = None,
+    body_status_sync_comparedTo_source_helm_releaseName: str = None,
+    body_status_sync_comparedTo_source_helm_skipCrds: bool = None,
+    body_status_sync_comparedTo_source_helm_skipSchemaValidation: bool = None,
+    body_status_sync_comparedTo_source_helm_skipTests: bool = None,
+    body_status_sync_comparedTo_source_helm_valueFiles: List[str] = None,
+    body_status_sync_comparedTo_source_helm_values: str = None,
+    body_status_sync_comparedTo_source_helm_valuesObject_raw: str = None,
+    body_status_sync_comparedTo_source_helm_version: str = None,
+    body_status_sync_comparedTo_source_kustomize_apiVersions: List[str] = None,
+    body_status_sync_comparedTo_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_status_sync_comparedTo_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_status_sync_comparedTo_source_kustomize_commonLabels: Dict[str, Any] = None,
+    body_status_sync_comparedTo_source_kustomize_components: List[str] = None,
+    body_status_sync_comparedTo_source_kustomize_forceCommonAnnotations: bool = None,
+    body_status_sync_comparedTo_source_kustomize_forceCommonLabels: bool = None,
+    body_status_sync_comparedTo_source_kustomize_ignoreMissingComponents: bool = None,
+    body_status_sync_comparedTo_source_kustomize_images: List[str] = None,
+    body_status_sync_comparedTo_source_kustomize_kubeVersion: str = None,
+    body_status_sync_comparedTo_source_kustomize_labelIncludeTemplates: bool = None,
+    body_status_sync_comparedTo_source_kustomize_labelWithoutSelector: bool = None,
+    body_status_sync_comparedTo_source_kustomize_namePrefix: str = None,
+    body_status_sync_comparedTo_source_kustomize_nameSuffix: str = None,
+    body_status_sync_comparedTo_source_kustomize_namespace: str = None,
+    body_status_sync_comparedTo_source_kustomize_patches: List[str] = None,
+    body_status_sync_comparedTo_source_kustomize_replicas: List[str] = None,
+    body_status_sync_comparedTo_source_kustomize_version: str = None,
+    body_status_sync_comparedTo_source_name: str = None,
+    body_status_sync_comparedTo_source_path: str = None,
+    body_status_sync_comparedTo_source_plugin_env: List[str] = None,
+    body_status_sync_comparedTo_source_plugin_name: str = None,
+    body_status_sync_comparedTo_source_plugin_parameters: List[str] = None,
+    body_status_sync_comparedTo_source_ref: str = None,
+    body_status_sync_comparedTo_source_repoURL: str = None,
+    body_status_sync_comparedTo_source_targetRevision: str = None,
+    body_status_sync_comparedTo_sources: List[str] = None,
     body_status_sync_revision: str = None,
     body_status_sync_revisions: List[str] = None,
     body_status_sync_status: str = None,
-    param_validate: str = None,
+    param_validate: bool = False,
     param_project: str = None,
 ) -> Dict[str, Any]:
     '''
     Update an application.
 
     Args:
-        path_application_metadata_name (str): The unique name of the application within a namespace. Required for resource creation. Cannot be updated.
-        body_metadata_annotations (Dict[str, Any], optional): Annotations for the application metadata. Defaults to None.
-        body_metadata_creation_timestamp (str, optional): The creation timestamp of the application metadata. Defaults to None.
-        body_metadata_deletion_grace_period_seconds (int, optional): The grace period in seconds for deletion of the application metadata. Defaults to None.
-        body_metadata_deletion_timestamp (str, optional): The deletion timestamp of the application metadata. Defaults to None.
-        body_metadata_finalizers (List[str], optional): Finalizers for the application metadata. Defaults to None.
-        body_metadata_generate_name (str, optional): Prefix used by the server to generate a unique name if the Name field is not provided. Defaults to None.
-        body_metadata_generation (int, optional): The generation number of the application metadata. Defaults to None.
-        body_metadata_labels (Dict[str, Any], optional): Labels for the application metadata. Defaults to None.
-        body_metadata_managed_fields (List[str], optional): Managed fields for the application metadata. Defaults to None.
-        body_metadata_name (str, optional): The name of the application metadata. Defaults to None.
-        body_metadata_namespace (str, optional): The namespace of the application metadata. Defaults to None.
-        body_metadata_owner_references (List[str], optional): Owner references for the application metadata. Defaults to None.
-        body_metadata_resource_version (str, optional): The resource version of the application metadata. Defaults to None.
-        body_metadata_self_link (str, optional): The self-link of the application metadata. Defaults to None.
-        body_metadata_uid (str, optional): The unique identifier of the application metadata. Defaults to None.
-        body_operation_info (List[str], optional): Information about the operation. Defaults to None.
-        body_operation_initiated_by_automated (bool, optional): Indicates if the operation was initiated automatically. Defaults to None.
-        body_operation_initiated_by_username (str, optional): The username that initiated the operation. Defaults to None.
-        body_operation_retry_backoff_duration (str, optional): The duration for retry backoff. Defaults to None.
-        body_operation_retry_backoff_factor (int, optional): The factor for retry backoff. Defaults to None.
-        body_operation_retry_backoff_max_duration (str, optional): The maximum duration for retry backoff. Defaults to None.
-        body_operation_retry_limit (int, optional): The maximum number of retry attempts for a failed sync. Defaults to None.
-        body_operation_sync_auto_heal_attempts_count (int, optional): The count of auto-heal attempts during sync. Defaults to None.
-        body_operation_sync_dry_run (bool, optional): Indicates if the sync operation is a dry run. Defaults to None.
-        body_operation_sync_manifests (List[str], optional): The manifests to sync during the operation. Defaults to None.
-        body_operation_sync_prune (bool, optional): Indicates if the sync operation should prune resources. Defaults to None.
-        body_operation_sync_resources (List[str], optional): The resources to sync during the operation. Defaults to None.
-        body_operation_sync_revision (str, optional): The revision to sync the application to. Defaults to None.
-        body_operation_sync_revisions (List[str], optional): The list of revisions to sync each source in the application. Defaults to None.
-        body_operation_sync_source_chart (str, optional): The Helm chart name for applications sourced from a Helm repo. Defaults to None.
-        body_operation_sync_source_directory_exclude (str, optional): Directories to exclude during sync. Defaults to None.
-        body_operation_sync_source_directory_include (str, optional): Directories to include during sync. Defaults to None.
-        body_operation_sync_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables for the source directory. Defaults to None.
-        body_operation_sync_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries for the source directory. Defaults to None.
-        body_operation_sync_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments for the source directory. Defaults to None.
-        body_operation_sync_source_directory_recurse (bool, optional): Indicates if the source directory should be recursed. Defaults to None.
-        body_operation_sync_source_helm_api_versions (List[str], optional): Kubernetes resource API versions for Helm templating. Defaults to None.
-        body_operation_sync_source_helm_file_parameters (List[str], optional): File parameters for Helm templating. Defaults to None.
-        body_operation_sync_source_helm_ignore_missing_value_files (bool, optional): Indicates if missing value files should be ignored in Helm. Defaults to None.
-        body_operation_sync_source_helm_kube_version (str, optional): Kubernetes API version for Helm templating. Defaults to None.
-        body_operation_sync_source_helm_namespace (str, optional): Namespace for Helm templating. Defaults to None.
-        body_operation_sync_source_helm_parameters (List[str], optional): Parameters for Helm templating. Defaults to None.
-        body_operation_sync_source_helm_pass_credentials (bool, optional): Indicates if credentials should be passed to Helm. Defaults to None.
-        body_operation_sync_source_helm_release_name (str, optional): Release name for Helm. Defaults to None.
-        body_operation_sync_source_helm_skip_crds (bool, optional): Indicates if CRDs should be skipped in Helm. Defaults to None.
-        body_operation_sync_source_helm_skip_schema_validation (bool, optional): Indicates if schema validation should be skipped in Helm. Defaults to None.
-        body_operation_sync_source_helm_skip_tests (bool, optional): Indicates if tests should be skipped in Helm. Defaults to None.
-        body_operation_sync_source_helm_value_files (List[str], optional): Value files for Helm. Defaults to None.
-        body_operation_sync_source_helm_values (str, optional): Values for Helm. Defaults to None.
-        body_operation_sync_source_helm_values_object_raw (str, optional): Raw serialization of Helm values object. Defaults to None.
-        body_operation_sync_source_helm_version (str, optional): Helm version. Defaults to None.
-        body_operation_sync_source_kustomize_api_versions (List[str], optional): Kubernetes resource API versions for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_common_annotations_envsubst (bool, optional): Indicates if environment substitution should be applied to common annotations in Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_common_labels (Dict[str, Any], optional): Common labels for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_components (List[str], optional): Components for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_force_common_annotations (bool, optional): Indicates if common annotations should be forced in Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_force_common_labels (bool, optional): Indicates if common labels should be forced in Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_ignore_missing_components (bool, optional): Indicates if missing components should be ignored in Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_images (List[str], optional): Images for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_kube_version (str, optional): Kubernetes API version for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_label_include_templates (bool, optional): Indicates if label templates should be included in Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_label_without_selector (bool, optional): Indicates if labels should be applied without selector in Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_name_prefix (str, optional): Name prefix for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_name_suffix (str, optional): Name suffix for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_namespace (str, optional): Namespace for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_patches (List[str], optional): Patches for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_replicas (List[str], optional): Replicas for Kustomize. Defaults to None.
-        body_operation_sync_source_kustomize_version (str, optional): Kustomize version. Defaults to None.
-        body_operation_sync_source_name (str, optional): Name of the source. Defaults to None.
-        body_operation_sync_source_path (str, optional): Path within the Git repository for the source. Defaults to None.
-        body_operation_sync_source_plugin_env (List[str], optional): Plugin environment variables for the source. Defaults to None.
-        body_operation_sync_source_plugin_name (str, optional): Plugin name for the source. Defaults to None.
-        body_operation_sync_source_plugin_parameters (List[str], optional): Plugin parameters for the source. Defaults to None.
-        body_operation_sync_source_ref (str, optional): Reference to another source within the sources field. Defaults to None.
-        body_operation_sync_source_repo_url (str, optional): Repository URL for the source. Defaults to None.
-        body_operation_sync_source_target_revision (str, optional): Target revision for the source. Defaults to None.
-        body_operation_sync_sources (List[str], optional): Sources for the operation sync. Defaults to None.
-        body_operation_sync_sync_options (List[str], optional): Sync options for the operation. Defaults to None.
-        body_operation_sync_sync_strategy_apply_force (bool, optional): Indicates if the --force flag should be supplied to `kubectl apply`. Defaults to None.
-        body_operation_sync_sync_strategy_hook_sync_strategy_apply_force (bool, optional): Indicates if the --force flag should be supplied to `kubectl apply` for hook sync strategy. Defaults to None.
-        body_spec_destination_name (str, optional): Symbolic name of the target cluster. Defaults to None.
-        body_spec_destination_namespace (str, optional): Namespace of the target cluster. Defaults to None.
-        body_spec_destination_server (str, optional): URL of the target cluster's Kubernetes control plane API. Defaults to None.
-        body_spec_ignore_differences (List[str], optional): Differences to ignore in the spec. Defaults to None.
-        body_spec_info (List[str], optional): Information about the spec. Defaults to None.
-        body_spec_project (str, optional): Reference to the project the application belongs to. Defaults to None.
-        body_spec_revision_history_limit (int, optional): Limit on the number of items in the application's revision history. Defaults to None.
-        body_spec_source_chart (str, optional): Helm chart name for applications sourced from a Helm repo. Defaults to None.
-        body_spec_source_directory_exclude (str, optional): Directories to exclude in the spec source. Defaults to None.
-        body_spec_source_directory_include (str, optional): Directories to include in the spec source. Defaults to None.
-        body_spec_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables for the spec source directory. Defaults to None.
-        body_spec_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries for the spec source directory. Defaults to None.
-        body_spec_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments for the spec source directory. Defaults to None.
-        body_spec_source_directory_recurse (bool, optional): Indicates if the spec source directory should be recursed. Defaults to None.
-        body_spec_source_helm_api_versions (List[str], optional): Kubernetes resource API versions for Helm templating in the spec source. Defaults to None.
-        body_spec_source_helm_file_parameters (List[str], optional): File parameters for Helm templating in the spec source. Defaults to None.
-        body_spec_source_helm_ignore_missing_value_files (bool, optional): Indicates if missing value files should be ignored in Helm for the spec source. Defaults to None.
-        body_spec_source_helm_kube_version (str, optional): Kubernetes API version for Helm templating in the spec source. Defaults to None.
-        body_spec_source_helm_namespace (str, optional): Namespace for Helm templating in the spec source. Defaults to None.
-        body_spec_source_helm_parameters (List[str], optional): Parameters for Helm templating in the spec source. Defaults to None.
-        body_spec_source_helm_pass_credentials (bool, optional): Indicates if credentials should be passed to Helm in the spec source. Defaults to None.
-        body_spec_source_helm_release_name (str, optional): Release name for Helm in the spec source. Defaults to None.
-        body_spec_source_helm_skip_crds (bool, optional): Indicates if CRDs should be skipped in Helm for the spec source. Defaults to None.
-        body_spec_source_helm_skip_schema_validation (bool, optional): Indicates if schema validation should be skipped in Helm for the spec source. Defaults to None.
-        body_spec_source_helm_skip_tests (bool, optional): Indicates if tests should be skipped in Helm for the spec source. Defaults to None.
-        body_spec_source_helm_value_files (List[str], optional): Value files for Helm in the spec source. Defaults to None.
-        body_spec_source_helm_values (str, optional): Values for Helm in the spec source. Defaults to None.
-        body_spec_source_helm_values_object_raw (str, optional): Raw serialization of Helm values object in the spec source. Defaults to None.
-        body_spec_source_helm_version (str, optional): Helm version in the spec source. Defaults to None.
-        body_spec_source_kustomize_api_versions (List[str], optional): Kubernetes resource API versions for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_common_annotations_envsubst (bool, optional): Indicates if environment substitution should be applied to common annotations in Kustomize for the spec source. Defaults to None.
-        body_spec_source_kustomize_common_labels (Dict[str, Any], optional): Common labels for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_components (List[str], optional): Components for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_force_common_annotations (bool, optional): Indicates if common annotations should be forced in Kustomize for the spec source. Defaults to None.
-        body_spec_source_kustomize_force_common_labels (bool, optional): Indicates if common labels should be forced in Kustomize for the spec source. Defaults to None.
-        body_spec_source_kustomize_ignore_missing_components (bool, optional): Indicates if missing components should be ignored in Kustomize for the spec source. Defaults to None.
-        body_spec_source_kustomize_images (List[str], optional): Images for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_kube_version (str, optional): Kubernetes API version for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_label_include_templates (bool, optional): Indicates if label templates should be included in Kustomize for the spec source. Defaults to None.
-        body_spec_source_kustomize_label_without_selector (bool, optional): Indicates if labels should be applied without selector in Kustomize for the spec source. Defaults to None.
-        body_spec_source_kustomize_name_prefix (str, optional): Name prefix for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_name_suffix (str, optional): Name suffix for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_namespace (str, optional): Namespace for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_patches (List[str], optional): Patches for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_replicas (List[str], optional): Replicas for Kustomize in the spec source. Defaults to None.
-        body_spec_source_kustomize_version (str, optional): Kustomize version in the spec source. Defaults to None.
-        body_spec_source_name (str, optional): Name of the spec source. Defaults to None.
-        body_spec_source_path (str, optional): Path within the Git repository for the spec source. Defaults to None.
-        body_spec_source_plugin_env (List[str], optional): Plugin environment variables for the spec source. Defaults to None.
-        body_spec_source_plugin_name (str, optional): Plugin name for the spec source. Defaults to None.
-        body_spec_source_plugin_parameters (List[str], optional): Plugin parameters for the spec source. Defaults to None.
-        body_spec_source_ref (str, optional): Reference to another source within the sources field in the spec. Defaults to None.
-        body_spec_source_repo_url (str, optional): Repository URL for the spec source. Defaults to None.
-        body_spec_source_target_revision (str, optional): Target revision for the spec source. Defaults to None.
-        body_spec_source_hydrator_dry_source_path (str, optional): Dry source path for the hydrator in the spec source. Defaults to None.
-        body_spec_source_hydrator_dry_source_repo_url (str, optional): Dry source repository URL for the hydrator in the spec source. Defaults to None.
-        body_spec_source_hydrator_dry_source_target_revision (str, optional): Dry source target revision for the hydrator in the spec source. Defaults to None.
-        body_spec_source_hydrator_hydrate_to_target_branch (str, optional): Target branch for hydration in the spec source. Defaults to None.
-        body_spec_source_hydrator_sync_source_path (str, optional): Sync source path for the hydrator in the spec source. Defaults to None.
-        body_spec_source_hydrator_sync_source_target_branch (str, optional): Sync source target branch for the hydrator in the spec source. Defaults to None.
-        body_spec_sources (List[str], optional): Sources in the spec. Defaults to None.
-        body_spec_sync_policy_automated_allow_empty (bool, optional): Indicates if empty sync policy is allowed in the spec. Defaults to None.
-        body_spec_sync_policy_automated_enable (bool, optional): Indicates if automated sync policy is enabled in the spec. Defaults to None.
-        body_spec_sync_policy_automated_prune (bool, optional): Indicates if automated sync policy should prune resources in the spec. Defaults to None.
-        body_spec_sync_policy_automated_self_heal (bool, optional): Indicates if automated sync policy should self-heal in the spec. Defaults to None.
-        body_spec_sync_policy_managed_namespace_metadata_annotations (Dict[str, Any], optional): Managed namespace metadata annotations for sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_managed_namespace_metadata_labels (Dict[str, Any], optional): Managed namespace metadata labels for sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_retry_backoff_duration (str, optional): Retry backoff duration for sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_retry_backoff_factor (int, optional): Retry backoff factor for sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_retry_backoff_max_duration (str, optional): Maximum retry backoff duration for sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_retry_limit (int, optional): Retry limit for sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_sync_options (List[str], optional): Sync options for sync policy in the spec. Defaults to None.
-        body_status_conditions (List[str], optional): Conditions in the status. Defaults to None.
-        body_status_controller_namespace (str, optional): Controller namespace in the status. Defaults to None.
-        body_status_health_last_transition_time (str, optional): Last transition time for health in the status. Defaults to None.
-        body_status_health_message (str, optional): Health message in the status. Defaults to None.
-        body_status_health_status (str, optional): Health status in the status. Defaults to None.
-        body_status_history (List[str], optional): History in the status. Defaults to None.
-        body_status_observed_at (str, optional): Observed time in the status. Defaults to None.
-        body_status_operation_state_finished_at (str, optional): Finished time for operation state in the status. Defaults to None.
-        body_status_operation_state_message (str, optional): Message for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_info (List[str], optional): Operation info for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_initiated_by_automated (bool, optional): Indicates if operation state was initiated automatically in the status. Defaults to None.
-        body_status_operation_state_operation_initiated_by_username (str, optional): Username that initiated operation state in the status. Defaults to None.
-        body_status_operation_state_operation_retry_backoff_duration (str, optional): Retry backoff duration for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_retry_backoff_factor (int, optional): Retry backoff factor for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_retry_backoff_max_duration (str, optional): Maximum retry backoff duration for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_retry_limit (int, optional): Retry limit for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_auto_heal_attempts_count (int, optional): Auto-heal attempts count for operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_dry_run (bool, optional): Indicates if sync operation state is a dry run in the status. Defaults to None.
-        body_status_operation_state_operation_sync_manifests (List[str], optional): Manifests for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_prune (bool, optional): Indicates if sync operation state should prune resources in the status. Defaults to None.
-        body_status_operation_state_operation_sync_resources (List[str], optional): Resources for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_revision (str, optional): Revision for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_revisions (List[str], optional): Revisions for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_chart (str, optional): Helm chart name for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_directory_exclude (str, optional): Directories to exclude for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_directory_include (str, optional): Directories to include for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_directory_recurse (bool, optional): Indicates if source directory should be recursed for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_api_versions (List[str], optional): Kubernetes resource API versions for Helm templating in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_file_parameters (List[str], optional): File parameters for Helm templating in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_ignore_missing_value_files (bool, optional): Indicates if missing value files should be ignored in Helm for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_kube_version (str, optional): Kubernetes API version for Helm templating in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_namespace (str, optional): Namespace for Helm templating in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_parameters (List[str], optional): Parameters for Helm templating in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_pass_credentials (bool, optional): Indicates if credentials should be passed to Helm in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_release_name (str, optional): Release name for Helm in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_skip_crds (bool, optional): Indicates if CRDs should be skipped in Helm for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_skip_schema_validation (bool, optional): Indicates if schema validation should be skipped in Helm for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_skip_tests (bool, optional): Indicates if tests should be skipped in Helm for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_value_files (List[str], optional): Value files for Helm in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_values (str, optional): Values for Helm in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_values_object_raw (str, optional): Raw serialization of Helm values object in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_helm_version (str, optional): Helm version in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_api_versions (List[str], optional): Kubernetes resource API versions for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_common_annotations_envsubst (bool, optional): Indicates if environment substitution should be applied to common annotations in Kustomize for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_common_labels (Dict[str, Any], optional): Common labels for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_components (List[str], optional): Components for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_force_common_annotations (bool, optional): Indicates if common annotations should be forced in Kustomize for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_force_common_labels (bool, optional): Indicates if common labels should be forced in Kustomize for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_ignore_missing_components (bool, optional): Indicates if missing components should be ignored in Kustomize for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_images (List[str], optional): Images for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_kube_version (str, optional): Kubernetes API version for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_label_include_templates (bool, optional): Indicates if label templates should be included in Kustomize for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_label_without_selector (bool, optional): Indicates if labels should be applied without selector in Kustomize for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_name_prefix (str, optional): Name prefix for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_name_suffix (str, optional): Name suffix for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_namespace (str, optional): Namespace for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_patches (List[str], optional): Patches for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_replicas (List[str], optional): Replicas for Kustomize in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_kustomize_version (str, optional): Kustomize version in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_name (str, optional): Name of the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_path (str, optional): Path within the Git repository for the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_plugin_env (List[str], optional): Plugin environment variables for the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_plugin_name (str, optional): Plugin name for the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_plugin_parameters (List[str], optional): Plugin parameters for the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_ref (str, optional): Reference to another source within the sources field in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_repo_url (str, optional): Repository URL for the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_source_target_revision (str, optional): Target revision for the source in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_sources (List[str], optional): Sources in sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_sync_options (List[str], optional): Sync options for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_sync_strategy_apply_force (bool, optional): Indicates if the --force flag should be supplied to `kubectl apply` for sync operation state in the status. Defaults to None.
-        body_status_operation_state_operation_sync_sync_strategy_hook_sync_strategy_apply_force (bool, optional): Indicates if the --force flag should be supplied to `kubectl apply` for hook sync strategy in sync operation state in the status. Defaults to None.
-        body_status_operation_state_phase (str, optional): Phase of the operation state in the status. Defaults to None.
-        body_status_operation_state_retry_count (int, optional): Retry count for operation state in the status. Defaults to None.
-        body_status_operation_state_started_at (str, optional): Start time for operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_managed_namespace_metadata_annotations (Dict[str, Any], optional): Managed namespace metadata annotations for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_managed_namespace_metadata_labels (Dict[str, Any], optional): Managed namespace metadata labels for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_resources (List[str], optional): Resources for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_revision (str, optional): Revision for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_revisions (List[str], optional): Revisions for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_chart (str, optional): Helm chart name for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_directory_exclude (str, optional): Directories to exclude for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_directory_include (str, optional): Directories to include for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_directory_recurse (bool, optional): Indicates if source directory should be recursed for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_api_versions (List[str], optional): Kubernetes resource API versions for Helm templating in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_file_parameters (List[str], optional): File parameters for Helm templating in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_ignore_missing_value_files (bool, optional): Indicates if missing value files should be ignored in Helm for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_kube_version (str, optional): Kubernetes API version for Helm templating in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_namespace (str, optional): Namespace for Helm templating in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_parameters (List[str], optional): Parameters for Helm templating in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_pass_credentials (bool, optional): Indicates if credentials should be passed to Helm in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_release_name (str, optional): Release name for Helm in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_skip_crds (bool, optional): Indicates if CRDs should be skipped in Helm for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_skip_schema_validation (bool, optional): Indicates if schema validation should be skipped in Helm for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_skip_tests (bool, optional): Indicates if tests should be skipped in Helm for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_value_files (List[str], optional): Value files for Helm in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_values (str, optional): Values for Helm in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_values_object_raw (str, optional): Raw serialization of Helm values object in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_helm_version (str, optional): Helm version in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_api_versions (List[str], optional): Kubernetes resource API versions for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_common_annotations_envsubst (bool, optional): Indicates if environment substitution should be applied to common annotations in Kustomize for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_common_labels (Dict[str, Any], optional): Common labels for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_components (List[str], optional): Components for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_force_common_annotations (bool, optional): Indicates if common annotations should be forced in Kustomize for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_force_common_labels (bool, optional): Indicates if common labels should be forced in Kustomize for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_ignore_missing_components (bool, optional): Indicates if missing components should be ignored in Kustomize for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_images (List[str], optional): Images for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_kube_version (str, optional): Kubernetes API version for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_label_include_templates (bool, optional): Indicates if label templates should be included in Kustomize for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_label_without_selector (bool, optional): Indicates if labels should be applied without selector in Kustomize for sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_name_prefix (str, optional): Name prefix for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_name_suffix (str, optional): Name suffix for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_namespace (str, optional): Namespace for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_patches (List[str], optional): Patches for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_replicas (List[str], optional): Replicas for Kustomize in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_kustomize_version (str, optional): Kustomize version in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_name (str, optional): Name of the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_path (str, optional): Path within the Git repository for the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_plugin_env (List[str], optional): Plugin environment variables for the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_plugin_name (str, optional): Plugin name for the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_plugin_parameters (List[str], optional): Plugin parameters for the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_ref (str, optional): Reference to another source within the sources field in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_repo_url (str, optional): Repository URL for the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_source_target_revision (str, optional): Target revision for the source in sync result in operation state in the status. Defaults to None.
-        body_status_operation_state_sync_result_sources (List[str], optional): Sources in sync result in operation state in the status. Defaults to None.
-        body_status_reconciled_at (str, optional): Reconciled time in the status. Defaults to None.
-        body_status_resource_health_source (str, optional): Resource health source in the status. Defaults to None.
-        body_status_resources (List[str], optional): Resources in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_dry_sha (str, optional): Dry SHA for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_finished_at (str, optional): Finished time for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_hydrated_sha (str, optional): Hydrated SHA for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_message (str, optional): Message for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_phase (str, optional): Phase for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_source_hydrator_dry_source_path (str, optional): Dry source path for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_source_hydrator_dry_source_repo_url (str, optional): Dry source repository URL for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_source_hydrator_dry_source_target_revision (str, optional): Dry source target revision for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_source_hydrator_hydrate_to_target_branch (str, optional): Target branch for hydration in current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_source_hydrator_sync_source_path (str, optional): Sync source path for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_source_hydrator_sync_source_target_branch (str, optional): Sync source target branch for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_current_operation_started_at (str, optional): Start time for current operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_dry_sha (str, optional): Dry SHA for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_hydrated_sha (str, optional): Hydrated SHA for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_path (str, optional): Dry source path for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_repo_url (str, optional): Dry source repository URL for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_target_revision (str, optional): Dry source target revision for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_source_hydrator_hydrate_to_target_branch (str, optional): Target branch for hydration in last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_path (str, optional): Sync source path for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_target_branch (str, optional): Sync source target branch for last successful operation in source hydrator in the status. Defaults to None.
-        body_status_source_type (str, optional): Source type in the status. Defaults to None.
-        body_status_source_types (List[str], optional): Source types in the status. Defaults to None.
-        body_status_summary_external_ur_ls (List[str], optional): External URLs in the status summary. Defaults to None.
-        body_status_summary_images (List[str], optional): Images in the status summary. Defaults to None.
-        body_status_sync_compared_to_destination_name (str, optional): Destination name for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_destination_namespace (str, optional): Destination namespace for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_destination_server (str, optional): Destination server for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_ignore_differences (List[str], optional): Differences to ignore for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_chart (str, optional): Source chart for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_directory_exclude (str, optional): Directories to exclude for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_directory_include (str, optional): Directories to include for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_directory_recurse (bool, optional): Indicates if source directory should be recursed for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_api_versions (List[str], optional): Kubernetes resource API versions for Helm templating in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_file_parameters (List[str], optional): File parameters for Helm templating in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_ignore_missing_value_files (bool, optional): Indicates if missing value files should be ignored in Helm for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_kube_version (str, optional): Kubernetes API version for Helm templating in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_namespace (str, optional): Namespace for Helm templating in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_parameters (List[str], optional): Parameters for Helm templating in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_pass_credentials (bool, optional): Indicates if credentials should be passed to Helm in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_release_name (str, optional): Release name for Helm in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_skip_crds (bool, optional): Indicates if CRDs should be skipped in Helm for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_skip_schema_validation (bool, optional): Indicates if schema validation should be skipped in Helm for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_skip_tests (bool, optional): Indicates if tests should be skipped in Helm for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_value_files (List[str], optional): Value files for Helm in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_values (str, optional): Values for Helm in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_values_object_raw (str, optional): Raw serialization of Helm values object in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_helm_version (str, optional): Helm version in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_api_versions (List[str], optional): Kubernetes resource API versions for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_common_annotations_envsubst (bool, optional): Indicates if environment substitution should be applied to common annotations in Kustomize for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_common_labels (Dict[str, Any], optional): Common labels for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_components (List[str], optional): Components for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_force_common_annotations (bool, optional): Indicates if common annotations should be forced in Kustomize for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_force_common_labels (bool, optional): Indicates if common labels should be forced in Kustomize for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_ignore_missing_components (bool, optional): Indicates if missing components should be ignored in Kustomize for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_images (List[str], optional): Images for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_kube_version (str, optional): Kubernetes API version for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_label_include_templates (bool, optional): Indicates if label templates should be included in Kustomize for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_label_without_selector (bool, optional): Indicates if labels should be applied without selector in Kustomize for sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_name_prefix (str, optional): Name prefix for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_name_suffix (str, optional): Name suffix for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_namespace (str, optional): Namespace for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_patches (List[str], optional): Patches for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_replicas (List[str], optional): Replicas for Kustomize in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_kustomize_version (str, optional): Kustomize version in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_name (str, optional): Name of the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_path (str, optional): Path within the Git repository for the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_plugin_env (List[str], optional): Plugin environment variables for the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_plugin_name (str, optional): Plugin name for the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_plugin_parameters (List[str], optional): Plugin parameters for the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_ref (str, optional): Reference to another source within the sources field in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_repo_url (str, optional): Repository URL for the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_source_target_revision (str, optional): Target revision for the source in sync comparison in the status. Defaults to None.
-        body_status_sync_compared_to_sources (List[str], optional): Sources in sync comparison in the status. Defaults to None.
-        body_status_sync_revision (str, optional): Revision in the sync status. Defaults to None.
-        body_status_sync_revisions (List[str], optional): Revisions in the sync status. Defaults to None.
-        body_status_sync_status (str, optional): Sync status. Defaults to None.
-        param_validate (str, optional): Validation parameter. Defaults to None.
-        param_project (str, optional): Project parameter. Defaults to None.
+        path_application_metadata_name (str): The unique name of the application within a namespace. This is required for creating resources and cannot be updated.
+        body_metadata_annotations (Dict[str, Any], optional): Annotations for the application metadata.
+        body_metadata_creationTimestamp (str, optional): The creation timestamp of the application.
+        body_metadata_deletionGracePeriodSeconds (int, optional): The grace period in seconds before the application is deleted.
+        body_metadata_deletionTimestamp (str, optional): The deletion timestamp of the application.
+        body_metadata_finalizers (List[str], optional): Finalizers for the application metadata.
+        body_metadata_generateName (str, optional): A prefix used by the server to generate a unique name if the Name field is not provided.
+        body_metadata_generation (int, optional): The generation of the application metadata.
+        body_metadata_labels (Dict[str, Any], optional): Labels for the application metadata.
+        body_metadata_managedFields (List[str], optional): Managed fields for the application metadata.
+        body_metadata_name (str, optional): The name of the application metadata.
+        body_metadata_namespace (str, optional): The namespace of the application metadata.
+        body_metadata_ownerReferences (List[str], optional): Owner references for the application metadata.
+        body_metadata_resourceVersion (str, optional): The resource version of the application metadata.
+        body_metadata_selfLink (str, optional): The self link of the application metadata.
+        body_metadata_uid (str, optional): The unique identifier of the application metadata.
+        body_operation_info (List[str], optional): Information about the operation.
+        body_operation_initiatedBy_automated (bool, optional): Whether the operation was initiated automatically.
+        body_operation_initiatedBy_username (str, optional): The username that initiated the operation.
+        body_operation_retry_backoff_duration (str, optional): The duration for retry backoff.
+        body_operation_retry_backoff_factor (int, optional): The factor for retry backoff.
+        body_operation_retry_backoff_maxDuration (str, optional): The maximum duration for retry backoff.
+        body_operation_retry_limit (int, optional): The maximum number of retry attempts.
+        body_operation_sync_autoHealAttemptsCount (int, optional): The number of auto-heal attempts for sync.
+        body_operation_sync_dryRun (bool, optional): Whether the sync operation is a dry run.
+        body_operation_sync_manifests (List[str], optional): The manifests for the sync operation.
+        body_operation_sync_prune (bool, optional): Whether to prune during the sync operation.
+        body_operation_sync_resources (List[str], optional): The resources for the sync operation.
+        body_operation_sync_revision (str, optional): The revision for the sync operation.
+        body_operation_sync_revisions (List[str], optional): The revisions for the sync operation.
+        body_operation_sync_source_chart (str, optional): The chart for the sync source.
+        body_operation_sync_source_directory_exclude (str, optional): The directories to exclude for the sync source.
+        body_operation_sync_source_directory_include (str, optional): The directories to include for the sync source.
+        body_operation_sync_source_directory_jsonnet_extVars (List[str], optional): The Jsonnet external variables for the sync source.
+        body_operation_sync_source_directory_jsonnet_libs (List[str], optional): The Jsonnet libraries for the sync source.
+        body_operation_sync_source_directory_jsonnet_tlas (List[str], optional): The Jsonnet top-level arguments for the sync source.
+        body_operation_sync_source_directory_recurse (bool, optional): Whether to recurse directories for the sync source.
+        body_operation_sync_source_helm_apiVersions (List[str], optional): The Helm API versions for the sync source.
+        body_operation_sync_source_helm_fileParameters (List[str], optional): The Helm file parameters for the sync source.
+        body_operation_sync_source_helm_ignoreMissingValueFiles (bool, optional): Whether to ignore missing value files for the Helm sync source.
+        body_operation_sync_source_helm_kubeVersion (str, optional): The Kubernetes version for the Helm sync source.
+        body_operation_sync_source_helm_namespace (str, optional): The namespace for the Helm sync source.
+        body_operation_sync_source_helm_parameters (List[str], optional): The Helm parameters for the sync source.
+        body_operation_sync_source_helm_passCredentials (bool, optional): Whether to pass credentials for the Helm sync source.
+        body_operation_sync_source_helm_releaseName (str, optional): The release name for the Helm sync source.
+        body_operation_sync_source_helm_skipCrds (bool, optional): Whether to skip CRDs for the Helm sync source.
+        body_operation_sync_source_helm_skipSchemaValidation (bool, optional): Whether to skip schema validation for the Helm sync source.
+        body_operation_sync_source_helm_skipTests (bool, optional): Whether to skip tests for the Helm sync source.
+        body_operation_sync_source_helm_valueFiles (List[str], optional): The value files for the Helm sync source.
+        body_operation_sync_source_helm_values (str, optional): The values for the Helm sync source.
+        body_operation_sync_source_helm_valuesObject_raw (str, optional): The raw values object for the Helm sync source.
+        body_operation_sync_source_helm_version (str, optional): The version for the Helm sync source.
+        body_operation_sync_source_kustomize_apiVersions (List[str], optional): The Kustomize API versions for the sync source.
+        body_operation_sync_source_kustomize_commonAnnotations (Dict[str, Any], optional): The common annotations for the Kustomize sync source.
+        body_operation_sync_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Whether to substitute environment variables in common annotations for the Kustomize sync source.
+        body_operation_sync_source_kustomize_commonLabels (Dict[str, Any], optional): The common labels for the Kustomize sync source.
+        body_operation_sync_source_kustomize_components (List[str], optional): The components for the Kustomize sync source.
+        body_operation_sync_source_kustomize_forceCommonAnnotations (bool, optional): Whether to force common annotations for the Kustomize sync source.
+        body_operation_sync_source_kustomize_forceCommonLabels (bool, optional): Whether to force common labels for the Kustomize sync source.
+        body_operation_sync_source_kustomize_ignoreMissingComponents (bool, optional): Whether to ignore missing components for the Kustomize sync source.
+        body_operation_sync_source_kustomize_images (List[str], optional): The images for the Kustomize sync source.
+        body_operation_sync_source_kustomize_kubeVersion (str, optional): The Kubernetes version for the Kustomize sync source.
+        body_operation_sync_source_kustomize_labelIncludeTemplates (bool, optional): Whether to include label templates for the Kustomize sync source.
+        body_operation_sync_source_kustomize_labelWithoutSelector (bool, optional): Whether to label without selector for the Kustomize sync source.
+        body_operation_sync_source_kustomize_namePrefix (str, optional): The name prefix for the Kustomize sync source.
+        body_operation_sync_source_kustomize_nameSuffix (str, optional): The name suffix for the Kustomize sync source.
+        body_operation_sync_source_kustomize_namespace (str, optional): The namespace for the Kustomize sync source.
+        body_operation_sync_source_kustomize_patches (List[str], optional): The patches for the Kustomize sync source.
+        body_operation_sync_source_kustomize_replicas (List[str], optional): The replicas for the Kustomize sync source.
+        body_operation_sync_source_kustomize_version (str, optional): The version for the Kustomize sync source.
+        body_operation_sync_source_name (str, optional): The name of the sync source.
+        body_operation_sync_source_path (str, optional): The path of the sync source.
+        body_operation_sync_source_plugin_env (List[str], optional): The plugin environment for the sync source.
+        body_operation_sync_source_plugin_name (str, optional): The plugin name for the sync source.
+        body_operation_sync_source_plugin_parameters (List[str], optional): The plugin parameters for the sync source.
+        body_operation_sync_source_ref (str, optional): The reference for the sync source.
+        body_operation_sync_source_repoURL (str, optional): The repository URL for the sync source.
+        body_operation_sync_source_targetRevision (str, optional): The target revision for the sync source.
+        body_operation_sync_sources (List[str], optional): The sources for the sync operation.
+        body_operation_sync_syncOptions (List[str], optional): The sync options for the sync operation.
+        body_operation_sync_syncStrategy_apply_force (bool, optional): Whether to apply force for the sync strategy.
+        body_operation_sync_syncStrategy_hook_syncStrategyApply_force (bool, optional): Whether to apply force for the hook sync strategy.
+        body_spec_destination_name (str, optional): The name of the destination.
+        body_spec_destination_namespace (str, optional): The namespace of the destination.
+        body_spec_destination_server (str, optional): The server of the destination.
+        body_spec_ignoreDifferences (List[str], optional): The differences to ignore in the spec.
+        body_spec_info (List[str], optional): The information for the spec.
+        body_spec_project (str, optional): The project for the spec.
+        body_spec_revisionHistoryLimit (int, optional): The revision history limit for the spec.
+        body_spec_source_chart (str, optional): The chart for the spec source.
+        body_spec_source_directory_exclude (str, optional): The directories to exclude for the spec source.
+        body_spec_source_directory_include (str, optional): The directories to include for the spec source.
+        body_spec_source_directory_jsonnet_extVars (List[str], optional): The Jsonnet external variables for the spec source.
+        body_spec_source_directory_jsonnet_libs (List[str], optional): The Jsonnet libraries for the spec source.
+        body_spec_source_directory_jsonnet_tlas (List[str], optional): The Jsonnet top-level arguments for the spec source.
+        body_spec_source_directory_recurse (bool, optional): Whether to recurse directories for the spec source.
+        body_spec_source_helm_apiVersions (List[str], optional): The Helm API versions for the spec source.
+        body_spec_source_helm_fileParameters (List[str], optional): The Helm file parameters for the spec source.
+        body_spec_source_helm_ignoreMissingValueFiles (bool, optional): Whether to ignore missing value files for the Helm spec source.
+        body_spec_source_helm_kubeVersion (str, optional): The Kubernetes version for the Helm spec source.
+        body_spec_source_helm_namespace (str, optional): The namespace for the Helm spec source.
+        body_spec_source_helm_parameters (List[str], optional): The Helm parameters for the spec source.
+        body_spec_source_helm_passCredentials (bool, optional): Whether to pass credentials for the Helm spec source.
+        body_spec_source_helm_releaseName (str, optional): The release name for the Helm spec source.
+        body_spec_source_helm_skipCrds (bool, optional): Whether to skip CRDs for the Helm spec source.
+        body_spec_source_helm_skipSchemaValidation (bool, optional): Whether to skip schema validation for the Helm spec source.
+        body_spec_source_helm_skipTests (bool, optional): Whether to skip tests for the Helm spec source.
+        body_spec_source_helm_valueFiles (List[str], optional): The value files for the Helm spec source.
+        body_spec_source_helm_values (str, optional): The values for the Helm spec source.
+        body_spec_source_helm_valuesObject_raw (str, optional): The raw values object for the Helm spec source.
+        body_spec_source_helm_version (str, optional): The version for the Helm spec source.
+        body_spec_source_kustomize_apiVersions (List[str], optional): The Kustomize API versions for the spec source.
+        body_spec_source_kustomize_commonAnnotations (Dict[str, Any], optional): The common annotations for the Kustomize spec source.
+        body_spec_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Whether to substitute environment variables in common annotations for the Kustomize spec source.
+        body_spec_source_kustomize_commonLabels (Dict[str, Any], optional): The common labels for the Kustomize spec source.
+        body_spec_source_kustomize_components (List[str], optional): The components for the Kustomize spec source.
+        body_spec_source_kustomize_forceCommonAnnotations (bool, optional): Whether to force common annotations for the Kustomize spec source.
+        body_spec_source_kustomize_forceCommonLabels (bool, optional): Whether to force common labels for the Kustomize spec source.
+        body_spec_source_kustomize_ignoreMissingComponents (bool, optional): Whether to ignore missing components for the Kustomize spec source.
+        body_spec_source_kustomize_images (List[str], optional): The images for the Kustomize spec source.
+        body_spec_source_kustomize_kubeVersion (str, optional): The Kubernetes version for the Kustomize spec source.
+        body_spec_source_kustomize_labelIncludeTemplates (bool, optional): Whether to include label templates for the Kustomize spec source.
+        body_spec_source_kustomize_labelWithoutSelector (bool, optional): Whether to label without selector for the Kustomize spec source.
+        body_spec_source_kustomize_namePrefix (str, optional): The name prefix for the Kustomize spec source.
+        body_spec_source_kustomize_nameSuffix (str, optional): The name suffix for the Kustomize spec source.
+        body_spec_source_kustomize_namespace (str, optional): The namespace for the Kustomize spec source.
+        body_spec_source_kustomize_patches (List[str], optional): The patches for the Kustomize spec source.
+        body_spec_source_kustomize_replicas (List[str], optional): The replicas for the Kustomize spec source.
+        body_spec_source_kustomize_version (str, optional): The version for the Kustomize spec source.
+        body_spec_source_name (str, optional): The name of the spec source.
+        body_spec_source_path (str, optional): The path of the spec source.
+        body_spec_source_plugin_env (List[str], optional): The plugin environment for the spec source.
+        body_spec_source_plugin_name (str, optional): The plugin name for the spec source.
+        body_spec_source_plugin_parameters (List[str], optional): The plugin parameters for the spec source.
+        body_spec_source_ref (str, optional): The reference for the spec source.
+        body_spec_source_repoURL (str, optional): The repository URL for the spec source.
+        body_spec_source_targetRevision (str, optional): The target revision for the spec source.
+        body_spec_sourceHydrator_drySource_path (str, optional): The dry source path for the source hydrator.
+        body_spec_sourceHydrator_drySource_repoURL (str, optional): The dry source repository URL for the source hydrator.
+        body_spec_sourceHydrator_drySource_targetRevision (str, optional): The dry source target revision for the source hydrator.
+        body_spec_sourceHydrator_hydrateTo_targetBranch (str, optional): The target branch to hydrate to for the source hydrator.
+        body_spec_sourceHydrator_syncSource_path (str, optional): The sync source path for the source hydrator.
+        body_spec_sourceHydrator_syncSource_targetBranch (str, optional): The sync source target branch for the source hydrator.
+        body_spec_sources (List[str], optional): The sources for the spec.
+        body_spec_syncPolicy_automated_allowEmpty (bool, optional): Whether to allow empty automated sync policy.
+        body_spec_syncPolicy_automated_enable (bool, optional): Whether to enable automated sync policy.
+        body_spec_syncPolicy_automated_prune (bool, optional): Whether to prune automated sync policy.
+        body_spec_syncPolicy_automated_selfHeal (bool, optional): Whether to self-heal automated sync policy.
+        body_spec_syncPolicy_managedNamespaceMetadata_annotations (Dict[str, Any], optional): The annotations for the managed namespace metadata in sync policy.
+        body_spec_syncPolicy_managedNamespaceMetadata_labels (Dict[str, Any], optional): The labels for the managed namespace metadata in sync policy.
+        body_spec_syncPolicy_retry_backoff_duration (str, optional): The retry backoff duration for sync policy.
+        body_spec_syncPolicy_retry_backoff_factor (int, optional): The retry backoff factor for sync policy.
+        body_spec_syncPolicy_retry_backoff_maxDuration (str, optional): The retry backoff maximum duration for sync policy.
+        body_spec_syncPolicy_retry_limit (int, optional): The retry limit for sync policy.
+        body_spec_syncPolicy_syncOptions (List[str], optional): The sync options for sync policy.
+        body_status_conditions (List[str], optional): The conditions for the status.
+        body_status_controllerNamespace (str, optional): The controller namespace for the status.
+        body_status_health_lastTransitionTime (str, optional): The last transition time for health status.
+        body_status_health_message (str, optional): The message for health status.
+        body_status_health_status (str, optional): The health status.
+        body_status_history (List[str], optional): The history for the status.
+        body_status_observedAt (str, optional): The observed time for the status.
+        body_status_operationState_finishedAt (str, optional): The finished time for the operation state.
+        body_status_operationState_message (str, optional): The message for the operation state.
+        body_status_operationState_operation_info (List[str], optional): The operation info for the operation state.
+        body_status_operationState_operation_initiatedBy_automated (bool, optional): Whether the operation was initiated automatically in the operation state.
+        body_status_operationState_operation_initiatedBy_username (str, optional): The username that initiated the operation in the operation state.
+        body_status_operationState_operation_retry_backoff_duration (str, optional): The retry backoff duration for the operation in the operation state.
+        body_status_operationState_operation_retry_backoff_factor (int, optional): The retry backoff factor for the operation in the operation state.
+        body_status_operationState_operation_retry_backoff_maxDuration (str, optional): The retry backoff maximum duration for the operation in the operation state.
+        body_status_operationState_operation_retry_limit (int, optional): The retry limit for the operation in the operation state.
+        body_status_operationState_operation_sync_autoHealAttemptsCount (int, optional): The auto-heal attempts count for the sync operation in the operation state.
+        body_status_operationState_operation_sync_dryRun (bool, optional): Whether the sync operation is a dry run in the operation state.
+        body_status_operationState_operation_sync_manifests (List[str], optional): The manifests for the sync operation in the operation state.
+        body_status_operationState_operation_sync_prune (bool, optional): Whether to prune during the sync operation in the operation state.
+        body_status_operationState_operation_sync_resources (List[str], optional): The resources for the sync operation in the operation state.
+        body_status_operationState_operation_sync_revision (str, optional): The revision for the sync operation in the operation state.
+        body_status_operationState_operation_sync_revisions (List[str], optional): The revisions for the sync operation in the operation state.
+        body_status_operationState_operation_sync_source_chart (str, optional): The chart for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_directory_exclude (str, optional): The directories to exclude for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_directory_include (str, optional): The directories to include for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_directory_jsonnet_extVars (List[str], optional): The Jsonnet external variables for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_directory_jsonnet_libs (List[str], optional): The Jsonnet libraries for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_directory_jsonnet_tlas (List[str], optional): The Jsonnet top-level arguments for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_directory_recurse (bool, optional): Whether to recurse directories for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_apiVersions (List[str], optional): The Helm API versions for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_fileParameters (List[str], optional): The Helm file parameters for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_ignoreMissingValueFiles (bool, optional): Whether to ignore missing value files for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_kubeVersion (str, optional): The Kubernetes version for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_namespace (str, optional): The namespace for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_parameters (List[str], optional): The Helm parameters for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_passCredentials (bool, optional): Whether to pass credentials for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_releaseName (str, optional): The release name for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_skipCrds (bool, optional): Whether to skip CRDs for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_skipSchemaValidation (bool, optional): Whether to skip schema validation for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_skipTests (bool, optional): Whether to skip tests for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_valueFiles (List[str], optional): The value files for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_values (str, optional): The values for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_valuesObject_raw (str, optional): The raw values object for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_helm_version (str, optional): The version for the Helm sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_apiVersions (List[str], optional): The Kustomize API versions for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_commonAnnotations (Dict[str, Any], optional): The common annotations for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Whether to substitute environment variables in common annotations for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_commonLabels (Dict[str, Any], optional): The common labels for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_components (List[str], optional): The components for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_forceCommonAnnotations (bool, optional): Whether to force common annotations for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_forceCommonLabels (bool, optional): Whether to force common labels for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_ignoreMissingComponents (bool, optional): Whether to ignore missing components for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_images (List[str], optional): The images for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_kubeVersion (str, optional): The Kubernetes version for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_labelIncludeTemplates (bool, optional): Whether to include label templates for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_labelWithoutSelector (bool, optional): Whether to label without selector for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_namePrefix (str, optional): The name prefix for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_nameSuffix (str, optional): The name suffix for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_namespace (str, optional): The namespace for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_patches (List[str], optional): The patches for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_replicas (List[str], optional): The replicas for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_kustomize_version (str, optional): The version for the Kustomize sync source in the operation state.
+        body_status_operationState_operation_sync_source_name (str, optional): The name of the sync source in the operation state.
+        body_status_operationState_operation_sync_source_path (str, optional): The path of the sync source in the operation state.
+        body_status_operationState_operation_sync_source_plugin_env (List[str], optional): The plugin environment for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_plugin_name (str, optional): The plugin name for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_plugin_parameters (List[str], optional): The plugin parameters for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_ref (str, optional): The reference for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_repoURL (str, optional): The repository URL for the sync source in the operation state.
+        body_status_operationState_operation_sync_source_targetRevision (str, optional): The target revision for the sync source in the operation state.
+        body_status_operationState_operation_sync_sources (List[str], optional): The sources for the sync operation in the operation state.
+        body_status_operationState_operation_sync_syncOptions (List[str], optional): The sync options for the sync operation in the operation state.
+        body_status_operationState_operation_sync_syncStrategy_apply_force (bool, optional): Whether to apply force for the sync strategy in the operation state.
+        body_status_operationState_operation_sync_syncStrategy_hook_syncStrategyApply_force (bool, optional): Whether to apply force for the hook sync strategy in the operation state.
+        body_status_operationState_phase (str, optional): The phase of the operation state.
+        body_status_operationState_retryCount (int, optional): The retry count for the operation state.
+        body_status_operationState_startedAt (str, optional): The start time for the operation state.
+        body_status_operationState_syncResult_managedNamespaceMetadata_annotations (Dict[str, Any], optional): The annotations for the managed namespace metadata in the sync result.
+        body_status_operationState_syncResult_managedNamespaceMetadata_labels (Dict[str, Any], optional): The labels for the managed namespace metadata in the sync result.
+        body_status_operationState_syncResult_resources (List[str], optional): The resources for the sync result.
+        body_status_operationState_syncResult_revision (str, optional): The revision for the sync result.
+        body_status_operationState_syncResult_revisions (List[str], optional): The revisions for the sync result.
+        body_status_operationState_syncResult_source_chart (str, optional): The chart for the sync source in the sync result.
+        body_status_operationState_syncResult_source_directory_exclude (str, optional): The directories to exclude for the sync source in the sync result.
+        body_status_operationState_syncResult_source_directory_include (str, optional): The directories to include for the sync source in the sync result.
+        body_status_operationState_syncResult_source_directory_jsonnet_extVars (List[str], optional): The Jsonnet external variables for the sync source in the sync result.
+        body_status_operationState_syncResult_source_directory_jsonnet_libs (List[str], optional): The Jsonnet libraries for the sync source in the sync result.
+        body_status_operationState_syncResult_source_directory_jsonnet_tlas (List[str], optional): The Jsonnet top-level arguments for the sync source in the sync result.
+        body_status_operationState_syncResult_source_directory_recurse (bool, optional): Whether to recurse directories for the sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_apiVersions (List[str], optional): The Helm API versions for the sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_fileParameters (List[str], optional): The Helm file parameters for the sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_ignoreMissingValueFiles (bool, optional): Whether to ignore missing value files for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_kubeVersion (str, optional): The Kubernetes version for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_namespace (str, optional): The namespace for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_parameters (List[str], optional): The Helm parameters for the sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_passCredentials (bool, optional): Whether to pass credentials for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_releaseName (str, optional): The release name for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_skipCrds (bool, optional): Whether to skip CRDs for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_skipSchemaValidation (bool, optional): Whether to skip schema validation for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_skipTests (bool, optional): Whether to skip tests for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_valueFiles (List[str], optional): The value files for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_values (str, optional): The values for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_valuesObject_raw (str, optional): The raw values object for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_helm_version (str, optional): The version for the Helm sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_apiVersions (List[str], optional): The Kustomize API versions for the sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_commonAnnotations (Dict[str, Any], optional): The common annotations for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Whether to substitute environment variables in common annotations for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_commonLabels (Dict[str, Any], optional): The common labels for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_components (List[str], optional): The components for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_forceCommonAnnotations (bool, optional): Whether to force common annotations for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_forceCommonLabels (bool, optional): Whether to force common labels for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_ignoreMissingComponents (bool, optional): Whether to ignore missing components for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_images (List[str], optional): The images for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_kubeVersion (str, optional): The Kubernetes version for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_labelIncludeTemplates (bool, optional): Whether to include label templates for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_labelWithoutSelector (bool, optional): Whether to label without selector for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_namePrefix (str, optional): The name prefix for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_nameSuffix (str, optional): The name suffix for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_namespace (str, optional): The namespace for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_patches (List[str], optional): The patches for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_replicas (List[str], optional): The replicas for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_kustomize_version (str, optional): The version for the Kustomize sync source in the sync result.
+        body_status_operationState_syncResult_source_name (str, optional): The name of the sync source in the sync result.
+        body_status_operationState_syncResult_source_path (str, optional): The path of the sync source in the sync result.
+        body_status_operationState_syncResult_source_plugin_env (List[str], optional): The plugin environment for the sync source in the sync result.
+        body_status_operationState_syncResult_source_plugin_name (str, optional): The plugin name for the sync source in the sync result.
+        body_status_operationState_syncResult_source_plugin_parameters (List[str], optional): The plugin parameters for the sync source in the sync result.
+        body_status_operationState_syncResult_source_ref (str, optional): The reference for the sync source in the sync result.
+        body_status_operationState_syncResult_source_repoURL (str, optional): The repository URL for the sync source in the sync result.
+        body_status_operationState_syncResult_source_targetRevision (str, optional): The target revision for the sync source in the sync result.
+        body_status_operationState_syncResult_sources (List[str], optional): The sources for the sync result.
+        body_status_reconciledAt (str, optional): The reconciled time for the status.
+        body_status_resourceHealthSource (str, optional): The resource health source for the status.
+        body_status_resources (List[str], optional): The resources for the status.
+        body_status_sourceHydrator_currentOperation_drySHA (str, optional): The dry SHA for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_finishedAt (str, optional): The finished time for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_hydratedSHA (str, optional): The hydrated SHA for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_message (str, optional): The message for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_phase (str, optional): The phase for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_path (str, optional): The dry source path for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_repoURL (str, optional): The dry source repository URL for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_targetRevision (str, optional): The dry source target revision for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo_targetBranch (str, optional): The target branch to hydrate to for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_path (str, optional): The sync source path for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_targetBranch (str, optional): The sync source target branch for the current operation in the source hydrator.
+        body_status_sourceHydrator_currentOperation_startedAt (str, optional): The start time for the current operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_drySHA (str, optional): The dry SHA for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_hydratedSHA (str, optional): The hydrated SHA for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_path (str, optional): The dry source path for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_repoURL (str, optional): The dry source repository URL for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_targetRevision (str, optional): The dry source target revision for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo_targetBranch (str, optional): The target branch to hydrate to for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_path (str, optional): The sync source path for the last successful operation in the source hydrator.
+        body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_targetBranch (str, optional): The sync source target branch for the last successful operation in the source hydrator.
+        body_status_sourceType (str, optional): The source type for the status.
+        body_status_sourceTypes (List[str], optional): The source types for the status.
+        body_status_summary_externalURLs (List[str], optional): The external URLs for the summary in the status.
+        body_status_summary_images (List[str], optional): The images for the summary in the status.
+        body_status_sync_comparedTo_destination_name (str, optional): The destination name for the sync compared to in the status.
+        body_status_sync_comparedTo_destination_namespace (str, optional): The destination namespace for the sync compared to in the status.
+        body_status_sync_comparedTo_destination_server (str, optional): The destination server for the sync compared to in the status.
+        body_status_sync_comparedTo_ignoreDifferences (List[str], optional): The differences to ignore for the sync compared to in the status.
+        body_status_sync_comparedTo_source_chart (str, optional): The source chart for the sync compared to in the status.
+        body_status_sync_comparedTo_source_directory_exclude (str, optional): The directories to exclude for the sync compared to in the status.
+        body_status_sync_comparedTo_source_directory_include (str, optional): The directories to include for the sync compared to in the status.
+        body_status_sync_comparedTo_source_directory_jsonnet_extVars (List[str], optional): The Jsonnet external variables for the sync compared to in the status.
+        body_status_sync_comparedTo_source_directory_jsonnet_libs (List[str], optional): The Jsonnet libraries for the sync compared to in the status.
+        body_status_sync_comparedTo_source_directory_jsonnet_tlas (List[str], optional): The Jsonnet top-level arguments for the sync compared to in the status.
+        body_status_sync_comparedTo_source_directory_recurse (bool, optional): Whether to recurse directories for the sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_apiVersions (List[str], optional): The Helm API versions for the sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_fileParameters (List[str], optional): The Helm file parameters for the sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_ignoreMissingValueFiles (bool, optional): Whether to ignore missing value files for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_kubeVersion (str, optional): The Kubernetes version for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_namespace (str, optional): The namespace for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_parameters (List[str], optional): The Helm parameters for the sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_passCredentials (bool, optional): Whether to pass credentials for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_releaseName (str, optional): The release name for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_skipCrds (bool, optional): Whether to skip CRDs for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_skipSchemaValidation (bool, optional): Whether to skip schema validation for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_skipTests (bool, optional): Whether to skip tests for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_valueFiles (List[str], optional): The value files for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_values (str, optional): The values for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_valuesObject_raw (str, optional): The raw values object for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_helm_version (str, optional): The version for the Helm sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_apiVersions (List[str], optional): The Kustomize API versions for the sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_commonAnnotations (Dict[str, Any], optional): The common annotations for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Whether to substitute environment variables in common annotations for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_commonLabels (Dict[str, Any], optional): The common labels for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_components (List[str], optional): The components for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_forceCommonAnnotations (bool, optional): Whether to force common annotations for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_forceCommonLabels (bool, optional): Whether to force common labels for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_ignoreMissingComponents (bool, optional): Whether to ignore missing components for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_images (List[str], optional): The images for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_kubeVersion (str, optional): The Kubernetes version for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_labelIncludeTemplates (bool, optional): Whether to include label templates for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_labelWithoutSelector (bool, optional): Whether to label without selector for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_namePrefix (str, optional): The name prefix for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_nameSuffix (str, optional): The name suffix for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_namespace (str, optional): The namespace for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_patches (List[str], optional): The patches for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_replicas (List[str], optional): The replicas for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_kustomize_version (str, optional): The version for the Kustomize sync compared to in the status.
+        body_status_sync_comparedTo_source_name (str, optional): The name of the sync source compared to in the status.
+        body_status_sync_comparedTo_source_path (str, optional): The path of the sync source compared to in the status.
+        body_status_sync_comparedTo_source_plugin_env (List[str], optional): The plugin environment for the sync source compared to in the status.
+        body_status_sync_comparedTo_source_plugin_name (str, optional): The plugin name for the sync source compared to in the status.
+        body_status_sync_comparedTo_source_plugin_parameters (List[str], optional): The plugin parameters for the sync source compared to in the status.
+        body_status_sync_comparedTo_source_ref (str, optional): The reference for the sync source compared to in the status.
+        body_status_sync_comparedTo_source_repoURL (str, optional): The repository URL for the sync source compared to in the status.
+        body_status_sync_comparedTo_source_targetRevision (str, optional): The target revision for the sync source compared to in the status.
+        body_status_sync_comparedTo_sources (List[str], optional): The sources for the sync compared to in the status.
+        body_status_sync_revision (str, optional): The revision for the sync in the status.
+        body_status_sync_revisions (List[str], optional): The revisions for the sync in the status.
+        body_status_sync_status (str, optional): The status for the sync in the status.
+        param_validate (bool, optional): Whether to validate the parameters.
+        param_project (str, optional): The project parameter.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
@@ -775,1057 +799,1092 @@ async def application_service__update(
     params = {}
     data = {}
 
-    params["validate"] = param_validate
-    params["project"] = param_project
+    params["validate"] = str(param_validate).lower() if isinstance(param_validate, bool) else param_validate
 
-    if body_metadata_annotations:
-        data["metadata_annotations"] = body_metadata_annotations
-    if body_metadata_creation_timestamp:
-        data["metadata_creation_timestamp"] = body_metadata_creation_timestamp
-    if body_metadata_deletion_grace_period_seconds:
-        data["metadata_deletion_grace_period_seconds"] = body_metadata_deletion_grace_period_seconds
-    if body_metadata_deletion_timestamp:
-        data["metadata_deletion_timestamp"] = body_metadata_deletion_timestamp
-    if body_metadata_finalizers:
-        data["metadata_finalizers"] = body_metadata_finalizers
-    if body_metadata_generate_name:
-        data["metadata_generate_name"] = body_metadata_generate_name
-    if body_metadata_generation:
-        data["metadata_generation"] = body_metadata_generation
-    if body_metadata_labels:
-        data["metadata_labels"] = body_metadata_labels
-    if body_metadata_managed_fields:
-        data["metadata_managed_fields"] = body_metadata_managed_fields
-    if body_metadata_name:
-        data["metadata_name"] = body_metadata_name
-    if body_metadata_namespace:
-        data["metadata_namespace"] = body_metadata_namespace
-    if body_metadata_owner_references:
-        data["metadata_owner_references"] = body_metadata_owner_references
-    if body_metadata_resource_version:
-        data["metadata_resource_version"] = body_metadata_resource_version
-    if body_metadata_self_link:
-        data["metadata_self_link"] = body_metadata_self_link
-    if body_metadata_uid:
-        data["metadata_uid"] = body_metadata_uid
-    if body_operation_info:
-        data["operation_info"] = body_operation_info
-    if body_operation_initiated_by_automated:
-        data["operation_initiated_by_automated"] = body_operation_initiated_by_automated
-    if body_operation_initiated_by_username:
-        data["operation_initiated_by_username"] = body_operation_initiated_by_username
-    if body_operation_retry_backoff_duration:
-        data["operation_retry_backoff_duration"] = body_operation_retry_backoff_duration
-    if body_operation_retry_backoff_factor:
-        data["operation_retry_backoff_factor"] = body_operation_retry_backoff_factor
-    if body_operation_retry_backoff_max_duration:
-        data["operation_retry_backoff_max_duration"] = body_operation_retry_backoff_max_duration
-    if body_operation_retry_limit:
-        data["operation_retry_limit"] = body_operation_retry_limit
-    if body_operation_sync_auto_heal_attempts_count:
-        data["operation_sync_auto_heal_attempts_count"] = body_operation_sync_auto_heal_attempts_count
-    if body_operation_sync_dry_run:
-        data["operation_sync_dry_run"] = body_operation_sync_dry_run
-    if body_operation_sync_manifests:
-        data["operation_sync_manifests"] = body_operation_sync_manifests
-    if body_operation_sync_prune:
-        data["operation_sync_prune"] = body_operation_sync_prune
-    if body_operation_sync_resources:
-        data["operation_sync_resources"] = body_operation_sync_resources
-    if body_operation_sync_revision:
-        data["operation_sync_revision"] = body_operation_sync_revision
-    if body_operation_sync_revisions:
-        data["operation_sync_revisions"] = body_operation_sync_revisions
-    if body_operation_sync_source_chart:
-        data["operation_sync_source_chart"] = body_operation_sync_source_chart
-    if body_operation_sync_source_directory_exclude:
-        data["operation_sync_source_directory_exclude"] = body_operation_sync_source_directory_exclude
-    if body_operation_sync_source_directory_include:
-        data["operation_sync_source_directory_include"] = body_operation_sync_source_directory_include
-    if body_operation_sync_source_directory_jsonnet_ext_vars:
-        data["operation_sync_source_directory_jsonnet_ext_vars"] = body_operation_sync_source_directory_jsonnet_ext_vars
-    if body_operation_sync_source_directory_jsonnet_libs:
-        data["operation_sync_source_directory_jsonnet_libs"] = body_operation_sync_source_directory_jsonnet_libs
-    if body_operation_sync_source_directory_jsonnet_tlas:
-        data["operation_sync_source_directory_jsonnet_tlas"] = body_operation_sync_source_directory_jsonnet_tlas
-    if body_operation_sync_source_directory_recurse:
-        data["operation_sync_source_directory_recurse"] = body_operation_sync_source_directory_recurse
-    if body_operation_sync_source_helm_api_versions:
-        data["operation_sync_source_helm_api_versions"] = body_operation_sync_source_helm_api_versions
-    if body_operation_sync_source_helm_file_parameters:
-        data["operation_sync_source_helm_file_parameters"] = body_operation_sync_source_helm_file_parameters
-    if body_operation_sync_source_helm_ignore_missing_value_files:
-        data["operation_sync_source_helm_ignore_missing_value_files"] = (
-            body_operation_sync_source_helm_ignore_missing_value_files
-        )
-    if body_operation_sync_source_helm_kube_version:
-        data["operation_sync_source_helm_kube_version"] = body_operation_sync_source_helm_kube_version
-    if body_operation_sync_source_helm_namespace:
-        data["operation_sync_source_helm_namespace"] = body_operation_sync_source_helm_namespace
-    if body_operation_sync_source_helm_parameters:
-        data["operation_sync_source_helm_parameters"] = body_operation_sync_source_helm_parameters
-    if body_operation_sync_source_helm_pass_credentials:
-        data["operation_sync_source_helm_pass_credentials"] = body_operation_sync_source_helm_pass_credentials
-    if body_operation_sync_source_helm_release_name:
-        data["operation_sync_source_helm_release_name"] = body_operation_sync_source_helm_release_name
-    if body_operation_sync_source_helm_skip_crds:
-        data["operation_sync_source_helm_skip_crds"] = body_operation_sync_source_helm_skip_crds
-    if body_operation_sync_source_helm_skip_schema_validation:
-        data["operation_sync_source_helm_skip_schema_validation"] = (
-            body_operation_sync_source_helm_skip_schema_validation
-        )
-    if body_operation_sync_source_helm_skip_tests:
-        data["operation_sync_source_helm_skip_tests"] = body_operation_sync_source_helm_skip_tests
-    if body_operation_sync_source_helm_value_files:
-        data["operation_sync_source_helm_value_files"] = body_operation_sync_source_helm_value_files
-    if body_operation_sync_source_helm_values:
-        data["operation_sync_source_helm_values"] = body_operation_sync_source_helm_values
-    if body_operation_sync_source_helm_values_object_raw:
-        data["operation_sync_source_helm_values_object_raw"] = body_operation_sync_source_helm_values_object_raw
-    if body_operation_sync_source_helm_version:
-        data["operation_sync_source_helm_version"] = body_operation_sync_source_helm_version
-    if body_operation_sync_source_kustomize_api_versions:
-        data["operation_sync_source_kustomize_api_versions"] = body_operation_sync_source_kustomize_api_versions
-    if body_operation_sync_source_kustomize_common_annotations:
-        data["operation_sync_source_kustomize_common_annotations"] = (
-            body_operation_sync_source_kustomize_common_annotations
-        )
-    if body_operation_sync_source_kustomize_common_annotations_envsubst:
-        data["operation_sync_source_kustomize_common_annotations_envsubst"] = (
-            body_operation_sync_source_kustomize_common_annotations_envsubst
-        )
-    if body_operation_sync_source_kustomize_common_labels:
-        data["operation_sync_source_kustomize_common_labels"] = body_operation_sync_source_kustomize_common_labels
-    if body_operation_sync_source_kustomize_components:
-        data["operation_sync_source_kustomize_components"] = body_operation_sync_source_kustomize_components
-    if body_operation_sync_source_kustomize_force_common_annotations:
-        data["operation_sync_source_kustomize_force_common_annotations"] = (
-            body_operation_sync_source_kustomize_force_common_annotations
-        )
-    if body_operation_sync_source_kustomize_force_common_labels:
-        data["operation_sync_source_kustomize_force_common_labels"] = (
-            body_operation_sync_source_kustomize_force_common_labels
-        )
-    if body_operation_sync_source_kustomize_ignore_missing_components:
-        data["operation_sync_source_kustomize_ignore_missing_components"] = (
-            body_operation_sync_source_kustomize_ignore_missing_components
-        )
-    if body_operation_sync_source_kustomize_images:
-        data["operation_sync_source_kustomize_images"] = body_operation_sync_source_kustomize_images
-    if body_operation_sync_source_kustomize_kube_version:
-        data["operation_sync_source_kustomize_kube_version"] = body_operation_sync_source_kustomize_kube_version
-    if body_operation_sync_source_kustomize_label_include_templates:
-        data["operation_sync_source_kustomize_label_include_templates"] = (
-            body_operation_sync_source_kustomize_label_include_templates
-        )
-    if body_operation_sync_source_kustomize_label_without_selector:
-        data["operation_sync_source_kustomize_label_without_selector"] = (
-            body_operation_sync_source_kustomize_label_without_selector
-        )
-    if body_operation_sync_source_kustomize_name_prefix:
-        data["operation_sync_source_kustomize_name_prefix"] = body_operation_sync_source_kustomize_name_prefix
-    if body_operation_sync_source_kustomize_name_suffix:
-        data["operation_sync_source_kustomize_name_suffix"] = body_operation_sync_source_kustomize_name_suffix
-    if body_operation_sync_source_kustomize_namespace:
-        data["operation_sync_source_kustomize_namespace"] = body_operation_sync_source_kustomize_namespace
-    if body_operation_sync_source_kustomize_patches:
-        data["operation_sync_source_kustomize_patches"] = body_operation_sync_source_kustomize_patches
-    if body_operation_sync_source_kustomize_replicas:
-        data["operation_sync_source_kustomize_replicas"] = body_operation_sync_source_kustomize_replicas
-    if body_operation_sync_source_kustomize_version:
-        data["operation_sync_source_kustomize_version"] = body_operation_sync_source_kustomize_version
-    if body_operation_sync_source_name:
-        data["operation_sync_source_name"] = body_operation_sync_source_name
-    if body_operation_sync_source_path:
-        data["operation_sync_source_path"] = body_operation_sync_source_path
-    if body_operation_sync_source_plugin_env:
-        data["operation_sync_source_plugin_env"] = body_operation_sync_source_plugin_env
-    if body_operation_sync_source_plugin_name:
-        data["operation_sync_source_plugin_name"] = body_operation_sync_source_plugin_name
-    if body_operation_sync_source_plugin_parameters:
-        data["operation_sync_source_plugin_parameters"] = body_operation_sync_source_plugin_parameters
-    if body_operation_sync_source_ref:
-        data["operation_sync_source_ref"] = body_operation_sync_source_ref
-    if body_operation_sync_source_repo_url:
-        data["operation_sync_source_repo_url"] = body_operation_sync_source_repo_url
-    if body_operation_sync_source_target_revision:
-        data["operation_sync_source_target_revision"] = body_operation_sync_source_target_revision
-    if body_operation_sync_sources:
-        data["operation_sync_sources"] = body_operation_sync_sources
-    if body_operation_sync_sync_options:
-        data["operation_sync_sync_options"] = body_operation_sync_sync_options
-    if body_operation_sync_sync_strategy_apply_force:
-        data["operation_sync_sync_strategy_apply_force"] = body_operation_sync_sync_strategy_apply_force
-    if body_operation_sync_sync_strategy_hook_sync_strategy_apply_force:
-        data["operation_sync_sync_strategy_hook_sync_strategy_apply_force"] = (
-            body_operation_sync_sync_strategy_hook_sync_strategy_apply_force
-        )
-    if body_spec_destination_name:
-        data["spec_destination_name"] = body_spec_destination_name
-    if body_spec_destination_namespace:
-        data["spec_destination_namespace"] = body_spec_destination_namespace
-    if body_spec_destination_server:
-        data["spec_destination_server"] = body_spec_destination_server
-    if body_spec_ignore_differences:
-        data["spec_ignore_differences"] = body_spec_ignore_differences
-    if body_spec_info:
-        data["spec_info"] = body_spec_info
-    if body_spec_project:
-        data["spec_project"] = body_spec_project
-    if body_spec_revision_history_limit:
-        data["spec_revision_history_limit"] = body_spec_revision_history_limit
-    if body_spec_source_chart:
-        data["spec_source_chart"] = body_spec_source_chart
-    if body_spec_source_directory_exclude:
-        data["spec_source_directory_exclude"] = body_spec_source_directory_exclude
-    if body_spec_source_directory_include:
-        data["spec_source_directory_include"] = body_spec_source_directory_include
-    if body_spec_source_directory_jsonnet_ext_vars:
-        data["spec_source_directory_jsonnet_ext_vars"] = body_spec_source_directory_jsonnet_ext_vars
-    if body_spec_source_directory_jsonnet_libs:
-        data["spec_source_directory_jsonnet_libs"] = body_spec_source_directory_jsonnet_libs
-    if body_spec_source_directory_jsonnet_tlas:
-        data["spec_source_directory_jsonnet_tlas"] = body_spec_source_directory_jsonnet_tlas
-    if body_spec_source_directory_recurse:
-        data["spec_source_directory_recurse"] = body_spec_source_directory_recurse
-    if body_spec_source_helm_api_versions:
-        data["spec_source_helm_api_versions"] = body_spec_source_helm_api_versions
-    if body_spec_source_helm_file_parameters:
-        data["spec_source_helm_file_parameters"] = body_spec_source_helm_file_parameters
-    if body_spec_source_helm_ignore_missing_value_files:
-        data["spec_source_helm_ignore_missing_value_files"] = body_spec_source_helm_ignore_missing_value_files
-    if body_spec_source_helm_kube_version:
-        data["spec_source_helm_kube_version"] = body_spec_source_helm_kube_version
-    if body_spec_source_helm_namespace:
-        data["spec_source_helm_namespace"] = body_spec_source_helm_namespace
-    if body_spec_source_helm_parameters:
-        data["spec_source_helm_parameters"] = body_spec_source_helm_parameters
-    if body_spec_source_helm_pass_credentials:
-        data["spec_source_helm_pass_credentials"] = body_spec_source_helm_pass_credentials
-    if body_spec_source_helm_release_name:
-        data["spec_source_helm_release_name"] = body_spec_source_helm_release_name
-    if body_spec_source_helm_skip_crds:
-        data["spec_source_helm_skip_crds"] = body_spec_source_helm_skip_crds
-    if body_spec_source_helm_skip_schema_validation:
-        data["spec_source_helm_skip_schema_validation"] = body_spec_source_helm_skip_schema_validation
-    if body_spec_source_helm_skip_tests:
-        data["spec_source_helm_skip_tests"] = body_spec_source_helm_skip_tests
-    if body_spec_source_helm_value_files:
-        data["spec_source_helm_value_files"] = body_spec_source_helm_value_files
-    if body_spec_source_helm_values:
-        data["spec_source_helm_values"] = body_spec_source_helm_values
-    if body_spec_source_helm_values_object_raw:
-        data["spec_source_helm_values_object_raw"] = body_spec_source_helm_values_object_raw
-    if body_spec_source_helm_version:
-        data["spec_source_helm_version"] = body_spec_source_helm_version
-    if body_spec_source_kustomize_api_versions:
-        data["spec_source_kustomize_api_versions"] = body_spec_source_kustomize_api_versions
-    if body_spec_source_kustomize_common_annotations:
-        data["spec_source_kustomize_common_annotations"] = body_spec_source_kustomize_common_annotations
-    if body_spec_source_kustomize_common_annotations_envsubst:
-        data["spec_source_kustomize_common_annotations_envsubst"] = (
-            body_spec_source_kustomize_common_annotations_envsubst
-        )
-    if body_spec_source_kustomize_common_labels:
-        data["spec_source_kustomize_common_labels"] = body_spec_source_kustomize_common_labels
-    if body_spec_source_kustomize_components:
-        data["spec_source_kustomize_components"] = body_spec_source_kustomize_components
-    if body_spec_source_kustomize_force_common_annotations:
-        data["spec_source_kustomize_force_common_annotations"] = body_spec_source_kustomize_force_common_annotations
-    if body_spec_source_kustomize_force_common_labels:
-        data["spec_source_kustomize_force_common_labels"] = body_spec_source_kustomize_force_common_labels
-    if body_spec_source_kustomize_ignore_missing_components:
-        data["spec_source_kustomize_ignore_missing_components"] = body_spec_source_kustomize_ignore_missing_components
-    if body_spec_source_kustomize_images:
-        data["spec_source_kustomize_images"] = body_spec_source_kustomize_images
-    if body_spec_source_kustomize_kube_version:
-        data["spec_source_kustomize_kube_version"] = body_spec_source_kustomize_kube_version
-    if body_spec_source_kustomize_label_include_templates:
-        data["spec_source_kustomize_label_include_templates"] = body_spec_source_kustomize_label_include_templates
-    if body_spec_source_kustomize_label_without_selector:
-        data["spec_source_kustomize_label_without_selector"] = body_spec_source_kustomize_label_without_selector
-    if body_spec_source_kustomize_name_prefix:
-        data["spec_source_kustomize_name_prefix"] = body_spec_source_kustomize_name_prefix
-    if body_spec_source_kustomize_name_suffix:
-        data["spec_source_kustomize_name_suffix"] = body_spec_source_kustomize_name_suffix
-    if body_spec_source_kustomize_namespace:
-        data["spec_source_kustomize_namespace"] = body_spec_source_kustomize_namespace
-    if body_spec_source_kustomize_patches:
-        data["spec_source_kustomize_patches"] = body_spec_source_kustomize_patches
-    if body_spec_source_kustomize_replicas:
-        data["spec_source_kustomize_replicas"] = body_spec_source_kustomize_replicas
-    if body_spec_source_kustomize_version:
-        data["spec_source_kustomize_version"] = body_spec_source_kustomize_version
-    if body_spec_source_name:
-        data["spec_source_name"] = body_spec_source_name
-    if body_spec_source_path:
-        data["spec_source_path"] = body_spec_source_path
-    if body_spec_source_plugin_env:
-        data["spec_source_plugin_env"] = body_spec_source_plugin_env
-    if body_spec_source_plugin_name:
-        data["spec_source_plugin_name"] = body_spec_source_plugin_name
-    if body_spec_source_plugin_parameters:
-        data["spec_source_plugin_parameters"] = body_spec_source_plugin_parameters
-    if body_spec_source_ref:
-        data["spec_source_ref"] = body_spec_source_ref
-    if body_spec_source_repo_url:
-        data["spec_source_repo_url"] = body_spec_source_repo_url
-    if body_spec_source_target_revision:
-        data["spec_source_target_revision"] = body_spec_source_target_revision
-    if body_spec_source_hydrator_dry_source_path:
-        data["spec_source_hydrator_dry_source_path"] = body_spec_source_hydrator_dry_source_path
-    if body_spec_source_hydrator_dry_source_repo_url:
-        data["spec_source_hydrator_dry_source_repo_url"] = body_spec_source_hydrator_dry_source_repo_url
-    if body_spec_source_hydrator_dry_source_target_revision:
-        data["spec_source_hydrator_dry_source_target_revision"] = body_spec_source_hydrator_dry_source_target_revision
-    if body_spec_source_hydrator_hydrate_to_target_branch:
-        data["spec_source_hydrator_hydrate_to_target_branch"] = body_spec_source_hydrator_hydrate_to_target_branch
-    if body_spec_source_hydrator_sync_source_path:
-        data["spec_source_hydrator_sync_source_path"] = body_spec_source_hydrator_sync_source_path
-    if body_spec_source_hydrator_sync_source_target_branch:
-        data["spec_source_hydrator_sync_source_target_branch"] = body_spec_source_hydrator_sync_source_target_branch
-    if body_spec_sources:
-        data["spec_sources"] = body_spec_sources
-    if body_spec_sync_policy_automated_allow_empty:
-        data["spec_sync_policy_automated_allow_empty"] = body_spec_sync_policy_automated_allow_empty
-    if body_spec_sync_policy_automated_enable:
-        data["spec_sync_policy_automated_enable"] = body_spec_sync_policy_automated_enable
-    if body_spec_sync_policy_automated_prune:
-        data["spec_sync_policy_automated_prune"] = body_spec_sync_policy_automated_prune
-    if body_spec_sync_policy_automated_self_heal:
-        data["spec_sync_policy_automated_self_heal"] = body_spec_sync_policy_automated_self_heal
-    if body_spec_sync_policy_managed_namespace_metadata_annotations:
-        data["spec_sync_policy_managed_namespace_metadata_annotations"] = (
-            body_spec_sync_policy_managed_namespace_metadata_annotations
-        )
-    if body_spec_sync_policy_managed_namespace_metadata_labels:
-        data["spec_sync_policy_managed_namespace_metadata_labels"] = (
-            body_spec_sync_policy_managed_namespace_metadata_labels
-        )
-    if body_spec_sync_policy_retry_backoff_duration:
-        data["spec_sync_policy_retry_backoff_duration"] = body_spec_sync_policy_retry_backoff_duration
-    if body_spec_sync_policy_retry_backoff_factor:
-        data["spec_sync_policy_retry_backoff_factor"] = body_spec_sync_policy_retry_backoff_factor
-    if body_spec_sync_policy_retry_backoff_max_duration:
-        data["spec_sync_policy_retry_backoff_max_duration"] = body_spec_sync_policy_retry_backoff_max_duration
-    if body_spec_sync_policy_retry_limit:
-        data["spec_sync_policy_retry_limit"] = body_spec_sync_policy_retry_limit
-    if body_spec_sync_policy_sync_options:
-        data["spec_sync_policy_sync_options"] = body_spec_sync_policy_sync_options
-    if body_status_conditions:
-        data["status_conditions"] = body_status_conditions
-    if body_status_controller_namespace:
-        data["status_controller_namespace"] = body_status_controller_namespace
-    if body_status_health_last_transition_time:
-        data["status_health_last_transition_time"] = body_status_health_last_transition_time
-    if body_status_health_message:
-        data["status_health_message"] = body_status_health_message
-    if body_status_health_status:
-        data["status_health_status"] = body_status_health_status
-    if body_status_history:
-        data["status_history"] = body_status_history
-    if body_status_observed_at:
-        data["status_observed_at"] = body_status_observed_at
-    if body_status_operation_state_finished_at:
-        data["status_operation_state_finished_at"] = body_status_operation_state_finished_at
-    if body_status_operation_state_message:
-        data["status_operation_state_message"] = body_status_operation_state_message
-    if body_status_operation_state_operation_info:
-        data["status_operation_state_operation_info"] = body_status_operation_state_operation_info
-    if body_status_operation_state_operation_initiated_by_automated:
-        data["status_operation_state_operation_initiated_by_automated"] = (
-            body_status_operation_state_operation_initiated_by_automated
-        )
-    if body_status_operation_state_operation_initiated_by_username:
-        data["status_operation_state_operation_initiated_by_username"] = (
-            body_status_operation_state_operation_initiated_by_username
-        )
-    if body_status_operation_state_operation_retry_backoff_duration:
-        data["status_operation_state_operation_retry_backoff_duration"] = (
-            body_status_operation_state_operation_retry_backoff_duration
-        )
-    if body_status_operation_state_operation_retry_backoff_factor:
-        data["status_operation_state_operation_retry_backoff_factor"] = (
-            body_status_operation_state_operation_retry_backoff_factor
-        )
-    if body_status_operation_state_operation_retry_backoff_max_duration:
-        data["status_operation_state_operation_retry_backoff_max_duration"] = (
-            body_status_operation_state_operation_retry_backoff_max_duration
-        )
-    if body_status_operation_state_operation_retry_limit:
-        data["status_operation_state_operation_retry_limit"] = body_status_operation_state_operation_retry_limit
-    if body_status_operation_state_operation_sync_auto_heal_attempts_count:
-        data["status_operation_state_operation_sync_auto_heal_attempts_count"] = (
-            body_status_operation_state_operation_sync_auto_heal_attempts_count
-        )
-    if body_status_operation_state_operation_sync_dry_run:
-        data["status_operation_state_operation_sync_dry_run"] = body_status_operation_state_operation_sync_dry_run
-    if body_status_operation_state_operation_sync_manifests:
-        data["status_operation_state_operation_sync_manifests"] = body_status_operation_state_operation_sync_manifests
-    if body_status_operation_state_operation_sync_prune:
-        data["status_operation_state_operation_sync_prune"] = body_status_operation_state_operation_sync_prune
-    if body_status_operation_state_operation_sync_resources:
-        data["status_operation_state_operation_sync_resources"] = body_status_operation_state_operation_sync_resources
-    if body_status_operation_state_operation_sync_revision:
-        data["status_operation_state_operation_sync_revision"] = body_status_operation_state_operation_sync_revision
-    if body_status_operation_state_operation_sync_revisions:
-        data["status_operation_state_operation_sync_revisions"] = body_status_operation_state_operation_sync_revisions
-    if body_status_operation_state_operation_sync_source_chart:
-        data["status_operation_state_operation_sync_source_chart"] = (
-            body_status_operation_state_operation_sync_source_chart
-        )
-    if body_status_operation_state_operation_sync_source_directory_exclude:
-        data["status_operation_state_operation_sync_source_directory_exclude"] = (
-            body_status_operation_state_operation_sync_source_directory_exclude
-        )
-    if body_status_operation_state_operation_sync_source_directory_include:
-        data["status_operation_state_operation_sync_source_directory_include"] = (
-            body_status_operation_state_operation_sync_source_directory_include
-        )
-    if body_status_operation_state_operation_sync_source_directory_jsonnet_ext_vars:
-        data["status_operation_state_operation_sync_source_directory_jsonnet_ext_vars"] = (
-            body_status_operation_state_operation_sync_source_directory_jsonnet_ext_vars
-        )
-    if body_status_operation_state_operation_sync_source_directory_jsonnet_libs:
-        data["status_operation_state_operation_sync_source_directory_jsonnet_libs"] = (
-            body_status_operation_state_operation_sync_source_directory_jsonnet_libs
-        )
-    if body_status_operation_state_operation_sync_source_directory_jsonnet_tlas:
-        data["status_operation_state_operation_sync_source_directory_jsonnet_tlas"] = (
-            body_status_operation_state_operation_sync_source_directory_jsonnet_tlas
-        )
-    if body_status_operation_state_operation_sync_source_directory_recurse:
-        data["status_operation_state_operation_sync_source_directory_recurse"] = (
-            body_status_operation_state_operation_sync_source_directory_recurse
-        )
-    if body_status_operation_state_operation_sync_source_helm_api_versions:
-        data["status_operation_state_operation_sync_source_helm_api_versions"] = (
-            body_status_operation_state_operation_sync_source_helm_api_versions
-        )
-    if body_status_operation_state_operation_sync_source_helm_file_parameters:
-        data["status_operation_state_operation_sync_source_helm_file_parameters"] = (
-            body_status_operation_state_operation_sync_source_helm_file_parameters
-        )
-    if body_status_operation_state_operation_sync_source_helm_ignore_missing_value_files:
-        data["status_operation_state_operation_sync_source_helm_ignore_missing_value_files"] = (
-            body_status_operation_state_operation_sync_source_helm_ignore_missing_value_files
-        )
-    if body_status_operation_state_operation_sync_source_helm_kube_version:
-        data["status_operation_state_operation_sync_source_helm_kube_version"] = (
-            body_status_operation_state_operation_sync_source_helm_kube_version
-        )
-    if body_status_operation_state_operation_sync_source_helm_namespace:
-        data["status_operation_state_operation_sync_source_helm_namespace"] = (
-            body_status_operation_state_operation_sync_source_helm_namespace
-        )
-    if body_status_operation_state_operation_sync_source_helm_parameters:
-        data["status_operation_state_operation_sync_source_helm_parameters"] = (
-            body_status_operation_state_operation_sync_source_helm_parameters
-        )
-    if body_status_operation_state_operation_sync_source_helm_pass_credentials:
-        data["status_operation_state_operation_sync_source_helm_pass_credentials"] = (
-            body_status_operation_state_operation_sync_source_helm_pass_credentials
-        )
-    if body_status_operation_state_operation_sync_source_helm_release_name:
-        data["status_operation_state_operation_sync_source_helm_release_name"] = (
-            body_status_operation_state_operation_sync_source_helm_release_name
-        )
-    if body_status_operation_state_operation_sync_source_helm_skip_crds:
-        data["status_operation_state_operation_sync_source_helm_skip_crds"] = (
-            body_status_operation_state_operation_sync_source_helm_skip_crds
-        )
-    if body_status_operation_state_operation_sync_source_helm_skip_schema_validation:
-        data["status_operation_state_operation_sync_source_helm_skip_schema_validation"] = (
-            body_status_operation_state_operation_sync_source_helm_skip_schema_validation
-        )
-    if body_status_operation_state_operation_sync_source_helm_skip_tests:
-        data["status_operation_state_operation_sync_source_helm_skip_tests"] = (
-            body_status_operation_state_operation_sync_source_helm_skip_tests
-        )
-    if body_status_operation_state_operation_sync_source_helm_value_files:
-        data["status_operation_state_operation_sync_source_helm_value_files"] = (
-            body_status_operation_state_operation_sync_source_helm_value_files
-        )
-    if body_status_operation_state_operation_sync_source_helm_values:
-        data["status_operation_state_operation_sync_source_helm_values"] = (
-            body_status_operation_state_operation_sync_source_helm_values
-        )
-    if body_status_operation_state_operation_sync_source_helm_values_object_raw:
-        data["status_operation_state_operation_sync_source_helm_values_object_raw"] = (
-            body_status_operation_state_operation_sync_source_helm_values_object_raw
-        )
-    if body_status_operation_state_operation_sync_source_helm_version:
-        data["status_operation_state_operation_sync_source_helm_version"] = (
-            body_status_operation_state_operation_sync_source_helm_version
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_api_versions:
-        data["status_operation_state_operation_sync_source_kustomize_api_versions"] = (
-            body_status_operation_state_operation_sync_source_kustomize_api_versions
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_common_annotations:
-        data["status_operation_state_operation_sync_source_kustomize_common_annotations"] = (
-            body_status_operation_state_operation_sync_source_kustomize_common_annotations
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_common_annotations_envsubst:
-        data["status_operation_state_operation_sync_source_kustomize_common_annotations_envsubst"] = (
-            body_status_operation_state_operation_sync_source_kustomize_common_annotations_envsubst
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_common_labels:
-        data["status_operation_state_operation_sync_source_kustomize_common_labels"] = (
-            body_status_operation_state_operation_sync_source_kustomize_common_labels
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_components:
-        data["status_operation_state_operation_sync_source_kustomize_components"] = (
-            body_status_operation_state_operation_sync_source_kustomize_components
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_force_common_annotations:
-        data["status_operation_state_operation_sync_source_kustomize_force_common_annotations"] = (
-            body_status_operation_state_operation_sync_source_kustomize_force_common_annotations
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_force_common_labels:
-        data["status_operation_state_operation_sync_source_kustomize_force_common_labels"] = (
-            body_status_operation_state_operation_sync_source_kustomize_force_common_labels
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_ignore_missing_components:
-        data["status_operation_state_operation_sync_source_kustomize_ignore_missing_components"] = (
-            body_status_operation_state_operation_sync_source_kustomize_ignore_missing_components
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_images:
-        data["status_operation_state_operation_sync_source_kustomize_images"] = (
-            body_status_operation_state_operation_sync_source_kustomize_images
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_kube_version:
-        data["status_operation_state_operation_sync_source_kustomize_kube_version"] = (
-            body_status_operation_state_operation_sync_source_kustomize_kube_version
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_label_include_templates:
-        data["status_operation_state_operation_sync_source_kustomize_label_include_templates"] = (
-            body_status_operation_state_operation_sync_source_kustomize_label_include_templates
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_label_without_selector:
-        data["status_operation_state_operation_sync_source_kustomize_label_without_selector"] = (
-            body_status_operation_state_operation_sync_source_kustomize_label_without_selector
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_name_prefix:
-        data["status_operation_state_operation_sync_source_kustomize_name_prefix"] = (
-            body_status_operation_state_operation_sync_source_kustomize_name_prefix
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_name_suffix:
-        data["status_operation_state_operation_sync_source_kustomize_name_suffix"] = (
-            body_status_operation_state_operation_sync_source_kustomize_name_suffix
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_namespace:
-        data["status_operation_state_operation_sync_source_kustomize_namespace"] = (
-            body_status_operation_state_operation_sync_source_kustomize_namespace
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_patches:
-        data["status_operation_state_operation_sync_source_kustomize_patches"] = (
-            body_status_operation_state_operation_sync_source_kustomize_patches
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_replicas:
-        data["status_operation_state_operation_sync_source_kustomize_replicas"] = (
-            body_status_operation_state_operation_sync_source_kustomize_replicas
-        )
-    if body_status_operation_state_operation_sync_source_kustomize_version:
-        data["status_operation_state_operation_sync_source_kustomize_version"] = (
-            body_status_operation_state_operation_sync_source_kustomize_version
-        )
-    if body_status_operation_state_operation_sync_source_name:
-        data["status_operation_state_operation_sync_source_name"] = (
-            body_status_operation_state_operation_sync_source_name
-        )
-    if body_status_operation_state_operation_sync_source_path:
-        data["status_operation_state_operation_sync_source_path"] = (
-            body_status_operation_state_operation_sync_source_path
-        )
-    if body_status_operation_state_operation_sync_source_plugin_env:
-        data["status_operation_state_operation_sync_source_plugin_env"] = (
-            body_status_operation_state_operation_sync_source_plugin_env
-        )
-    if body_status_operation_state_operation_sync_source_plugin_name:
-        data["status_operation_state_operation_sync_source_plugin_name"] = (
-            body_status_operation_state_operation_sync_source_plugin_name
-        )
-    if body_status_operation_state_operation_sync_source_plugin_parameters:
-        data["status_operation_state_operation_sync_source_plugin_parameters"] = (
-            body_status_operation_state_operation_sync_source_plugin_parameters
-        )
-    if body_status_operation_state_operation_sync_source_ref:
-        data["status_operation_state_operation_sync_source_ref"] = body_status_operation_state_operation_sync_source_ref
-    if body_status_operation_state_operation_sync_source_repo_url:
-        data["status_operation_state_operation_sync_source_repo_url"] = (
-            body_status_operation_state_operation_sync_source_repo_url
-        )
-    if body_status_operation_state_operation_sync_source_target_revision:
-        data["status_operation_state_operation_sync_source_target_revision"] = (
-            body_status_operation_state_operation_sync_source_target_revision
-        )
-    if body_status_operation_state_operation_sync_sources:
-        data["status_operation_state_operation_sync_sources"] = body_status_operation_state_operation_sync_sources
-    if body_status_operation_state_operation_sync_sync_options:
-        data["status_operation_state_operation_sync_sync_options"] = (
-            body_status_operation_state_operation_sync_sync_options
-        )
-    if body_status_operation_state_operation_sync_sync_strategy_apply_force:
-        data["status_operation_state_operation_sync_sync_strategy_apply_force"] = (
-            body_status_operation_state_operation_sync_sync_strategy_apply_force
-        )
-    if body_status_operation_state_operation_sync_sync_strategy_hook_sync_strategy_apply_force:
-        data["status_operation_state_operation_sync_sync_strategy_hook_sync_strategy_apply_force"] = (
-            body_status_operation_state_operation_sync_sync_strategy_hook_sync_strategy_apply_force
-        )
-    if body_status_operation_state_phase:
-        data["status_operation_state_phase"] = body_status_operation_state_phase
-    if body_status_operation_state_retry_count:
-        data["status_operation_state_retry_count"] = body_status_operation_state_retry_count
-    if body_status_operation_state_started_at:
-        data["status_operation_state_started_at"] = body_status_operation_state_started_at
-    if body_status_operation_state_sync_result_managed_namespace_metadata_annotations:
-        data["status_operation_state_sync_result_managed_namespace_metadata_annotations"] = (
-            body_status_operation_state_sync_result_managed_namespace_metadata_annotations
-        )
-    if body_status_operation_state_sync_result_managed_namespace_metadata_labels:
-        data["status_operation_state_sync_result_managed_namespace_metadata_labels"] = (
-            body_status_operation_state_sync_result_managed_namespace_metadata_labels
-        )
-    if body_status_operation_state_sync_result_resources:
-        data["status_operation_state_sync_result_resources"] = body_status_operation_state_sync_result_resources
-    if body_status_operation_state_sync_result_revision:
-        data["status_operation_state_sync_result_revision"] = body_status_operation_state_sync_result_revision
-    if body_status_operation_state_sync_result_revisions:
-        data["status_operation_state_sync_result_revisions"] = body_status_operation_state_sync_result_revisions
-    if body_status_operation_state_sync_result_source_chart:
-        data["status_operation_state_sync_result_source_chart"] = body_status_operation_state_sync_result_source_chart
-    if body_status_operation_state_sync_result_source_directory_exclude:
-        data["status_operation_state_sync_result_source_directory_exclude"] = (
-            body_status_operation_state_sync_result_source_directory_exclude
-        )
-    if body_status_operation_state_sync_result_source_directory_include:
-        data["status_operation_state_sync_result_source_directory_include"] = (
-            body_status_operation_state_sync_result_source_directory_include
-        )
-    if body_status_operation_state_sync_result_source_directory_jsonnet_ext_vars:
-        data["status_operation_state_sync_result_source_directory_jsonnet_ext_vars"] = (
-            body_status_operation_state_sync_result_source_directory_jsonnet_ext_vars
-        )
-    if body_status_operation_state_sync_result_source_directory_jsonnet_libs:
-        data["status_operation_state_sync_result_source_directory_jsonnet_libs"] = (
-            body_status_operation_state_sync_result_source_directory_jsonnet_libs
-        )
-    if body_status_operation_state_sync_result_source_directory_jsonnet_tlas:
-        data["status_operation_state_sync_result_source_directory_jsonnet_tlas"] = (
-            body_status_operation_state_sync_result_source_directory_jsonnet_tlas
-        )
-    if body_status_operation_state_sync_result_source_directory_recurse:
-        data["status_operation_state_sync_result_source_directory_recurse"] = (
-            body_status_operation_state_sync_result_source_directory_recurse
-        )
-    if body_status_operation_state_sync_result_source_helm_api_versions:
-        data["status_operation_state_sync_result_source_helm_api_versions"] = (
-            body_status_operation_state_sync_result_source_helm_api_versions
-        )
-    if body_status_operation_state_sync_result_source_helm_file_parameters:
-        data["status_operation_state_sync_result_source_helm_file_parameters"] = (
-            body_status_operation_state_sync_result_source_helm_file_parameters
-        )
-    if body_status_operation_state_sync_result_source_helm_ignore_missing_value_files:
-        data["status_operation_state_sync_result_source_helm_ignore_missing_value_files"] = (
-            body_status_operation_state_sync_result_source_helm_ignore_missing_value_files
-        )
-    if body_status_operation_state_sync_result_source_helm_kube_version:
-        data["status_operation_state_sync_result_source_helm_kube_version"] = (
-            body_status_operation_state_sync_result_source_helm_kube_version
-        )
-    if body_status_operation_state_sync_result_source_helm_namespace:
-        data["status_operation_state_sync_result_source_helm_namespace"] = (
-            body_status_operation_state_sync_result_source_helm_namespace
-        )
-    if body_status_operation_state_sync_result_source_helm_parameters:
-        data["status_operation_state_sync_result_source_helm_parameters"] = (
-            body_status_operation_state_sync_result_source_helm_parameters
-        )
-    if body_status_operation_state_sync_result_source_helm_pass_credentials:
-        data["status_operation_state_sync_result_source_helm_pass_credentials"] = (
-            body_status_operation_state_sync_result_source_helm_pass_credentials
-        )
-    if body_status_operation_state_sync_result_source_helm_release_name:
-        data["status_operation_state_sync_result_source_helm_release_name"] = (
-            body_status_operation_state_sync_result_source_helm_release_name
-        )
-    if body_status_operation_state_sync_result_source_helm_skip_crds:
-        data["status_operation_state_sync_result_source_helm_skip_crds"] = (
-            body_status_operation_state_sync_result_source_helm_skip_crds
-        )
-    if body_status_operation_state_sync_result_source_helm_skip_schema_validation:
-        data["status_operation_state_sync_result_source_helm_skip_schema_validation"] = (
-            body_status_operation_state_sync_result_source_helm_skip_schema_validation
-        )
-    if body_status_operation_state_sync_result_source_helm_skip_tests:
-        data["status_operation_state_sync_result_source_helm_skip_tests"] = (
-            body_status_operation_state_sync_result_source_helm_skip_tests
-        )
-    if body_status_operation_state_sync_result_source_helm_value_files:
-        data["status_operation_state_sync_result_source_helm_value_files"] = (
-            body_status_operation_state_sync_result_source_helm_value_files
-        )
-    if body_status_operation_state_sync_result_source_helm_values:
-        data["status_operation_state_sync_result_source_helm_values"] = (
-            body_status_operation_state_sync_result_source_helm_values
-        )
-    if body_status_operation_state_sync_result_source_helm_values_object_raw:
-        data["status_operation_state_sync_result_source_helm_values_object_raw"] = (
-            body_status_operation_state_sync_result_source_helm_values_object_raw
-        )
-    if body_status_operation_state_sync_result_source_helm_version:
-        data["status_operation_state_sync_result_source_helm_version"] = (
-            body_status_operation_state_sync_result_source_helm_version
-        )
-    if body_status_operation_state_sync_result_source_kustomize_api_versions:
-        data["status_operation_state_sync_result_source_kustomize_api_versions"] = (
-            body_status_operation_state_sync_result_source_kustomize_api_versions
-        )
-    if body_status_operation_state_sync_result_source_kustomize_common_annotations:
-        data["status_operation_state_sync_result_source_kustomize_common_annotations"] = (
-            body_status_operation_state_sync_result_source_kustomize_common_annotations
-        )
-    if body_status_operation_state_sync_result_source_kustomize_common_annotations_envsubst:
-        data["status_operation_state_sync_result_source_kustomize_common_annotations_envsubst"] = (
-            body_status_operation_state_sync_result_source_kustomize_common_annotations_envsubst
-        )
-    if body_status_operation_state_sync_result_source_kustomize_common_labels:
-        data["status_operation_state_sync_result_source_kustomize_common_labels"] = (
-            body_status_operation_state_sync_result_source_kustomize_common_labels
-        )
-    if body_status_operation_state_sync_result_source_kustomize_components:
-        data["status_operation_state_sync_result_source_kustomize_components"] = (
-            body_status_operation_state_sync_result_source_kustomize_components
-        )
-    if body_status_operation_state_sync_result_source_kustomize_force_common_annotations:
-        data["status_operation_state_sync_result_source_kustomize_force_common_annotations"] = (
-            body_status_operation_state_sync_result_source_kustomize_force_common_annotations
-        )
-    if body_status_operation_state_sync_result_source_kustomize_force_common_labels:
-        data["status_operation_state_sync_result_source_kustomize_force_common_labels"] = (
-            body_status_operation_state_sync_result_source_kustomize_force_common_labels
-        )
-    if body_status_operation_state_sync_result_source_kustomize_ignore_missing_components:
-        data["status_operation_state_sync_result_source_kustomize_ignore_missing_components"] = (
-            body_status_operation_state_sync_result_source_kustomize_ignore_missing_components
-        )
-    if body_status_operation_state_sync_result_source_kustomize_images:
-        data["status_operation_state_sync_result_source_kustomize_images"] = (
-            body_status_operation_state_sync_result_source_kustomize_images
-        )
-    if body_status_operation_state_sync_result_source_kustomize_kube_version:
-        data["status_operation_state_sync_result_source_kustomize_kube_version"] = (
-            body_status_operation_state_sync_result_source_kustomize_kube_version
-        )
-    if body_status_operation_state_sync_result_source_kustomize_label_include_templates:
-        data["status_operation_state_sync_result_source_kustomize_label_include_templates"] = (
-            body_status_operation_state_sync_result_source_kustomize_label_include_templates
-        )
-    if body_status_operation_state_sync_result_source_kustomize_label_without_selector:
-        data["status_operation_state_sync_result_source_kustomize_label_without_selector"] = (
-            body_status_operation_state_sync_result_source_kustomize_label_without_selector
-        )
-    if body_status_operation_state_sync_result_source_kustomize_name_prefix:
-        data["status_operation_state_sync_result_source_kustomize_name_prefix"] = (
-            body_status_operation_state_sync_result_source_kustomize_name_prefix
-        )
-    if body_status_operation_state_sync_result_source_kustomize_name_suffix:
-        data["status_operation_state_sync_result_source_kustomize_name_suffix"] = (
-            body_status_operation_state_sync_result_source_kustomize_name_suffix
-        )
-    if body_status_operation_state_sync_result_source_kustomize_namespace:
-        data["status_operation_state_sync_result_source_kustomize_namespace"] = (
-            body_status_operation_state_sync_result_source_kustomize_namespace
-        )
-    if body_status_operation_state_sync_result_source_kustomize_patches:
-        data["status_operation_state_sync_result_source_kustomize_patches"] = (
-            body_status_operation_state_sync_result_source_kustomize_patches
-        )
-    if body_status_operation_state_sync_result_source_kustomize_replicas:
-        data["status_operation_state_sync_result_source_kustomize_replicas"] = (
-            body_status_operation_state_sync_result_source_kustomize_replicas
-        )
-    if body_status_operation_state_sync_result_source_kustomize_version:
-        data["status_operation_state_sync_result_source_kustomize_version"] = (
-            body_status_operation_state_sync_result_source_kustomize_version
-        )
-    if body_status_operation_state_sync_result_source_name:
-        data["status_operation_state_sync_result_source_name"] = body_status_operation_state_sync_result_source_name
-    if body_status_operation_state_sync_result_source_path:
-        data["status_operation_state_sync_result_source_path"] = body_status_operation_state_sync_result_source_path
-    if body_status_operation_state_sync_result_source_plugin_env:
-        data["status_operation_state_sync_result_source_plugin_env"] = (
-            body_status_operation_state_sync_result_source_plugin_env
-        )
-    if body_status_operation_state_sync_result_source_plugin_name:
-        data["status_operation_state_sync_result_source_plugin_name"] = (
-            body_status_operation_state_sync_result_source_plugin_name
-        )
-    if body_status_operation_state_sync_result_source_plugin_parameters:
-        data["status_operation_state_sync_result_source_plugin_parameters"] = (
-            body_status_operation_state_sync_result_source_plugin_parameters
-        )
-    if body_status_operation_state_sync_result_source_ref:
-        data["status_operation_state_sync_result_source_ref"] = body_status_operation_state_sync_result_source_ref
-    if body_status_operation_state_sync_result_source_repo_url:
-        data["status_operation_state_sync_result_source_repo_url"] = (
-            body_status_operation_state_sync_result_source_repo_url
-        )
-    if body_status_operation_state_sync_result_source_target_revision:
-        data["status_operation_state_sync_result_source_target_revision"] = (
-            body_status_operation_state_sync_result_source_target_revision
-        )
-    if body_status_operation_state_sync_result_sources:
-        data["status_operation_state_sync_result_sources"] = body_status_operation_state_sync_result_sources
-    if body_status_reconciled_at:
-        data["status_reconciled_at"] = body_status_reconciled_at
-    if body_status_resource_health_source:
-        data["status_resource_health_source"] = body_status_resource_health_source
-    if body_status_resources:
-        data["status_resources"] = body_status_resources
-    if body_status_source_hydrator_current_operation_dry_sha:
-        data["status_source_hydrator_current_operation_dry_sha"] = body_status_source_hydrator_current_operation_dry_sha
-    if body_status_source_hydrator_current_operation_finished_at:
-        data["status_source_hydrator_current_operation_finished_at"] = (
-            body_status_source_hydrator_current_operation_finished_at
-        )
-    if body_status_source_hydrator_current_operation_hydrated_sha:
-        data["status_source_hydrator_current_operation_hydrated_sha"] = (
-            body_status_source_hydrator_current_operation_hydrated_sha
-        )
-    if body_status_source_hydrator_current_operation_message:
-        data["status_source_hydrator_current_operation_message"] = body_status_source_hydrator_current_operation_message
-    if body_status_source_hydrator_current_operation_phase:
-        data["status_source_hydrator_current_operation_phase"] = body_status_source_hydrator_current_operation_phase
-    if body_status_source_hydrator_current_operation_source_hydrator_dry_source_path:
-        data["status_source_hydrator_current_operation_source_hydrator_dry_source_path"] = (
-            body_status_source_hydrator_current_operation_source_hydrator_dry_source_path
-        )
-    if body_status_source_hydrator_current_operation_source_hydrator_dry_source_repo_url:
-        data["status_source_hydrator_current_operation_source_hydrator_dry_source_repo_url"] = (
-            body_status_source_hydrator_current_operation_source_hydrator_dry_source_repo_url
-        )
-    if body_status_source_hydrator_current_operation_source_hydrator_dry_source_target_revision:
-        data["status_source_hydrator_current_operation_source_hydrator_dry_source_target_revision"] = (
-            body_status_source_hydrator_current_operation_source_hydrator_dry_source_target_revision
-        )
-    if body_status_source_hydrator_current_operation_source_hydrator_hydrate_to_target_branch:
-        data["status_source_hydrator_current_operation_source_hydrator_hydrate_to_target_branch"] = (
-            body_status_source_hydrator_current_operation_source_hydrator_hydrate_to_target_branch
-        )
-    if body_status_source_hydrator_current_operation_source_hydrator_sync_source_path:
-        data["status_source_hydrator_current_operation_source_hydrator_sync_source_path"] = (
-            body_status_source_hydrator_current_operation_source_hydrator_sync_source_path
-        )
-    if body_status_source_hydrator_current_operation_source_hydrator_sync_source_target_branch:
-        data["status_source_hydrator_current_operation_source_hydrator_sync_source_target_branch"] = (
-            body_status_source_hydrator_current_operation_source_hydrator_sync_source_target_branch
-        )
-    if body_status_source_hydrator_current_operation_started_at:
-        data["status_source_hydrator_current_operation_started_at"] = (
-            body_status_source_hydrator_current_operation_started_at
-        )
-    if body_status_source_hydrator_last_successful_operation_dry_sha:
-        data["status_source_hydrator_last_successful_operation_dry_sha"] = (
-            body_status_source_hydrator_last_successful_operation_dry_sha
-        )
-    if body_status_source_hydrator_last_successful_operation_hydrated_sha:
-        data["status_source_hydrator_last_successful_operation_hydrated_sha"] = (
-            body_status_source_hydrator_last_successful_operation_hydrated_sha
-        )
-    if body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_path:
-        data["status_source_hydrator_last_successful_operation_source_hydrator_dry_source_path"] = (
-            body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_path
-        )
-    if body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_repo_url:
-        data["status_source_hydrator_last_successful_operation_source_hydrator_dry_source_repo_url"] = (
-            body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_repo_url
-        )
-    if body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_target_revision:
-        data["status_source_hydrator_last_successful_operation_source_hydrator_dry_source_target_revision"] = (
-            body_status_source_hydrator_last_successful_operation_source_hydrator_dry_source_target_revision
-        )
-    if body_status_source_hydrator_last_successful_operation_source_hydrator_hydrate_to_target_branch:
-        data["status_source_hydrator_last_successful_operation_source_hydrator_hydrate_to_target_branch"] = (
-            body_status_source_hydrator_last_successful_operation_source_hydrator_hydrate_to_target_branch
-        )
-    if body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_path:
-        data["status_source_hydrator_last_successful_operation_source_hydrator_sync_source_path"] = (
-            body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_path
-        )
-    if body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_target_branch:
-        data["status_source_hydrator_last_successful_operation_source_hydrator_sync_source_target_branch"] = (
-            body_status_source_hydrator_last_successful_operation_source_hydrator_sync_source_target_branch
-        )
-    if body_status_source_type:
-        data["status_source_type"] = body_status_source_type
-    if body_status_source_types:
-        data["status_source_types"] = body_status_source_types
-    if body_status_summary_external_ur_ls:
-        data["status_summary_external_ur_ls"] = body_status_summary_external_ur_ls
-    if body_status_summary_images:
-        data["status_summary_images"] = body_status_summary_images
-    if body_status_sync_compared_to_destination_name:
-        data["status_sync_compared_to_destination_name"] = body_status_sync_compared_to_destination_name
-    if body_status_sync_compared_to_destination_namespace:
-        data["status_sync_compared_to_destination_namespace"] = body_status_sync_compared_to_destination_namespace
-    if body_status_sync_compared_to_destination_server:
-        data["status_sync_compared_to_destination_server"] = body_status_sync_compared_to_destination_server
-    if body_status_sync_compared_to_ignore_differences:
-        data["status_sync_compared_to_ignore_differences"] = body_status_sync_compared_to_ignore_differences
-    if body_status_sync_compared_to_source_chart:
-        data["status_sync_compared_to_source_chart"] = body_status_sync_compared_to_source_chart
-    if body_status_sync_compared_to_source_directory_exclude:
-        data["status_sync_compared_to_source_directory_exclude"] = body_status_sync_compared_to_source_directory_exclude
-    if body_status_sync_compared_to_source_directory_include:
-        data["status_sync_compared_to_source_directory_include"] = body_status_sync_compared_to_source_directory_include
-    if body_status_sync_compared_to_source_directory_jsonnet_ext_vars:
-        data["status_sync_compared_to_source_directory_jsonnet_ext_vars"] = (
-            body_status_sync_compared_to_source_directory_jsonnet_ext_vars
-        )
-    if body_status_sync_compared_to_source_directory_jsonnet_libs:
-        data["status_sync_compared_to_source_directory_jsonnet_libs"] = (
-            body_status_sync_compared_to_source_directory_jsonnet_libs
-        )
-    if body_status_sync_compared_to_source_directory_jsonnet_tlas:
-        data["status_sync_compared_to_source_directory_jsonnet_tlas"] = (
-            body_status_sync_compared_to_source_directory_jsonnet_tlas
-        )
-    if body_status_sync_compared_to_source_directory_recurse:
-        data["status_sync_compared_to_source_directory_recurse"] = body_status_sync_compared_to_source_directory_recurse
-    if body_status_sync_compared_to_source_helm_api_versions:
-        data["status_sync_compared_to_source_helm_api_versions"] = body_status_sync_compared_to_source_helm_api_versions
-    if body_status_sync_compared_to_source_helm_file_parameters:
-        data["status_sync_compared_to_source_helm_file_parameters"] = (
-            body_status_sync_compared_to_source_helm_file_parameters
-        )
-    if body_status_sync_compared_to_source_helm_ignore_missing_value_files:
-        data["status_sync_compared_to_source_helm_ignore_missing_value_files"] = (
-            body_status_sync_compared_to_source_helm_ignore_missing_value_files
-        )
-    if body_status_sync_compared_to_source_helm_kube_version:
-        data["status_sync_compared_to_source_helm_kube_version"] = body_status_sync_compared_to_source_helm_kube_version
-    if body_status_sync_compared_to_source_helm_namespace:
-        data["status_sync_compared_to_source_helm_namespace"] = body_status_sync_compared_to_source_helm_namespace
-    if body_status_sync_compared_to_source_helm_parameters:
-        data["status_sync_compared_to_source_helm_parameters"] = body_status_sync_compared_to_source_helm_parameters
-    if body_status_sync_compared_to_source_helm_pass_credentials:
-        data["status_sync_compared_to_source_helm_pass_credentials"] = (
-            body_status_sync_compared_to_source_helm_pass_credentials
-        )
-    if body_status_sync_compared_to_source_helm_release_name:
-        data["status_sync_compared_to_source_helm_release_name"] = body_status_sync_compared_to_source_helm_release_name
-    if body_status_sync_compared_to_source_helm_skip_crds:
-        data["status_sync_compared_to_source_helm_skip_crds"] = body_status_sync_compared_to_source_helm_skip_crds
-    if body_status_sync_compared_to_source_helm_skip_schema_validation:
-        data["status_sync_compared_to_source_helm_skip_schema_validation"] = (
-            body_status_sync_compared_to_source_helm_skip_schema_validation
-        )
-    if body_status_sync_compared_to_source_helm_skip_tests:
-        data["status_sync_compared_to_source_helm_skip_tests"] = body_status_sync_compared_to_source_helm_skip_tests
-    if body_status_sync_compared_to_source_helm_value_files:
-        data["status_sync_compared_to_source_helm_value_files"] = body_status_sync_compared_to_source_helm_value_files
-    if body_status_sync_compared_to_source_helm_values:
-        data["status_sync_compared_to_source_helm_values"] = body_status_sync_compared_to_source_helm_values
-    if body_status_sync_compared_to_source_helm_values_object_raw:
-        data["status_sync_compared_to_source_helm_values_object_raw"] = (
-            body_status_sync_compared_to_source_helm_values_object_raw
-        )
-    if body_status_sync_compared_to_source_helm_version:
-        data["status_sync_compared_to_source_helm_version"] = body_status_sync_compared_to_source_helm_version
-    if body_status_sync_compared_to_source_kustomize_api_versions:
-        data["status_sync_compared_to_source_kustomize_api_versions"] = (
-            body_status_sync_compared_to_source_kustomize_api_versions
-        )
-    if body_status_sync_compared_to_source_kustomize_common_annotations:
-        data["status_sync_compared_to_source_kustomize_common_annotations"] = (
-            body_status_sync_compared_to_source_kustomize_common_annotations
-        )
-    if body_status_sync_compared_to_source_kustomize_common_annotations_envsubst:
-        data["status_sync_compared_to_source_kustomize_common_annotations_envsubst"] = (
-            body_status_sync_compared_to_source_kustomize_common_annotations_envsubst
-        )
-    if body_status_sync_compared_to_source_kustomize_common_labels:
-        data["status_sync_compared_to_source_kustomize_common_labels"] = (
-            body_status_sync_compared_to_source_kustomize_common_labels
-        )
-    if body_status_sync_compared_to_source_kustomize_components:
-        data["status_sync_compared_to_source_kustomize_components"] = (
-            body_status_sync_compared_to_source_kustomize_components
-        )
-    if body_status_sync_compared_to_source_kustomize_force_common_annotations:
-        data["status_sync_compared_to_source_kustomize_force_common_annotations"] = (
-            body_status_sync_compared_to_source_kustomize_force_common_annotations
-        )
-    if body_status_sync_compared_to_source_kustomize_force_common_labels:
-        data["status_sync_compared_to_source_kustomize_force_common_labels"] = (
-            body_status_sync_compared_to_source_kustomize_force_common_labels
-        )
-    if body_status_sync_compared_to_source_kustomize_ignore_missing_components:
-        data["status_sync_compared_to_source_kustomize_ignore_missing_components"] = (
-            body_status_sync_compared_to_source_kustomize_ignore_missing_components
-        )
-    if body_status_sync_compared_to_source_kustomize_images:
-        data["status_sync_compared_to_source_kustomize_images"] = body_status_sync_compared_to_source_kustomize_images
-    if body_status_sync_compared_to_source_kustomize_kube_version:
-        data["status_sync_compared_to_source_kustomize_kube_version"] = (
-            body_status_sync_compared_to_source_kustomize_kube_version
-        )
-    if body_status_sync_compared_to_source_kustomize_label_include_templates:
-        data["status_sync_compared_to_source_kustomize_label_include_templates"] = (
-            body_status_sync_compared_to_source_kustomize_label_include_templates
-        )
-    if body_status_sync_compared_to_source_kustomize_label_without_selector:
-        data["status_sync_compared_to_source_kustomize_label_without_selector"] = (
-            body_status_sync_compared_to_source_kustomize_label_without_selector
-        )
-    if body_status_sync_compared_to_source_kustomize_name_prefix:
-        data["status_sync_compared_to_source_kustomize_name_prefix"] = (
-            body_status_sync_compared_to_source_kustomize_name_prefix
-        )
-    if body_status_sync_compared_to_source_kustomize_name_suffix:
-        data["status_sync_compared_to_source_kustomize_name_suffix"] = (
-            body_status_sync_compared_to_source_kustomize_name_suffix
-        )
-    if body_status_sync_compared_to_source_kustomize_namespace:
-        data["status_sync_compared_to_source_kustomize_namespace"] = (
-            body_status_sync_compared_to_source_kustomize_namespace
-        )
-    if body_status_sync_compared_to_source_kustomize_patches:
-        data["status_sync_compared_to_source_kustomize_patches"] = body_status_sync_compared_to_source_kustomize_patches
-    if body_status_sync_compared_to_source_kustomize_replicas:
-        data["status_sync_compared_to_source_kustomize_replicas"] = (
-            body_status_sync_compared_to_source_kustomize_replicas
-        )
-    if body_status_sync_compared_to_source_kustomize_version:
-        data["status_sync_compared_to_source_kustomize_version"] = body_status_sync_compared_to_source_kustomize_version
-    if body_status_sync_compared_to_source_name:
-        data["status_sync_compared_to_source_name"] = body_status_sync_compared_to_source_name
-    if body_status_sync_compared_to_source_path:
-        data["status_sync_compared_to_source_path"] = body_status_sync_compared_to_source_path
-    if body_status_sync_compared_to_source_plugin_env:
-        data["status_sync_compared_to_source_plugin_env"] = body_status_sync_compared_to_source_plugin_env
-    if body_status_sync_compared_to_source_plugin_name:
-        data["status_sync_compared_to_source_plugin_name"] = body_status_sync_compared_to_source_plugin_name
-    if body_status_sync_compared_to_source_plugin_parameters:
-        data["status_sync_compared_to_source_plugin_parameters"] = body_status_sync_compared_to_source_plugin_parameters
-    if body_status_sync_compared_to_source_ref:
-        data["status_sync_compared_to_source_ref"] = body_status_sync_compared_to_source_ref
-    if body_status_sync_compared_to_source_repo_url:
-        data["status_sync_compared_to_source_repo_url"] = body_status_sync_compared_to_source_repo_url
-    if body_status_sync_compared_to_source_target_revision:
-        data["status_sync_compared_to_source_target_revision"] = body_status_sync_compared_to_source_target_revision
-    if body_status_sync_compared_to_sources:
-        data["status_sync_compared_to_sources"] = body_status_sync_compared_to_sources
-    if body_status_sync_revision:
-        data["status_sync_revision"] = body_status_sync_revision
-    if body_status_sync_revisions:
-        data["status_sync_revisions"] = body_status_sync_revisions
-    if body_status_sync_status:
-        data["status_sync_status"] = body_status_sync_status
+    params["project"] = str(param_project).lower() if isinstance(param_project, bool) else param_project
+
+    flat_body = {}
+    if body_metadata_annotations is not None:
+        flat_body["metadata_annotations"] = body_metadata_annotations
+    if body_metadata_creationTimestamp is not None:
+        flat_body["metadata_creationTimestamp"] = body_metadata_creationTimestamp
+    if body_metadata_deletionGracePeriodSeconds is not None:
+        flat_body["metadata_deletionGracePeriodSeconds"] = body_metadata_deletionGracePeriodSeconds
+    if body_metadata_deletionTimestamp is not None:
+        flat_body["metadata_deletionTimestamp"] = body_metadata_deletionTimestamp
+    if body_metadata_finalizers is not None:
+        flat_body["metadata_finalizers"] = body_metadata_finalizers
+    if body_metadata_generateName is not None:
+        flat_body["metadata_generateName"] = body_metadata_generateName
+    if body_metadata_generation is not None:
+        flat_body["metadata_generation"] = body_metadata_generation
+    if body_metadata_labels is not None:
+        flat_body["metadata_labels"] = body_metadata_labels
+    if body_metadata_managedFields is not None:
+        flat_body["metadata_managedFields"] = body_metadata_managedFields
+    if body_metadata_name is not None:
+        flat_body["metadata_name"] = body_metadata_name
+    if body_metadata_namespace is not None:
+        flat_body["metadata_namespace"] = body_metadata_namespace
+    if body_metadata_ownerReferences is not None:
+        flat_body["metadata_ownerReferences"] = body_metadata_ownerReferences
+    if body_metadata_resourceVersion is not None:
+        flat_body["metadata_resourceVersion"] = body_metadata_resourceVersion
+    if body_metadata_selfLink is not None:
+        flat_body["metadata_selfLink"] = body_metadata_selfLink
+    if body_metadata_uid is not None:
+        flat_body["metadata_uid"] = body_metadata_uid
+    if body_operation_info is not None:
+        flat_body["operation_info"] = body_operation_info
+    if body_operation_initiatedBy_automated is not None:
+        flat_body["operation_initiatedBy_automated"] = body_operation_initiatedBy_automated
+    if body_operation_initiatedBy_username is not None:
+        flat_body["operation_initiatedBy_username"] = body_operation_initiatedBy_username
+    if body_operation_retry_backoff_duration is not None:
+        flat_body["operation_retry_backoff_duration"] = body_operation_retry_backoff_duration
+    if body_operation_retry_backoff_factor is not None:
+        flat_body["operation_retry_backoff_factor"] = body_operation_retry_backoff_factor
+    if body_operation_retry_backoff_maxDuration is not None:
+        flat_body["operation_retry_backoff_maxDuration"] = body_operation_retry_backoff_maxDuration
+    if body_operation_retry_limit is not None:
+        flat_body["operation_retry_limit"] = body_operation_retry_limit
+    if body_operation_sync_autoHealAttemptsCount is not None:
+        flat_body["operation_sync_autoHealAttemptsCount"] = body_operation_sync_autoHealAttemptsCount
+    if body_operation_sync_dryRun is not None:
+        flat_body["operation_sync_dryRun"] = body_operation_sync_dryRun
+    if body_operation_sync_manifests is not None:
+        flat_body["operation_sync_manifests"] = body_operation_sync_manifests
+    if body_operation_sync_prune is not None:
+        flat_body["operation_sync_prune"] = body_operation_sync_prune
+    if body_operation_sync_resources is not None:
+        flat_body["operation_sync_resources"] = body_operation_sync_resources
+    if body_operation_sync_revision is not None:
+        flat_body["operation_sync_revision"] = body_operation_sync_revision
+    if body_operation_sync_revisions is not None:
+        flat_body["operation_sync_revisions"] = body_operation_sync_revisions
+    if body_operation_sync_source_chart is not None:
+        flat_body["operation_sync_source_chart"] = body_operation_sync_source_chart
+    if body_operation_sync_source_directory_exclude is not None:
+        flat_body["operation_sync_source_directory_exclude"] = body_operation_sync_source_directory_exclude
+    if body_operation_sync_source_directory_include is not None:
+        flat_body["operation_sync_source_directory_include"] = body_operation_sync_source_directory_include
+    if body_operation_sync_source_directory_jsonnet_extVars is not None:
+        flat_body["operation_sync_source_directory_jsonnet_extVars"] = (
+            body_operation_sync_source_directory_jsonnet_extVars
+        )
+    if body_operation_sync_source_directory_jsonnet_libs is not None:
+        flat_body["operation_sync_source_directory_jsonnet_libs"] = body_operation_sync_source_directory_jsonnet_libs
+    if body_operation_sync_source_directory_jsonnet_tlas is not None:
+        flat_body["operation_sync_source_directory_jsonnet_tlas"] = body_operation_sync_source_directory_jsonnet_tlas
+    if body_operation_sync_source_directory_recurse is not None:
+        flat_body["operation_sync_source_directory_recurse"] = body_operation_sync_source_directory_recurse
+    if body_operation_sync_source_helm_apiVersions is not None:
+        flat_body["operation_sync_source_helm_apiVersions"] = body_operation_sync_source_helm_apiVersions
+    if body_operation_sync_source_helm_fileParameters is not None:
+        flat_body["operation_sync_source_helm_fileParameters"] = body_operation_sync_source_helm_fileParameters
+    if body_operation_sync_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["operation_sync_source_helm_ignoreMissingValueFiles"] = (
+            body_operation_sync_source_helm_ignoreMissingValueFiles
+        )
+    if body_operation_sync_source_helm_kubeVersion is not None:
+        flat_body["operation_sync_source_helm_kubeVersion"] = body_operation_sync_source_helm_kubeVersion
+    if body_operation_sync_source_helm_namespace is not None:
+        flat_body["operation_sync_source_helm_namespace"] = body_operation_sync_source_helm_namespace
+    if body_operation_sync_source_helm_parameters is not None:
+        flat_body["operation_sync_source_helm_parameters"] = body_operation_sync_source_helm_parameters
+    if body_operation_sync_source_helm_passCredentials is not None:
+        flat_body["operation_sync_source_helm_passCredentials"] = body_operation_sync_source_helm_passCredentials
+    if body_operation_sync_source_helm_releaseName is not None:
+        flat_body["operation_sync_source_helm_releaseName"] = body_operation_sync_source_helm_releaseName
+    if body_operation_sync_source_helm_skipCrds is not None:
+        flat_body["operation_sync_source_helm_skipCrds"] = body_operation_sync_source_helm_skipCrds
+    if body_operation_sync_source_helm_skipSchemaValidation is not None:
+        flat_body["operation_sync_source_helm_skipSchemaValidation"] = (
+            body_operation_sync_source_helm_skipSchemaValidation
+        )
+    if body_operation_sync_source_helm_skipTests is not None:
+        flat_body["operation_sync_source_helm_skipTests"] = body_operation_sync_source_helm_skipTests
+    if body_operation_sync_source_helm_valueFiles is not None:
+        flat_body["operation_sync_source_helm_valueFiles"] = body_operation_sync_source_helm_valueFiles
+    if body_operation_sync_source_helm_values is not None:
+        flat_body["operation_sync_source_helm_values"] = body_operation_sync_source_helm_values
+    if body_operation_sync_source_helm_valuesObject_raw is not None:
+        flat_body["operation_sync_source_helm_valuesObject_raw"] = body_operation_sync_source_helm_valuesObject_raw
+    if body_operation_sync_source_helm_version is not None:
+        flat_body["operation_sync_source_helm_version"] = body_operation_sync_source_helm_version
+    if body_operation_sync_source_kustomize_apiVersions is not None:
+        flat_body["operation_sync_source_kustomize_apiVersions"] = body_operation_sync_source_kustomize_apiVersions
+    if body_operation_sync_source_kustomize_commonAnnotations is not None:
+        flat_body["operation_sync_source_kustomize_commonAnnotations"] = (
+            body_operation_sync_source_kustomize_commonAnnotations
+        )
+    if body_operation_sync_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["operation_sync_source_kustomize_commonAnnotationsEnvsubst"] = (
+            body_operation_sync_source_kustomize_commonAnnotationsEnvsubst
+        )
+    if body_operation_sync_source_kustomize_commonLabels is not None:
+        flat_body["operation_sync_source_kustomize_commonLabels"] = body_operation_sync_source_kustomize_commonLabels
+    if body_operation_sync_source_kustomize_components is not None:
+        flat_body["operation_sync_source_kustomize_components"] = body_operation_sync_source_kustomize_components
+    if body_operation_sync_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["operation_sync_source_kustomize_forceCommonAnnotations"] = (
+            body_operation_sync_source_kustomize_forceCommonAnnotations
+        )
+    if body_operation_sync_source_kustomize_forceCommonLabels is not None:
+        flat_body["operation_sync_source_kustomize_forceCommonLabels"] = (
+            body_operation_sync_source_kustomize_forceCommonLabels
+        )
+    if body_operation_sync_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["operation_sync_source_kustomize_ignoreMissingComponents"] = (
+            body_operation_sync_source_kustomize_ignoreMissingComponents
+        )
+    if body_operation_sync_source_kustomize_images is not None:
+        flat_body["operation_sync_source_kustomize_images"] = body_operation_sync_source_kustomize_images
+    if body_operation_sync_source_kustomize_kubeVersion is not None:
+        flat_body["operation_sync_source_kustomize_kubeVersion"] = body_operation_sync_source_kustomize_kubeVersion
+    if body_operation_sync_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["operation_sync_source_kustomize_labelIncludeTemplates"] = (
+            body_operation_sync_source_kustomize_labelIncludeTemplates
+        )
+    if body_operation_sync_source_kustomize_labelWithoutSelector is not None:
+        flat_body["operation_sync_source_kustomize_labelWithoutSelector"] = (
+            body_operation_sync_source_kustomize_labelWithoutSelector
+        )
+    if body_operation_sync_source_kustomize_namePrefix is not None:
+        flat_body["operation_sync_source_kustomize_namePrefix"] = body_operation_sync_source_kustomize_namePrefix
+    if body_operation_sync_source_kustomize_nameSuffix is not None:
+        flat_body["operation_sync_source_kustomize_nameSuffix"] = body_operation_sync_source_kustomize_nameSuffix
+    if body_operation_sync_source_kustomize_namespace is not None:
+        flat_body["operation_sync_source_kustomize_namespace"] = body_operation_sync_source_kustomize_namespace
+    if body_operation_sync_source_kustomize_patches is not None:
+        flat_body["operation_sync_source_kustomize_patches"] = body_operation_sync_source_kustomize_patches
+    if body_operation_sync_source_kustomize_replicas is not None:
+        flat_body["operation_sync_source_kustomize_replicas"] = body_operation_sync_source_kustomize_replicas
+    if body_operation_sync_source_kustomize_version is not None:
+        flat_body["operation_sync_source_kustomize_version"] = body_operation_sync_source_kustomize_version
+    if body_operation_sync_source_name is not None:
+        flat_body["operation_sync_source_name"] = body_operation_sync_source_name
+    if body_operation_sync_source_path is not None:
+        flat_body["operation_sync_source_path"] = body_operation_sync_source_path
+    if body_operation_sync_source_plugin_env is not None:
+        flat_body["operation_sync_source_plugin_env"] = body_operation_sync_source_plugin_env
+    if body_operation_sync_source_plugin_name is not None:
+        flat_body["operation_sync_source_plugin_name"] = body_operation_sync_source_plugin_name
+    if body_operation_sync_source_plugin_parameters is not None:
+        flat_body["operation_sync_source_plugin_parameters"] = body_operation_sync_source_plugin_parameters
+    if body_operation_sync_source_ref is not None:
+        flat_body["operation_sync_source_ref"] = body_operation_sync_source_ref
+    if body_operation_sync_source_repoURL is not None:
+        flat_body["operation_sync_source_repoURL"] = body_operation_sync_source_repoURL
+    if body_operation_sync_source_targetRevision is not None:
+        flat_body["operation_sync_source_targetRevision"] = body_operation_sync_source_targetRevision
+    if body_operation_sync_sources is not None:
+        flat_body["operation_sync_sources"] = body_operation_sync_sources
+    if body_operation_sync_syncOptions is not None:
+        flat_body["operation_sync_syncOptions"] = body_operation_sync_syncOptions
+    if body_operation_sync_syncStrategy_apply_force is not None:
+        flat_body["operation_sync_syncStrategy_apply_force"] = body_operation_sync_syncStrategy_apply_force
+    if body_operation_sync_syncStrategy_hook_syncStrategyApply_force is not None:
+        flat_body["operation_sync_syncStrategy_hook_syncStrategyApply_force"] = (
+            body_operation_sync_syncStrategy_hook_syncStrategyApply_force
+        )
+    if body_spec_destination_name is not None:
+        flat_body["spec_destination_name"] = body_spec_destination_name
+    if body_spec_destination_namespace is not None:
+        flat_body["spec_destination_namespace"] = body_spec_destination_namespace
+    if body_spec_destination_server is not None:
+        flat_body["spec_destination_server"] = body_spec_destination_server
+    if body_spec_ignoreDifferences is not None:
+        flat_body["spec_ignoreDifferences"] = body_spec_ignoreDifferences
+    if body_spec_info is not None:
+        flat_body["spec_info"] = body_spec_info
+    if body_spec_project is not None:
+        flat_body["spec_project"] = body_spec_project
+    if body_spec_revisionHistoryLimit is not None:
+        flat_body["spec_revisionHistoryLimit"] = body_spec_revisionHistoryLimit
+    if body_spec_source_chart is not None:
+        flat_body["spec_source_chart"] = body_spec_source_chart
+    if body_spec_source_directory_exclude is not None:
+        flat_body["spec_source_directory_exclude"] = body_spec_source_directory_exclude
+    if body_spec_source_directory_include is not None:
+        flat_body["spec_source_directory_include"] = body_spec_source_directory_include
+    if body_spec_source_directory_jsonnet_extVars is not None:
+        flat_body["spec_source_directory_jsonnet_extVars"] = body_spec_source_directory_jsonnet_extVars
+    if body_spec_source_directory_jsonnet_libs is not None:
+        flat_body["spec_source_directory_jsonnet_libs"] = body_spec_source_directory_jsonnet_libs
+    if body_spec_source_directory_jsonnet_tlas is not None:
+        flat_body["spec_source_directory_jsonnet_tlas"] = body_spec_source_directory_jsonnet_tlas
+    if body_spec_source_directory_recurse is not None:
+        flat_body["spec_source_directory_recurse"] = body_spec_source_directory_recurse
+    if body_spec_source_helm_apiVersions is not None:
+        flat_body["spec_source_helm_apiVersions"] = body_spec_source_helm_apiVersions
+    if body_spec_source_helm_fileParameters is not None:
+        flat_body["spec_source_helm_fileParameters"] = body_spec_source_helm_fileParameters
+    if body_spec_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["spec_source_helm_ignoreMissingValueFiles"] = body_spec_source_helm_ignoreMissingValueFiles
+    if body_spec_source_helm_kubeVersion is not None:
+        flat_body["spec_source_helm_kubeVersion"] = body_spec_source_helm_kubeVersion
+    if body_spec_source_helm_namespace is not None:
+        flat_body["spec_source_helm_namespace"] = body_spec_source_helm_namespace
+    if body_spec_source_helm_parameters is not None:
+        flat_body["spec_source_helm_parameters"] = body_spec_source_helm_parameters
+    if body_spec_source_helm_passCredentials is not None:
+        flat_body["spec_source_helm_passCredentials"] = body_spec_source_helm_passCredentials
+    if body_spec_source_helm_releaseName is not None:
+        flat_body["spec_source_helm_releaseName"] = body_spec_source_helm_releaseName
+    if body_spec_source_helm_skipCrds is not None:
+        flat_body["spec_source_helm_skipCrds"] = body_spec_source_helm_skipCrds
+    if body_spec_source_helm_skipSchemaValidation is not None:
+        flat_body["spec_source_helm_skipSchemaValidation"] = body_spec_source_helm_skipSchemaValidation
+    if body_spec_source_helm_skipTests is not None:
+        flat_body["spec_source_helm_skipTests"] = body_spec_source_helm_skipTests
+    if body_spec_source_helm_valueFiles is not None:
+        flat_body["spec_source_helm_valueFiles"] = body_spec_source_helm_valueFiles
+    if body_spec_source_helm_values is not None:
+        flat_body["spec_source_helm_values"] = body_spec_source_helm_values
+    if body_spec_source_helm_valuesObject_raw is not None:
+        flat_body["spec_source_helm_valuesObject_raw"] = body_spec_source_helm_valuesObject_raw
+    if body_spec_source_helm_version is not None:
+        flat_body["spec_source_helm_version"] = body_spec_source_helm_version
+    if body_spec_source_kustomize_apiVersions is not None:
+        flat_body["spec_source_kustomize_apiVersions"] = body_spec_source_kustomize_apiVersions
+    if body_spec_source_kustomize_commonAnnotations is not None:
+        flat_body["spec_source_kustomize_commonAnnotations"] = body_spec_source_kustomize_commonAnnotations
+    if body_spec_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["spec_source_kustomize_commonAnnotationsEnvsubst"] = (
+            body_spec_source_kustomize_commonAnnotationsEnvsubst
+        )
+    if body_spec_source_kustomize_commonLabels is not None:
+        flat_body["spec_source_kustomize_commonLabels"] = body_spec_source_kustomize_commonLabels
+    if body_spec_source_kustomize_components is not None:
+        flat_body["spec_source_kustomize_components"] = body_spec_source_kustomize_components
+    if body_spec_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["spec_source_kustomize_forceCommonAnnotations"] = body_spec_source_kustomize_forceCommonAnnotations
+    if body_spec_source_kustomize_forceCommonLabels is not None:
+        flat_body["spec_source_kustomize_forceCommonLabels"] = body_spec_source_kustomize_forceCommonLabels
+    if body_spec_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["spec_source_kustomize_ignoreMissingComponents"] = body_spec_source_kustomize_ignoreMissingComponents
+    if body_spec_source_kustomize_images is not None:
+        flat_body["spec_source_kustomize_images"] = body_spec_source_kustomize_images
+    if body_spec_source_kustomize_kubeVersion is not None:
+        flat_body["spec_source_kustomize_kubeVersion"] = body_spec_source_kustomize_kubeVersion
+    if body_spec_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["spec_source_kustomize_labelIncludeTemplates"] = body_spec_source_kustomize_labelIncludeTemplates
+    if body_spec_source_kustomize_labelWithoutSelector is not None:
+        flat_body["spec_source_kustomize_labelWithoutSelector"] = body_spec_source_kustomize_labelWithoutSelector
+    if body_spec_source_kustomize_namePrefix is not None:
+        flat_body["spec_source_kustomize_namePrefix"] = body_spec_source_kustomize_namePrefix
+    if body_spec_source_kustomize_nameSuffix is not None:
+        flat_body["spec_source_kustomize_nameSuffix"] = body_spec_source_kustomize_nameSuffix
+    if body_spec_source_kustomize_namespace is not None:
+        flat_body["spec_source_kustomize_namespace"] = body_spec_source_kustomize_namespace
+    if body_spec_source_kustomize_patches is not None:
+        flat_body["spec_source_kustomize_patches"] = body_spec_source_kustomize_patches
+    if body_spec_source_kustomize_replicas is not None:
+        flat_body["spec_source_kustomize_replicas"] = body_spec_source_kustomize_replicas
+    if body_spec_source_kustomize_version is not None:
+        flat_body["spec_source_kustomize_version"] = body_spec_source_kustomize_version
+    if body_spec_source_name is not None:
+        flat_body["spec_source_name"] = body_spec_source_name
+    if body_spec_source_path is not None:
+        flat_body["spec_source_path"] = body_spec_source_path
+    if body_spec_source_plugin_env is not None:
+        flat_body["spec_source_plugin_env"] = body_spec_source_plugin_env
+    if body_spec_source_plugin_name is not None:
+        flat_body["spec_source_plugin_name"] = body_spec_source_plugin_name
+    if body_spec_source_plugin_parameters is not None:
+        flat_body["spec_source_plugin_parameters"] = body_spec_source_plugin_parameters
+    if body_spec_source_ref is not None:
+        flat_body["spec_source_ref"] = body_spec_source_ref
+    if body_spec_source_repoURL is not None:
+        flat_body["spec_source_repoURL"] = body_spec_source_repoURL
+    if body_spec_source_targetRevision is not None:
+        flat_body["spec_source_targetRevision"] = body_spec_source_targetRevision
+    if body_spec_sourceHydrator_drySource_path is not None:
+        flat_body["spec_sourceHydrator_drySource_path"] = body_spec_sourceHydrator_drySource_path
+    if body_spec_sourceHydrator_drySource_repoURL is not None:
+        flat_body["spec_sourceHydrator_drySource_repoURL"] = body_spec_sourceHydrator_drySource_repoURL
+    if body_spec_sourceHydrator_drySource_targetRevision is not None:
+        flat_body["spec_sourceHydrator_drySource_targetRevision"] = body_spec_sourceHydrator_drySource_targetRevision
+    if body_spec_sourceHydrator_hydrateTo_targetBranch is not None:
+        flat_body["spec_sourceHydrator_hydrateTo_targetBranch"] = body_spec_sourceHydrator_hydrateTo_targetBranch
+    if body_spec_sourceHydrator_syncSource_path is not None:
+        flat_body["spec_sourceHydrator_syncSource_path"] = body_spec_sourceHydrator_syncSource_path
+    if body_spec_sourceHydrator_syncSource_targetBranch is not None:
+        flat_body["spec_sourceHydrator_syncSource_targetBranch"] = body_spec_sourceHydrator_syncSource_targetBranch
+    if body_spec_sources is not None:
+        flat_body["spec_sources"] = body_spec_sources
+    if body_spec_syncPolicy_automated_allowEmpty is not None:
+        flat_body["spec_syncPolicy_automated_allowEmpty"] = body_spec_syncPolicy_automated_allowEmpty
+    if body_spec_syncPolicy_automated_enable is not None:
+        flat_body["spec_syncPolicy_automated_enable"] = body_spec_syncPolicy_automated_enable
+    if body_spec_syncPolicy_automated_prune is not None:
+        flat_body["spec_syncPolicy_automated_prune"] = body_spec_syncPolicy_automated_prune
+    if body_spec_syncPolicy_automated_selfHeal is not None:
+        flat_body["spec_syncPolicy_automated_selfHeal"] = body_spec_syncPolicy_automated_selfHeal
+    if body_spec_syncPolicy_managedNamespaceMetadata_annotations is not None:
+        flat_body["spec_syncPolicy_managedNamespaceMetadata_annotations"] = (
+            body_spec_syncPolicy_managedNamespaceMetadata_annotations
+        )
+    if body_spec_syncPolicy_managedNamespaceMetadata_labels is not None:
+        flat_body["spec_syncPolicy_managedNamespaceMetadata_labels"] = (
+            body_spec_syncPolicy_managedNamespaceMetadata_labels
+        )
+    if body_spec_syncPolicy_retry_backoff_duration is not None:
+        flat_body["spec_syncPolicy_retry_backoff_duration"] = body_spec_syncPolicy_retry_backoff_duration
+    if body_spec_syncPolicy_retry_backoff_factor is not None:
+        flat_body["spec_syncPolicy_retry_backoff_factor"] = body_spec_syncPolicy_retry_backoff_factor
+    if body_spec_syncPolicy_retry_backoff_maxDuration is not None:
+        flat_body["spec_syncPolicy_retry_backoff_maxDuration"] = body_spec_syncPolicy_retry_backoff_maxDuration
+    if body_spec_syncPolicy_retry_limit is not None:
+        flat_body["spec_syncPolicy_retry_limit"] = body_spec_syncPolicy_retry_limit
+    if body_spec_syncPolicy_syncOptions is not None:
+        flat_body["spec_syncPolicy_syncOptions"] = body_spec_syncPolicy_syncOptions
+    if body_status_conditions is not None:
+        flat_body["status_conditions"] = body_status_conditions
+    if body_status_controllerNamespace is not None:
+        flat_body["status_controllerNamespace"] = body_status_controllerNamespace
+    if body_status_health_lastTransitionTime is not None:
+        flat_body["status_health_lastTransitionTime"] = body_status_health_lastTransitionTime
+    if body_status_health_message is not None:
+        flat_body["status_health_message"] = body_status_health_message
+    if body_status_health_status is not None:
+        flat_body["status_health_status"] = body_status_health_status
+    if body_status_history is not None:
+        flat_body["status_history"] = body_status_history
+    if body_status_observedAt is not None:
+        flat_body["status_observedAt"] = body_status_observedAt
+    if body_status_operationState_finishedAt is not None:
+        flat_body["status_operationState_finishedAt"] = body_status_operationState_finishedAt
+    if body_status_operationState_message is not None:
+        flat_body["status_operationState_message"] = body_status_operationState_message
+    if body_status_operationState_operation_info is not None:
+        flat_body["status_operationState_operation_info"] = body_status_operationState_operation_info
+    if body_status_operationState_operation_initiatedBy_automated is not None:
+        flat_body["status_operationState_operation_initiatedBy_automated"] = (
+            body_status_operationState_operation_initiatedBy_automated
+        )
+    if body_status_operationState_operation_initiatedBy_username is not None:
+        flat_body["status_operationState_operation_initiatedBy_username"] = (
+            body_status_operationState_operation_initiatedBy_username
+        )
+    if body_status_operationState_operation_retry_backoff_duration is not None:
+        flat_body["status_operationState_operation_retry_backoff_duration"] = (
+            body_status_operationState_operation_retry_backoff_duration
+        )
+    if body_status_operationState_operation_retry_backoff_factor is not None:
+        flat_body["status_operationState_operation_retry_backoff_factor"] = (
+            body_status_operationState_operation_retry_backoff_factor
+        )
+    if body_status_operationState_operation_retry_backoff_maxDuration is not None:
+        flat_body["status_operationState_operation_retry_backoff_maxDuration"] = (
+            body_status_operationState_operation_retry_backoff_maxDuration
+        )
+    if body_status_operationState_operation_retry_limit is not None:
+        flat_body["status_operationState_operation_retry_limit"] = body_status_operationState_operation_retry_limit
+    if body_status_operationState_operation_sync_autoHealAttemptsCount is not None:
+        flat_body["status_operationState_operation_sync_autoHealAttemptsCount"] = (
+            body_status_operationState_operation_sync_autoHealAttemptsCount
+        )
+    if body_status_operationState_operation_sync_dryRun is not None:
+        flat_body["status_operationState_operation_sync_dryRun"] = body_status_operationState_operation_sync_dryRun
+    if body_status_operationState_operation_sync_manifests is not None:
+        flat_body["status_operationState_operation_sync_manifests"] = (
+            body_status_operationState_operation_sync_manifests
+        )
+    if body_status_operationState_operation_sync_prune is not None:
+        flat_body["status_operationState_operation_sync_prune"] = body_status_operationState_operation_sync_prune
+    if body_status_operationState_operation_sync_resources is not None:
+        flat_body["status_operationState_operation_sync_resources"] = (
+            body_status_operationState_operation_sync_resources
+        )
+    if body_status_operationState_operation_sync_revision is not None:
+        flat_body["status_operationState_operation_sync_revision"] = body_status_operationState_operation_sync_revision
+    if body_status_operationState_operation_sync_revisions is not None:
+        flat_body["status_operationState_operation_sync_revisions"] = (
+            body_status_operationState_operation_sync_revisions
+        )
+    if body_status_operationState_operation_sync_source_chart is not None:
+        flat_body["status_operationState_operation_sync_source_chart"] = (
+            body_status_operationState_operation_sync_source_chart
+        )
+    if body_status_operationState_operation_sync_source_directory_exclude is not None:
+        flat_body["status_operationState_operation_sync_source_directory_exclude"] = (
+            body_status_operationState_operation_sync_source_directory_exclude
+        )
+    if body_status_operationState_operation_sync_source_directory_include is not None:
+        flat_body["status_operationState_operation_sync_source_directory_include"] = (
+            body_status_operationState_operation_sync_source_directory_include
+        )
+    if body_status_operationState_operation_sync_source_directory_jsonnet_extVars is not None:
+        flat_body["status_operationState_operation_sync_source_directory_jsonnet_extVars"] = (
+            body_status_operationState_operation_sync_source_directory_jsonnet_extVars
+        )
+    if body_status_operationState_operation_sync_source_directory_jsonnet_libs is not None:
+        flat_body["status_operationState_operation_sync_source_directory_jsonnet_libs"] = (
+            body_status_operationState_operation_sync_source_directory_jsonnet_libs
+        )
+    if body_status_operationState_operation_sync_source_directory_jsonnet_tlas is not None:
+        flat_body["status_operationState_operation_sync_source_directory_jsonnet_tlas"] = (
+            body_status_operationState_operation_sync_source_directory_jsonnet_tlas
+        )
+    if body_status_operationState_operation_sync_source_directory_recurse is not None:
+        flat_body["status_operationState_operation_sync_source_directory_recurse"] = (
+            body_status_operationState_operation_sync_source_directory_recurse
+        )
+    if body_status_operationState_operation_sync_source_helm_apiVersions is not None:
+        flat_body["status_operationState_operation_sync_source_helm_apiVersions"] = (
+            body_status_operationState_operation_sync_source_helm_apiVersions
+        )
+    if body_status_operationState_operation_sync_source_helm_fileParameters is not None:
+        flat_body["status_operationState_operation_sync_source_helm_fileParameters"] = (
+            body_status_operationState_operation_sync_source_helm_fileParameters
+        )
+    if body_status_operationState_operation_sync_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["status_operationState_operation_sync_source_helm_ignoreMissingValueFiles"] = (
+            body_status_operationState_operation_sync_source_helm_ignoreMissingValueFiles
+        )
+    if body_status_operationState_operation_sync_source_helm_kubeVersion is not None:
+        flat_body["status_operationState_operation_sync_source_helm_kubeVersion"] = (
+            body_status_operationState_operation_sync_source_helm_kubeVersion
+        )
+    if body_status_operationState_operation_sync_source_helm_namespace is not None:
+        flat_body["status_operationState_operation_sync_source_helm_namespace"] = (
+            body_status_operationState_operation_sync_source_helm_namespace
+        )
+    if body_status_operationState_operation_sync_source_helm_parameters is not None:
+        flat_body["status_operationState_operation_sync_source_helm_parameters"] = (
+            body_status_operationState_operation_sync_source_helm_parameters
+        )
+    if body_status_operationState_operation_sync_source_helm_passCredentials is not None:
+        flat_body["status_operationState_operation_sync_source_helm_passCredentials"] = (
+            body_status_operationState_operation_sync_source_helm_passCredentials
+        )
+    if body_status_operationState_operation_sync_source_helm_releaseName is not None:
+        flat_body["status_operationState_operation_sync_source_helm_releaseName"] = (
+            body_status_operationState_operation_sync_source_helm_releaseName
+        )
+    if body_status_operationState_operation_sync_source_helm_skipCrds is not None:
+        flat_body["status_operationState_operation_sync_source_helm_skipCrds"] = (
+            body_status_operationState_operation_sync_source_helm_skipCrds
+        )
+    if body_status_operationState_operation_sync_source_helm_skipSchemaValidation is not None:
+        flat_body["status_operationState_operation_sync_source_helm_skipSchemaValidation"] = (
+            body_status_operationState_operation_sync_source_helm_skipSchemaValidation
+        )
+    if body_status_operationState_operation_sync_source_helm_skipTests is not None:
+        flat_body["status_operationState_operation_sync_source_helm_skipTests"] = (
+            body_status_operationState_operation_sync_source_helm_skipTests
+        )
+    if body_status_operationState_operation_sync_source_helm_valueFiles is not None:
+        flat_body["status_operationState_operation_sync_source_helm_valueFiles"] = (
+            body_status_operationState_operation_sync_source_helm_valueFiles
+        )
+    if body_status_operationState_operation_sync_source_helm_values is not None:
+        flat_body["status_operationState_operation_sync_source_helm_values"] = (
+            body_status_operationState_operation_sync_source_helm_values
+        )
+    if body_status_operationState_operation_sync_source_helm_valuesObject_raw is not None:
+        flat_body["status_operationState_operation_sync_source_helm_valuesObject_raw"] = (
+            body_status_operationState_operation_sync_source_helm_valuesObject_raw
+        )
+    if body_status_operationState_operation_sync_source_helm_version is not None:
+        flat_body["status_operationState_operation_sync_source_helm_version"] = (
+            body_status_operationState_operation_sync_source_helm_version
+        )
+    if body_status_operationState_operation_sync_source_kustomize_apiVersions is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_apiVersions"] = (
+            body_status_operationState_operation_sync_source_kustomize_apiVersions
+        )
+    if body_status_operationState_operation_sync_source_kustomize_commonAnnotations is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_commonAnnotations"] = (
+            body_status_operationState_operation_sync_source_kustomize_commonAnnotations
+        )
+    if body_status_operationState_operation_sync_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_commonAnnotationsEnvsubst"] = (
+            body_status_operationState_operation_sync_source_kustomize_commonAnnotationsEnvsubst
+        )
+    if body_status_operationState_operation_sync_source_kustomize_commonLabels is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_commonLabels"] = (
+            body_status_operationState_operation_sync_source_kustomize_commonLabels
+        )
+    if body_status_operationState_operation_sync_source_kustomize_components is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_components"] = (
+            body_status_operationState_operation_sync_source_kustomize_components
+        )
+    if body_status_operationState_operation_sync_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_forceCommonAnnotations"] = (
+            body_status_operationState_operation_sync_source_kustomize_forceCommonAnnotations
+        )
+    if body_status_operationState_operation_sync_source_kustomize_forceCommonLabels is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_forceCommonLabels"] = (
+            body_status_operationState_operation_sync_source_kustomize_forceCommonLabels
+        )
+    if body_status_operationState_operation_sync_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_ignoreMissingComponents"] = (
+            body_status_operationState_operation_sync_source_kustomize_ignoreMissingComponents
+        )
+    if body_status_operationState_operation_sync_source_kustomize_images is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_images"] = (
+            body_status_operationState_operation_sync_source_kustomize_images
+        )
+    if body_status_operationState_operation_sync_source_kustomize_kubeVersion is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_kubeVersion"] = (
+            body_status_operationState_operation_sync_source_kustomize_kubeVersion
+        )
+    if body_status_operationState_operation_sync_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_labelIncludeTemplates"] = (
+            body_status_operationState_operation_sync_source_kustomize_labelIncludeTemplates
+        )
+    if body_status_operationState_operation_sync_source_kustomize_labelWithoutSelector is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_labelWithoutSelector"] = (
+            body_status_operationState_operation_sync_source_kustomize_labelWithoutSelector
+        )
+    if body_status_operationState_operation_sync_source_kustomize_namePrefix is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_namePrefix"] = (
+            body_status_operationState_operation_sync_source_kustomize_namePrefix
+        )
+    if body_status_operationState_operation_sync_source_kustomize_nameSuffix is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_nameSuffix"] = (
+            body_status_operationState_operation_sync_source_kustomize_nameSuffix
+        )
+    if body_status_operationState_operation_sync_source_kustomize_namespace is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_namespace"] = (
+            body_status_operationState_operation_sync_source_kustomize_namespace
+        )
+    if body_status_operationState_operation_sync_source_kustomize_patches is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_patches"] = (
+            body_status_operationState_operation_sync_source_kustomize_patches
+        )
+    if body_status_operationState_operation_sync_source_kustomize_replicas is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_replicas"] = (
+            body_status_operationState_operation_sync_source_kustomize_replicas
+        )
+    if body_status_operationState_operation_sync_source_kustomize_version is not None:
+        flat_body["status_operationState_operation_sync_source_kustomize_version"] = (
+            body_status_operationState_operation_sync_source_kustomize_version
+        )
+    if body_status_operationState_operation_sync_source_name is not None:
+        flat_body["status_operationState_operation_sync_source_name"] = (
+            body_status_operationState_operation_sync_source_name
+        )
+    if body_status_operationState_operation_sync_source_path is not None:
+        flat_body["status_operationState_operation_sync_source_path"] = (
+            body_status_operationState_operation_sync_source_path
+        )
+    if body_status_operationState_operation_sync_source_plugin_env is not None:
+        flat_body["status_operationState_operation_sync_source_plugin_env"] = (
+            body_status_operationState_operation_sync_source_plugin_env
+        )
+    if body_status_operationState_operation_sync_source_plugin_name is not None:
+        flat_body["status_operationState_operation_sync_source_plugin_name"] = (
+            body_status_operationState_operation_sync_source_plugin_name
+        )
+    if body_status_operationState_operation_sync_source_plugin_parameters is not None:
+        flat_body["status_operationState_operation_sync_source_plugin_parameters"] = (
+            body_status_operationState_operation_sync_source_plugin_parameters
+        )
+    if body_status_operationState_operation_sync_source_ref is not None:
+        flat_body["status_operationState_operation_sync_source_ref"] = (
+            body_status_operationState_operation_sync_source_ref
+        )
+    if body_status_operationState_operation_sync_source_repoURL is not None:
+        flat_body["status_operationState_operation_sync_source_repoURL"] = (
+            body_status_operationState_operation_sync_source_repoURL
+        )
+    if body_status_operationState_operation_sync_source_targetRevision is not None:
+        flat_body["status_operationState_operation_sync_source_targetRevision"] = (
+            body_status_operationState_operation_sync_source_targetRevision
+        )
+    if body_status_operationState_operation_sync_sources is not None:
+        flat_body["status_operationState_operation_sync_sources"] = body_status_operationState_operation_sync_sources
+    if body_status_operationState_operation_sync_syncOptions is not None:
+        flat_body["status_operationState_operation_sync_syncOptions"] = (
+            body_status_operationState_operation_sync_syncOptions
+        )
+    if body_status_operationState_operation_sync_syncStrategy_apply_force is not None:
+        flat_body["status_operationState_operation_sync_syncStrategy_apply_force"] = (
+            body_status_operationState_operation_sync_syncStrategy_apply_force
+        )
+    if body_status_operationState_operation_sync_syncStrategy_hook_syncStrategyApply_force is not None:
+        flat_body["status_operationState_operation_sync_syncStrategy_hook_syncStrategyApply_force"] = (
+            body_status_operationState_operation_sync_syncStrategy_hook_syncStrategyApply_force
+        )
+    if body_status_operationState_phase is not None:
+        flat_body["status_operationState_phase"] = body_status_operationState_phase
+    if body_status_operationState_retryCount is not None:
+        flat_body["status_operationState_retryCount"] = body_status_operationState_retryCount
+    if body_status_operationState_startedAt is not None:
+        flat_body["status_operationState_startedAt"] = body_status_operationState_startedAt
+    if body_status_operationState_syncResult_managedNamespaceMetadata_annotations is not None:
+        flat_body["status_operationState_syncResult_managedNamespaceMetadata_annotations"] = (
+            body_status_operationState_syncResult_managedNamespaceMetadata_annotations
+        )
+    if body_status_operationState_syncResult_managedNamespaceMetadata_labels is not None:
+        flat_body["status_operationState_syncResult_managedNamespaceMetadata_labels"] = (
+            body_status_operationState_syncResult_managedNamespaceMetadata_labels
+        )
+    if body_status_operationState_syncResult_resources is not None:
+        flat_body["status_operationState_syncResult_resources"] = body_status_operationState_syncResult_resources
+    if body_status_operationState_syncResult_revision is not None:
+        flat_body["status_operationState_syncResult_revision"] = body_status_operationState_syncResult_revision
+    if body_status_operationState_syncResult_revisions is not None:
+        flat_body["status_operationState_syncResult_revisions"] = body_status_operationState_syncResult_revisions
+    if body_status_operationState_syncResult_source_chart is not None:
+        flat_body["status_operationState_syncResult_source_chart"] = body_status_operationState_syncResult_source_chart
+    if body_status_operationState_syncResult_source_directory_exclude is not None:
+        flat_body["status_operationState_syncResult_source_directory_exclude"] = (
+            body_status_operationState_syncResult_source_directory_exclude
+        )
+    if body_status_operationState_syncResult_source_directory_include is not None:
+        flat_body["status_operationState_syncResult_source_directory_include"] = (
+            body_status_operationState_syncResult_source_directory_include
+        )
+    if body_status_operationState_syncResult_source_directory_jsonnet_extVars is not None:
+        flat_body["status_operationState_syncResult_source_directory_jsonnet_extVars"] = (
+            body_status_operationState_syncResult_source_directory_jsonnet_extVars
+        )
+    if body_status_operationState_syncResult_source_directory_jsonnet_libs is not None:
+        flat_body["status_operationState_syncResult_source_directory_jsonnet_libs"] = (
+            body_status_operationState_syncResult_source_directory_jsonnet_libs
+        )
+    if body_status_operationState_syncResult_source_directory_jsonnet_tlas is not None:
+        flat_body["status_operationState_syncResult_source_directory_jsonnet_tlas"] = (
+            body_status_operationState_syncResult_source_directory_jsonnet_tlas
+        )
+    if body_status_operationState_syncResult_source_directory_recurse is not None:
+        flat_body["status_operationState_syncResult_source_directory_recurse"] = (
+            body_status_operationState_syncResult_source_directory_recurse
+        )
+    if body_status_operationState_syncResult_source_helm_apiVersions is not None:
+        flat_body["status_operationState_syncResult_source_helm_apiVersions"] = (
+            body_status_operationState_syncResult_source_helm_apiVersions
+        )
+    if body_status_operationState_syncResult_source_helm_fileParameters is not None:
+        flat_body["status_operationState_syncResult_source_helm_fileParameters"] = (
+            body_status_operationState_syncResult_source_helm_fileParameters
+        )
+    if body_status_operationState_syncResult_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["status_operationState_syncResult_source_helm_ignoreMissingValueFiles"] = (
+            body_status_operationState_syncResult_source_helm_ignoreMissingValueFiles
+        )
+    if body_status_operationState_syncResult_source_helm_kubeVersion is not None:
+        flat_body["status_operationState_syncResult_source_helm_kubeVersion"] = (
+            body_status_operationState_syncResult_source_helm_kubeVersion
+        )
+    if body_status_operationState_syncResult_source_helm_namespace is not None:
+        flat_body["status_operationState_syncResult_source_helm_namespace"] = (
+            body_status_operationState_syncResult_source_helm_namespace
+        )
+    if body_status_operationState_syncResult_source_helm_parameters is not None:
+        flat_body["status_operationState_syncResult_source_helm_parameters"] = (
+            body_status_operationState_syncResult_source_helm_parameters
+        )
+    if body_status_operationState_syncResult_source_helm_passCredentials is not None:
+        flat_body["status_operationState_syncResult_source_helm_passCredentials"] = (
+            body_status_operationState_syncResult_source_helm_passCredentials
+        )
+    if body_status_operationState_syncResult_source_helm_releaseName is not None:
+        flat_body["status_operationState_syncResult_source_helm_releaseName"] = (
+            body_status_operationState_syncResult_source_helm_releaseName
+        )
+    if body_status_operationState_syncResult_source_helm_skipCrds is not None:
+        flat_body["status_operationState_syncResult_source_helm_skipCrds"] = (
+            body_status_operationState_syncResult_source_helm_skipCrds
+        )
+    if body_status_operationState_syncResult_source_helm_skipSchemaValidation is not None:
+        flat_body["status_operationState_syncResult_source_helm_skipSchemaValidation"] = (
+            body_status_operationState_syncResult_source_helm_skipSchemaValidation
+        )
+    if body_status_operationState_syncResult_source_helm_skipTests is not None:
+        flat_body["status_operationState_syncResult_source_helm_skipTests"] = (
+            body_status_operationState_syncResult_source_helm_skipTests
+        )
+    if body_status_operationState_syncResult_source_helm_valueFiles is not None:
+        flat_body["status_operationState_syncResult_source_helm_valueFiles"] = (
+            body_status_operationState_syncResult_source_helm_valueFiles
+        )
+    if body_status_operationState_syncResult_source_helm_values is not None:
+        flat_body["status_operationState_syncResult_source_helm_values"] = (
+            body_status_operationState_syncResult_source_helm_values
+        )
+    if body_status_operationState_syncResult_source_helm_valuesObject_raw is not None:
+        flat_body["status_operationState_syncResult_source_helm_valuesObject_raw"] = (
+            body_status_operationState_syncResult_source_helm_valuesObject_raw
+        )
+    if body_status_operationState_syncResult_source_helm_version is not None:
+        flat_body["status_operationState_syncResult_source_helm_version"] = (
+            body_status_operationState_syncResult_source_helm_version
+        )
+    if body_status_operationState_syncResult_source_kustomize_apiVersions is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_apiVersions"] = (
+            body_status_operationState_syncResult_source_kustomize_apiVersions
+        )
+    if body_status_operationState_syncResult_source_kustomize_commonAnnotations is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_commonAnnotations"] = (
+            body_status_operationState_syncResult_source_kustomize_commonAnnotations
+        )
+    if body_status_operationState_syncResult_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_commonAnnotationsEnvsubst"] = (
+            body_status_operationState_syncResult_source_kustomize_commonAnnotationsEnvsubst
+        )
+    if body_status_operationState_syncResult_source_kustomize_commonLabels is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_commonLabels"] = (
+            body_status_operationState_syncResult_source_kustomize_commonLabels
+        )
+    if body_status_operationState_syncResult_source_kustomize_components is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_components"] = (
+            body_status_operationState_syncResult_source_kustomize_components
+        )
+    if body_status_operationState_syncResult_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_forceCommonAnnotations"] = (
+            body_status_operationState_syncResult_source_kustomize_forceCommonAnnotations
+        )
+    if body_status_operationState_syncResult_source_kustomize_forceCommonLabels is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_forceCommonLabels"] = (
+            body_status_operationState_syncResult_source_kustomize_forceCommonLabels
+        )
+    if body_status_operationState_syncResult_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_ignoreMissingComponents"] = (
+            body_status_operationState_syncResult_source_kustomize_ignoreMissingComponents
+        )
+    if body_status_operationState_syncResult_source_kustomize_images is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_images"] = (
+            body_status_operationState_syncResult_source_kustomize_images
+        )
+    if body_status_operationState_syncResult_source_kustomize_kubeVersion is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_kubeVersion"] = (
+            body_status_operationState_syncResult_source_kustomize_kubeVersion
+        )
+    if body_status_operationState_syncResult_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_labelIncludeTemplates"] = (
+            body_status_operationState_syncResult_source_kustomize_labelIncludeTemplates
+        )
+    if body_status_operationState_syncResult_source_kustomize_labelWithoutSelector is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_labelWithoutSelector"] = (
+            body_status_operationState_syncResult_source_kustomize_labelWithoutSelector
+        )
+    if body_status_operationState_syncResult_source_kustomize_namePrefix is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_namePrefix"] = (
+            body_status_operationState_syncResult_source_kustomize_namePrefix
+        )
+    if body_status_operationState_syncResult_source_kustomize_nameSuffix is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_nameSuffix"] = (
+            body_status_operationState_syncResult_source_kustomize_nameSuffix
+        )
+    if body_status_operationState_syncResult_source_kustomize_namespace is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_namespace"] = (
+            body_status_operationState_syncResult_source_kustomize_namespace
+        )
+    if body_status_operationState_syncResult_source_kustomize_patches is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_patches"] = (
+            body_status_operationState_syncResult_source_kustomize_patches
+        )
+    if body_status_operationState_syncResult_source_kustomize_replicas is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_replicas"] = (
+            body_status_operationState_syncResult_source_kustomize_replicas
+        )
+    if body_status_operationState_syncResult_source_kustomize_version is not None:
+        flat_body["status_operationState_syncResult_source_kustomize_version"] = (
+            body_status_operationState_syncResult_source_kustomize_version
+        )
+    if body_status_operationState_syncResult_source_name is not None:
+        flat_body["status_operationState_syncResult_source_name"] = body_status_operationState_syncResult_source_name
+    if body_status_operationState_syncResult_source_path is not None:
+        flat_body["status_operationState_syncResult_source_path"] = body_status_operationState_syncResult_source_path
+    if body_status_operationState_syncResult_source_plugin_env is not None:
+        flat_body["status_operationState_syncResult_source_plugin_env"] = (
+            body_status_operationState_syncResult_source_plugin_env
+        )
+    if body_status_operationState_syncResult_source_plugin_name is not None:
+        flat_body["status_operationState_syncResult_source_plugin_name"] = (
+            body_status_operationState_syncResult_source_plugin_name
+        )
+    if body_status_operationState_syncResult_source_plugin_parameters is not None:
+        flat_body["status_operationState_syncResult_source_plugin_parameters"] = (
+            body_status_operationState_syncResult_source_plugin_parameters
+        )
+    if body_status_operationState_syncResult_source_ref is not None:
+        flat_body["status_operationState_syncResult_source_ref"] = body_status_operationState_syncResult_source_ref
+    if body_status_operationState_syncResult_source_repoURL is not None:
+        flat_body["status_operationState_syncResult_source_repoURL"] = (
+            body_status_operationState_syncResult_source_repoURL
+        )
+    if body_status_operationState_syncResult_source_targetRevision is not None:
+        flat_body["status_operationState_syncResult_source_targetRevision"] = (
+            body_status_operationState_syncResult_source_targetRevision
+        )
+    if body_status_operationState_syncResult_sources is not None:
+        flat_body["status_operationState_syncResult_sources"] = body_status_operationState_syncResult_sources
+    if body_status_reconciledAt is not None:
+        flat_body["status_reconciledAt"] = body_status_reconciledAt
+    if body_status_resourceHealthSource is not None:
+        flat_body["status_resourceHealthSource"] = body_status_resourceHealthSource
+    if body_status_resources is not None:
+        flat_body["status_resources"] = body_status_resources
+    if body_status_sourceHydrator_currentOperation_drySHA is not None:
+        flat_body["status_sourceHydrator_currentOperation_drySHA"] = body_status_sourceHydrator_currentOperation_drySHA
+    if body_status_sourceHydrator_currentOperation_finishedAt is not None:
+        flat_body["status_sourceHydrator_currentOperation_finishedAt"] = (
+            body_status_sourceHydrator_currentOperation_finishedAt
+        )
+    if body_status_sourceHydrator_currentOperation_hydratedSHA is not None:
+        flat_body["status_sourceHydrator_currentOperation_hydratedSHA"] = (
+            body_status_sourceHydrator_currentOperation_hydratedSHA
+        )
+    if body_status_sourceHydrator_currentOperation_message is not None:
+        flat_body["status_sourceHydrator_currentOperation_message"] = (
+            body_status_sourceHydrator_currentOperation_message
+        )
+    if body_status_sourceHydrator_currentOperation_phase is not None:
+        flat_body["status_sourceHydrator_currentOperation_phase"] = body_status_sourceHydrator_currentOperation_phase
+    if body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_path is not None:
+        flat_body["status_sourceHydrator_currentOperation_sourceHydrator_drySource_path"] = (
+            body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_path
+        )
+    if body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_repoURL is not None:
+        flat_body["status_sourceHydrator_currentOperation_sourceHydrator_drySource_repoURL"] = (
+            body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_repoURL
+        )
+    if body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_targetRevision is not None:
+        flat_body["status_sourceHydrator_currentOperation_sourceHydrator_drySource_targetRevision"] = (
+            body_status_sourceHydrator_currentOperation_sourceHydrator_drySource_targetRevision
+        )
+    if body_status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo_targetBranch is not None:
+        flat_body["status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo_targetBranch"] = (
+            body_status_sourceHydrator_currentOperation_sourceHydrator_hydrateTo_targetBranch
+        )
+    if body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_path is not None:
+        flat_body["status_sourceHydrator_currentOperation_sourceHydrator_syncSource_path"] = (
+            body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_path
+        )
+    if body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_targetBranch is not None:
+        flat_body["status_sourceHydrator_currentOperation_sourceHydrator_syncSource_targetBranch"] = (
+            body_status_sourceHydrator_currentOperation_sourceHydrator_syncSource_targetBranch
+        )
+    if body_status_sourceHydrator_currentOperation_startedAt is not None:
+        flat_body["status_sourceHydrator_currentOperation_startedAt"] = (
+            body_status_sourceHydrator_currentOperation_startedAt
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_drySHA is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_drySHA"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_drySHA
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_hydratedSHA is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_hydratedSHA"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_hydratedSHA
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_path is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_path"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_path
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_repoURL is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_repoURL"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_repoURL
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_targetRevision is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_targetRevision"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_drySource_targetRevision
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo_targetBranch is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo_targetBranch"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_hydrateTo_targetBranch
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_path is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_path"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_path
+        )
+    if body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_targetBranch is not None:
+        flat_body["status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_targetBranch"] = (
+            body_status_sourceHydrator_lastSuccessfulOperation_sourceHydrator_syncSource_targetBranch
+        )
+    if body_status_sourceType is not None:
+        flat_body["status_sourceType"] = body_status_sourceType
+    if body_status_sourceTypes is not None:
+        flat_body["status_sourceTypes"] = body_status_sourceTypes
+    if body_status_summary_externalURLs is not None:
+        flat_body["status_summary_externalURLs"] = body_status_summary_externalURLs
+    if body_status_summary_images is not None:
+        flat_body["status_summary_images"] = body_status_summary_images
+    if body_status_sync_comparedTo_destination_name is not None:
+        flat_body["status_sync_comparedTo_destination_name"] = body_status_sync_comparedTo_destination_name
+    if body_status_sync_comparedTo_destination_namespace is not None:
+        flat_body["status_sync_comparedTo_destination_namespace"] = body_status_sync_comparedTo_destination_namespace
+    if body_status_sync_comparedTo_destination_server is not None:
+        flat_body["status_sync_comparedTo_destination_server"] = body_status_sync_comparedTo_destination_server
+    if body_status_sync_comparedTo_ignoreDifferences is not None:
+        flat_body["status_sync_comparedTo_ignoreDifferences"] = body_status_sync_comparedTo_ignoreDifferences
+    if body_status_sync_comparedTo_source_chart is not None:
+        flat_body["status_sync_comparedTo_source_chart"] = body_status_sync_comparedTo_source_chart
+    if body_status_sync_comparedTo_source_directory_exclude is not None:
+        flat_body["status_sync_comparedTo_source_directory_exclude"] = (
+            body_status_sync_comparedTo_source_directory_exclude
+        )
+    if body_status_sync_comparedTo_source_directory_include is not None:
+        flat_body["status_sync_comparedTo_source_directory_include"] = (
+            body_status_sync_comparedTo_source_directory_include
+        )
+    if body_status_sync_comparedTo_source_directory_jsonnet_extVars is not None:
+        flat_body["status_sync_comparedTo_source_directory_jsonnet_extVars"] = (
+            body_status_sync_comparedTo_source_directory_jsonnet_extVars
+        )
+    if body_status_sync_comparedTo_source_directory_jsonnet_libs is not None:
+        flat_body["status_sync_comparedTo_source_directory_jsonnet_libs"] = (
+            body_status_sync_comparedTo_source_directory_jsonnet_libs
+        )
+    if body_status_sync_comparedTo_source_directory_jsonnet_tlas is not None:
+        flat_body["status_sync_comparedTo_source_directory_jsonnet_tlas"] = (
+            body_status_sync_comparedTo_source_directory_jsonnet_tlas
+        )
+    if body_status_sync_comparedTo_source_directory_recurse is not None:
+        flat_body["status_sync_comparedTo_source_directory_recurse"] = (
+            body_status_sync_comparedTo_source_directory_recurse
+        )
+    if body_status_sync_comparedTo_source_helm_apiVersions is not None:
+        flat_body["status_sync_comparedTo_source_helm_apiVersions"] = (
+            body_status_sync_comparedTo_source_helm_apiVersions
+        )
+    if body_status_sync_comparedTo_source_helm_fileParameters is not None:
+        flat_body["status_sync_comparedTo_source_helm_fileParameters"] = (
+            body_status_sync_comparedTo_source_helm_fileParameters
+        )
+    if body_status_sync_comparedTo_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["status_sync_comparedTo_source_helm_ignoreMissingValueFiles"] = (
+            body_status_sync_comparedTo_source_helm_ignoreMissingValueFiles
+        )
+    if body_status_sync_comparedTo_source_helm_kubeVersion is not None:
+        flat_body["status_sync_comparedTo_source_helm_kubeVersion"] = (
+            body_status_sync_comparedTo_source_helm_kubeVersion
+        )
+    if body_status_sync_comparedTo_source_helm_namespace is not None:
+        flat_body["status_sync_comparedTo_source_helm_namespace"] = body_status_sync_comparedTo_source_helm_namespace
+    if body_status_sync_comparedTo_source_helm_parameters is not None:
+        flat_body["status_sync_comparedTo_source_helm_parameters"] = body_status_sync_comparedTo_source_helm_parameters
+    if body_status_sync_comparedTo_source_helm_passCredentials is not None:
+        flat_body["status_sync_comparedTo_source_helm_passCredentials"] = (
+            body_status_sync_comparedTo_source_helm_passCredentials
+        )
+    if body_status_sync_comparedTo_source_helm_releaseName is not None:
+        flat_body["status_sync_comparedTo_source_helm_releaseName"] = (
+            body_status_sync_comparedTo_source_helm_releaseName
+        )
+    if body_status_sync_comparedTo_source_helm_skipCrds is not None:
+        flat_body["status_sync_comparedTo_source_helm_skipCrds"] = body_status_sync_comparedTo_source_helm_skipCrds
+    if body_status_sync_comparedTo_source_helm_skipSchemaValidation is not None:
+        flat_body["status_sync_comparedTo_source_helm_skipSchemaValidation"] = (
+            body_status_sync_comparedTo_source_helm_skipSchemaValidation
+        )
+    if body_status_sync_comparedTo_source_helm_skipTests is not None:
+        flat_body["status_sync_comparedTo_source_helm_skipTests"] = body_status_sync_comparedTo_source_helm_skipTests
+    if body_status_sync_comparedTo_source_helm_valueFiles is not None:
+        flat_body["status_sync_comparedTo_source_helm_valueFiles"] = body_status_sync_comparedTo_source_helm_valueFiles
+    if body_status_sync_comparedTo_source_helm_values is not None:
+        flat_body["status_sync_comparedTo_source_helm_values"] = body_status_sync_comparedTo_source_helm_values
+    if body_status_sync_comparedTo_source_helm_valuesObject_raw is not None:
+        flat_body["status_sync_comparedTo_source_helm_valuesObject_raw"] = (
+            body_status_sync_comparedTo_source_helm_valuesObject_raw
+        )
+    if body_status_sync_comparedTo_source_helm_version is not None:
+        flat_body["status_sync_comparedTo_source_helm_version"] = body_status_sync_comparedTo_source_helm_version
+    if body_status_sync_comparedTo_source_kustomize_apiVersions is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_apiVersions"] = (
+            body_status_sync_comparedTo_source_kustomize_apiVersions
+        )
+    if body_status_sync_comparedTo_source_kustomize_commonAnnotations is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_commonAnnotations"] = (
+            body_status_sync_comparedTo_source_kustomize_commonAnnotations
+        )
+    if body_status_sync_comparedTo_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_commonAnnotationsEnvsubst"] = (
+            body_status_sync_comparedTo_source_kustomize_commonAnnotationsEnvsubst
+        )
+    if body_status_sync_comparedTo_source_kustomize_commonLabels is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_commonLabels"] = (
+            body_status_sync_comparedTo_source_kustomize_commonLabels
+        )
+    if body_status_sync_comparedTo_source_kustomize_components is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_components"] = (
+            body_status_sync_comparedTo_source_kustomize_components
+        )
+    if body_status_sync_comparedTo_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_forceCommonAnnotations"] = (
+            body_status_sync_comparedTo_source_kustomize_forceCommonAnnotations
+        )
+    if body_status_sync_comparedTo_source_kustomize_forceCommonLabels is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_forceCommonLabels"] = (
+            body_status_sync_comparedTo_source_kustomize_forceCommonLabels
+        )
+    if body_status_sync_comparedTo_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_ignoreMissingComponents"] = (
+            body_status_sync_comparedTo_source_kustomize_ignoreMissingComponents
+        )
+    if body_status_sync_comparedTo_source_kustomize_images is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_images"] = (
+            body_status_sync_comparedTo_source_kustomize_images
+        )
+    if body_status_sync_comparedTo_source_kustomize_kubeVersion is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_kubeVersion"] = (
+            body_status_sync_comparedTo_source_kustomize_kubeVersion
+        )
+    if body_status_sync_comparedTo_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_labelIncludeTemplates"] = (
+            body_status_sync_comparedTo_source_kustomize_labelIncludeTemplates
+        )
+    if body_status_sync_comparedTo_source_kustomize_labelWithoutSelector is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_labelWithoutSelector"] = (
+            body_status_sync_comparedTo_source_kustomize_labelWithoutSelector
+        )
+    if body_status_sync_comparedTo_source_kustomize_namePrefix is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_namePrefix"] = (
+            body_status_sync_comparedTo_source_kustomize_namePrefix
+        )
+    if body_status_sync_comparedTo_source_kustomize_nameSuffix is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_nameSuffix"] = (
+            body_status_sync_comparedTo_source_kustomize_nameSuffix
+        )
+    if body_status_sync_comparedTo_source_kustomize_namespace is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_namespace"] = (
+            body_status_sync_comparedTo_source_kustomize_namespace
+        )
+    if body_status_sync_comparedTo_source_kustomize_patches is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_patches"] = (
+            body_status_sync_comparedTo_source_kustomize_patches
+        )
+    if body_status_sync_comparedTo_source_kustomize_replicas is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_replicas"] = (
+            body_status_sync_comparedTo_source_kustomize_replicas
+        )
+    if body_status_sync_comparedTo_source_kustomize_version is not None:
+        flat_body["status_sync_comparedTo_source_kustomize_version"] = (
+            body_status_sync_comparedTo_source_kustomize_version
+        )
+    if body_status_sync_comparedTo_source_name is not None:
+        flat_body["status_sync_comparedTo_source_name"] = body_status_sync_comparedTo_source_name
+    if body_status_sync_comparedTo_source_path is not None:
+        flat_body["status_sync_comparedTo_source_path"] = body_status_sync_comparedTo_source_path
+    if body_status_sync_comparedTo_source_plugin_env is not None:
+        flat_body["status_sync_comparedTo_source_plugin_env"] = body_status_sync_comparedTo_source_plugin_env
+    if body_status_sync_comparedTo_source_plugin_name is not None:
+        flat_body["status_sync_comparedTo_source_plugin_name"] = body_status_sync_comparedTo_source_plugin_name
+    if body_status_sync_comparedTo_source_plugin_parameters is not None:
+        flat_body["status_sync_comparedTo_source_plugin_parameters"] = (
+            body_status_sync_comparedTo_source_plugin_parameters
+        )
+    if body_status_sync_comparedTo_source_ref is not None:
+        flat_body["status_sync_comparedTo_source_ref"] = body_status_sync_comparedTo_source_ref
+    if body_status_sync_comparedTo_source_repoURL is not None:
+        flat_body["status_sync_comparedTo_source_repoURL"] = body_status_sync_comparedTo_source_repoURL
+    if body_status_sync_comparedTo_source_targetRevision is not None:
+        flat_body["status_sync_comparedTo_source_targetRevision"] = body_status_sync_comparedTo_source_targetRevision
+    if body_status_sync_comparedTo_sources is not None:
+        flat_body["status_sync_comparedTo_sources"] = body_status_sync_comparedTo_sources
+    if body_status_sync_revision is not None:
+        flat_body["status_sync_revision"] = body_status_sync_revision
+    if body_status_sync_revisions is not None:
+        flat_body["status_sync_revisions"] = body_status_sync_revisions
+    if body_status_sync_status is not None:
+        flat_body["status_sync_status"] = body_status_sync_status
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request(
         f"/api/v1/applications/{path_application_metadata_name}", method="PUT", params=params, data=data

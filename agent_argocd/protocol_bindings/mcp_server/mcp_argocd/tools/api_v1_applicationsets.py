@@ -8,24 +8,48 @@ import logging
 from typing import Dict, Any, List
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains keys that cannot be split into valid parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
 async def application_set_service__list(
-    param_projects: str = None, param_selector: str = None, param_appsetNamespace: str = None
+    param_projects: List[str] = None, param_selector: str = None, param_appsetNamespace: str = None
 ) -> Dict[str, Any]:
     '''
-    List returns a list of application sets.
+    List returns a list of applicationset.
 
     Args:
-        param_projects (str, optional): The project names to restrict the returned list of application sets. Defaults to None.
+        param_projects (List[str], optional): The project names to restrict the returned list of applicationsets. Defaults to None.
         param_selector (str, optional): The selector to restrict the returned list to applications only with matched labels. Defaults to None.
-        param_appsetNamespace (str, optional): The application set namespace. If not provided, defaults to the ArgoCD control plane namespace.
+        param_appsetNamespace (str, optional): The application set namespace. Default is the ArgoCD control plane namespace if not specified. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call containing the list of application sets.
+        Dict[str, Any]: The JSON response from the API call containing the list of applicationsets.
 
     Raises:
         Exception: If the API request fails or returns an error.
@@ -35,9 +59,16 @@ async def application_set_service__list(
     params = {}
     data = {}
 
-    params["projects"] = param_projects
-    params["selector"] = param_selector
-    params["appsetNamespace"] = param_appsetNamespace
+    params["projects"] = str(param_projects).lower() if isinstance(param_projects, bool) else param_projects
+
+    params["selector"] = str(param_selector).lower() if isinstance(param_selector, bool) else param_selector
+
+    params["appsetNamespace"] = (
+        str(param_appsetNamespace).lower() if isinstance(param_appsetNamespace, bool) else param_appsetNamespace
+    )
+
+    flat_body = {}
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/applicationsets", method="GET", params=params, data=data)
 
@@ -49,31 +80,31 @@ async def application_set_service__list(
 
 async def application_set_service__create(
     body_metadata_annotations: Dict[str, Any] = None,
-    body_metadata_creation_timestamp: str = None,
-    body_metadata_deletion_grace_period_seconds: int = None,
-    body_metadata_deletion_timestamp: str = None,
+    body_metadata_creationTimestamp: str = None,
+    body_metadata_deletionGracePeriodSeconds: int = None,
+    body_metadata_deletionTimestamp: str = None,
     body_metadata_finalizers: List[str] = None,
-    body_metadata_generate_name: str = None,
+    body_metadata_generateName: str = None,
     body_metadata_generation: int = None,
     body_metadata_labels: Dict[str, Any] = None,
-    body_metadata_managed_fields: List[str] = None,
+    body_metadata_managedFields: List[str] = None,
     body_metadata_name: str = None,
     body_metadata_namespace: str = None,
-    body_metadata_owner_references: List[str] = None,
-    body_metadata_resource_version: str = None,
-    body_metadata_self_link: str = None,
+    body_metadata_ownerReferences: List[str] = None,
+    body_metadata_resourceVersion: str = None,
+    body_metadata_selfLink: str = None,
     body_metadata_uid: str = None,
-    body_spec_apply_nested_selectors: bool = None,
+    body_spec_applyNestedSelectors: bool = None,
     body_spec_generators: List[str] = None,
-    body_spec_go_template: bool = None,
-    body_spec_go_template_options: List[str] = None,
-    body_spec_ignore_application_differences: List[str] = None,
-    body_spec_preserved_fields_annotations: List[str] = None,
-    body_spec_preserved_fields_labels: List[str] = None,
-    body_spec_strategy_rolling_sync_steps: List[str] = None,
+    body_spec_goTemplate: bool = None,
+    body_spec_goTemplateOptions: List[str] = None,
+    body_spec_ignoreApplicationDifferences: List[str] = None,
+    body_spec_preservedFields_annotations: List[str] = None,
+    body_spec_preservedFields_labels: List[str] = None,
+    body_spec_strategy_rollingSync_steps: List[str] = None,
     body_spec_strategy_type: str = None,
-    body_spec_sync_policy_applications_sync: str = None,
-    body_spec_sync_policy_preserve_resources_on_deletion: bool = None,
+    body_spec_syncPolicy_applicationsSync: str = None,
+    body_spec_syncPolicy_preserveResourcesOnDeletion: bool = None,
     body_spec_template_metadata_annotations: Dict[str, Any] = None,
     body_spec_template_metadata_finalizers: List[str] = None,
     body_spec_template_metadata_labels: Dict[str, Any] = None,
@@ -82,46 +113,46 @@ async def application_set_service__create(
     body_spec_template_spec_destination_name: str = None,
     body_spec_template_spec_destination_namespace: str = None,
     body_spec_template_spec_destination_server: str = None,
-    body_spec_template_spec_ignore_differences: List[str] = None,
+    body_spec_template_spec_ignoreDifferences: List[str] = None,
     body_spec_template_spec_info: List[str] = None,
     body_spec_template_spec_project: str = None,
-    body_spec_template_spec_revision_history_limit: int = None,
+    body_spec_template_spec_revisionHistoryLimit: int = None,
     body_spec_template_spec_source_chart: str = None,
     body_spec_template_spec_source_directory_exclude: str = None,
     body_spec_template_spec_source_directory_include: str = None,
-    body_spec_template_spec_source_directory_jsonnet_ext_vars: List[str] = None,
+    body_spec_template_spec_source_directory_jsonnet_extVars: List[str] = None,
     body_spec_template_spec_source_directory_jsonnet_libs: List[str] = None,
     body_spec_template_spec_source_directory_jsonnet_tlas: List[str] = None,
     body_spec_template_spec_source_directory_recurse: bool = None,
-    body_spec_template_spec_source_helm_api_versions: List[str] = None,
-    body_spec_template_spec_source_helm_file_parameters: List[str] = None,
-    body_spec_template_spec_source_helm_ignore_missing_value_files: bool = None,
-    body_spec_template_spec_source_helm_kube_version: str = None,
+    body_spec_template_spec_source_helm_apiVersions: List[str] = None,
+    body_spec_template_spec_source_helm_fileParameters: List[str] = None,
+    body_spec_template_spec_source_helm_ignoreMissingValueFiles: bool = None,
+    body_spec_template_spec_source_helm_kubeVersion: str = None,
     body_spec_template_spec_source_helm_namespace: str = None,
     body_spec_template_spec_source_helm_parameters: List[str] = None,
-    body_spec_template_spec_source_helm_pass_credentials: bool = None,
-    body_spec_template_spec_source_helm_release_name: str = None,
-    body_spec_template_spec_source_helm_skip_crds: bool = None,
-    body_spec_template_spec_source_helm_skip_schema_validation: bool = None,
-    body_spec_template_spec_source_helm_skip_tests: bool = None,
-    body_spec_template_spec_source_helm_value_files: List[str] = None,
+    body_spec_template_spec_source_helm_passCredentials: bool = None,
+    body_spec_template_spec_source_helm_releaseName: str = None,
+    body_spec_template_spec_source_helm_skipCrds: bool = None,
+    body_spec_template_spec_source_helm_skipSchemaValidation: bool = None,
+    body_spec_template_spec_source_helm_skipTests: bool = None,
+    body_spec_template_spec_source_helm_valueFiles: List[str] = None,
     body_spec_template_spec_source_helm_values: str = None,
-    body_spec_template_spec_source_helm_values_object_raw: str = None,
+    body_spec_template_spec_source_helm_valuesObject_raw: str = None,
     body_spec_template_spec_source_helm_version: str = None,
-    body_spec_template_spec_source_kustomize_api_versions: List[str] = None,
-    body_spec_template_spec_source_kustomize_common_annotations: Dict[str, Any] = None,
-    body_spec_template_spec_source_kustomize_common_annotations_envsubst: bool = None,
-    body_spec_template_spec_source_kustomize_common_labels: Dict[str, Any] = None,
+    body_spec_template_spec_source_kustomize_apiVersions: List[str] = None,
+    body_spec_template_spec_source_kustomize_commonAnnotations: Dict[str, Any] = None,
+    body_spec_template_spec_source_kustomize_commonAnnotationsEnvsubst: bool = None,
+    body_spec_template_spec_source_kustomize_commonLabels: Dict[str, Any] = None,
     body_spec_template_spec_source_kustomize_components: List[str] = None,
-    body_spec_template_spec_source_kustomize_force_common_annotations: bool = None,
-    body_spec_template_spec_source_kustomize_force_common_labels: bool = None,
-    body_spec_template_spec_source_kustomize_ignore_missing_components: bool = None,
+    body_spec_template_spec_source_kustomize_forceCommonAnnotations: bool = None,
+    body_spec_template_spec_source_kustomize_forceCommonLabels: bool = None,
+    body_spec_template_spec_source_kustomize_ignoreMissingComponents: bool = None,
     body_spec_template_spec_source_kustomize_images: List[str] = None,
-    body_spec_template_spec_source_kustomize_kube_version: str = None,
-    body_spec_template_spec_source_kustomize_label_include_templates: bool = None,
-    body_spec_template_spec_source_kustomize_label_without_selector: bool = None,
-    body_spec_template_spec_source_kustomize_name_prefix: str = None,
-    body_spec_template_spec_source_kustomize_name_suffix: str = None,
+    body_spec_template_spec_source_kustomize_kubeVersion: str = None,
+    body_spec_template_spec_source_kustomize_labelIncludeTemplates: bool = None,
+    body_spec_template_spec_source_kustomize_labelWithoutSelector: bool = None,
+    body_spec_template_spec_source_kustomize_namePrefix: str = None,
+    body_spec_template_spec_source_kustomize_nameSuffix: str = None,
     body_spec_template_spec_source_kustomize_namespace: str = None,
     body_spec_template_spec_source_kustomize_patches: List[str] = None,
     body_spec_template_spec_source_kustomize_replicas: List[str] = None,
@@ -132,147 +163,147 @@ async def application_set_service__create(
     body_spec_template_spec_source_plugin_name: str = None,
     body_spec_template_spec_source_plugin_parameters: List[str] = None,
     body_spec_template_spec_source_ref: str = None,
-    body_spec_template_spec_source_repo_url: str = None,
-    body_spec_template_spec_source_target_revision: str = None,
-    body_spec_template_spec_source_hydrator_dry_source_path: str = None,
-    body_spec_template_spec_source_hydrator_dry_source_repo_url: str = None,
-    body_spec_template_spec_source_hydrator_dry_source_target_revision: str = None,
-    body_spec_template_spec_source_hydrator_hydrate_to_target_branch: str = None,
-    body_spec_template_spec_source_hydrator_sync_source_path: str = None,
-    body_spec_template_spec_source_hydrator_sync_source_target_branch: str = None,
+    body_spec_template_spec_source_repoURL: str = None,
+    body_spec_template_spec_source_targetRevision: str = None,
+    body_spec_template_spec_sourceHydrator_drySource_path: str = None,
+    body_spec_template_spec_sourceHydrator_drySource_repoURL: str = None,
+    body_spec_template_spec_sourceHydrator_drySource_targetRevision: str = None,
+    body_spec_template_spec_sourceHydrator_hydrateTo_targetBranch: str = None,
+    body_spec_template_spec_sourceHydrator_syncSource_path: str = None,
+    body_spec_template_spec_sourceHydrator_syncSource_targetBranch: str = None,
     body_spec_template_spec_sources: List[str] = None,
-    body_spec_template_spec_sync_policy_automated_allow_empty: bool = None,
-    body_spec_template_spec_sync_policy_automated_enable: bool = None,
-    body_spec_template_spec_sync_policy_automated_prune: bool = None,
-    body_spec_template_spec_sync_policy_automated_self_heal: bool = None,
-    body_spec_template_spec_sync_policy_managed_namespace_metadata_annotations: Dict[str, Any] = None,
-    body_spec_template_spec_sync_policy_managed_namespace_metadata_labels: Dict[str, Any] = None,
-    body_spec_template_spec_sync_policy_retry_backoff_duration: str = None,
-    body_spec_template_spec_sync_policy_retry_backoff_factor: int = None,
-    body_spec_template_spec_sync_policy_retry_backoff_max_duration: str = None,
-    body_spec_template_spec_sync_policy_retry_limit: int = None,
-    body_spec_template_spec_sync_policy_sync_options: List[str] = None,
-    body_spec_template_patch: str = None,
-    body_status_application_status: List[str] = None,
+    body_spec_template_spec_syncPolicy_automated_allowEmpty: bool = None,
+    body_spec_template_spec_syncPolicy_automated_enable: bool = None,
+    body_spec_template_spec_syncPolicy_automated_prune: bool = None,
+    body_spec_template_spec_syncPolicy_automated_selfHeal: bool = None,
+    body_spec_template_spec_syncPolicy_managedNamespaceMetadata_annotations: Dict[str, Any] = None,
+    body_spec_template_spec_syncPolicy_managedNamespaceMetadata_labels: Dict[str, Any] = None,
+    body_spec_template_spec_syncPolicy_retry_backoff_duration: str = None,
+    body_spec_template_spec_syncPolicy_retry_backoff_factor: int = None,
+    body_spec_template_spec_syncPolicy_retry_backoff_maxDuration: str = None,
+    body_spec_template_spec_syncPolicy_retry_limit: int = None,
+    body_spec_template_spec_syncPolicy_syncOptions: List[str] = None,
+    body_spec_templatePatch: str = None,
+    body_status_applicationStatus: List[str] = None,
     body_status_conditions: List[str] = None,
     body_status_resources: List[str] = None,
-    param_upsert: str = None,
-    param_dryRun: str = None,
+    param_upsert: bool = False,
+    param_dryRun: bool = False,
 ) -> Dict[str, Any]:
     '''
     Create an application set.
 
     Args:
         body_metadata_annotations (Dict[str, Any], optional): Annotations for the metadata. Defaults to None.
-        body_metadata_creation_timestamp (str, optional): Creation timestamp for the metadata. Defaults to None.
-        body_metadata_deletion_grace_period_seconds (int, optional): Grace period seconds for metadata deletion. Defaults to None.
-        body_metadata_deletion_timestamp (str, optional): Deletion timestamp for the metadata. Defaults to None.
-        body_metadata_finalizers (List[str], optional): Finalizers for the metadata. Defaults to None.
-        body_metadata_generate_name (str, optional): Generate name for the metadata. Defaults to None.
-        body_metadata_generation (int, optional): Generation number for the metadata. Defaults to None.
+        body_metadata_creationTimestamp (str, optional): Timestamp of creation. Defaults to None.
+        body_metadata_deletionGracePeriodSeconds (int, optional): Grace period for deletion in seconds. Defaults to None.
+        body_metadata_deletionTimestamp (str, optional): Timestamp of deletion. Defaults to None.
+        body_metadata_finalizers (List[str], optional): List of finalizers. Defaults to None.
+        body_metadata_generateName (str, optional): Prefix for generating a unique name. Defaults to None.
+        body_metadata_generation (int, optional): Generation number. Defaults to None.
         body_metadata_labels (Dict[str, Any], optional): Labels for the metadata. Defaults to None.
-        body_metadata_managed_fields (List[str], optional): Managed fields for the metadata. Defaults to None.
-        body_metadata_name (str, optional): Name for the metadata. Defaults to None.
-        body_metadata_namespace (str, optional): Namespace for the metadata. Defaults to None.
-        body_metadata_owner_references (List[str], optional): Owner references for the metadata. Defaults to None.
-        body_metadata_resource_version (str, optional): Resource version for the metadata. Defaults to None.
-        body_metadata_self_link (str, optional): Self link for the metadata. Defaults to None.
-        body_metadata_uid (str, optional): UID for the metadata. Defaults to None.
-        body_spec_apply_nested_selectors (bool, optional): Apply nested selectors in the spec. Defaults to None.
-        body_spec_generators (List[str], optional): Generators for the spec. Defaults to None.
-        body_spec_go_template (bool, optional): Use Go template in the spec. Defaults to None.
-        body_spec_go_template_options (List[str], optional): Options for Go template in the spec. Defaults to None.
-        body_spec_ignore_application_differences (List[str], optional): Ignore application differences in the spec. Defaults to None.
-        body_spec_preserved_fields_annotations (List[str], optional): Preserved fields annotations in the spec. Defaults to None.
-        body_spec_preserved_fields_labels (List[str], optional): Preserved fields labels in the spec. Defaults to None.
-        body_spec_strategy_rolling_sync_steps (List[str], optional): Rolling sync steps strategy in the spec. Defaults to None.
-        body_spec_strategy_type (str, optional): Strategy type in the spec. Defaults to None.
-        body_spec_sync_policy_applications_sync (str, optional): Applications sync policy in the spec. Defaults to None.
-        body_spec_sync_policy_preserve_resources_on_deletion (bool, optional): Preserve resources on deletion in the sync policy. Defaults to None.
-        body_spec_template_metadata_annotations (Dict[str, Any], optional): Annotations for the template metadata. Defaults to None.
-        body_spec_template_metadata_finalizers (List[str], optional): Finalizers for the template metadata. Defaults to None.
-        body_spec_template_metadata_labels (Dict[str, Any], optional): Labels for the template metadata. Defaults to None.
-        body_spec_template_metadata_name (str, optional): Name for the template metadata. Defaults to None.
-        body_spec_template_metadata_namespace (str, optional): Namespace for the template metadata. Defaults to None.
-        body_spec_template_spec_destination_name (str, optional): Destination name in the template spec. Defaults to None.
-        body_spec_template_spec_destination_namespace (str, optional): Destination namespace in the template spec. Defaults to None.
-        body_spec_template_spec_destination_server (str, optional): Destination server in the template spec. Defaults to None.
-        body_spec_template_spec_ignore_differences (List[str], optional): Ignore differences in the template spec. Defaults to None.
-        body_spec_template_spec_info (List[str], optional): Info in the template spec. Defaults to None.
-        body_spec_template_spec_project (str, optional): Project in the template spec. Defaults to None.
-        body_spec_template_spec_revision_history_limit (int, optional): Revision history limit in the template spec. Defaults to None.
-        body_spec_template_spec_source_chart (str, optional): Source chart in the template spec. Defaults to None.
-        body_spec_template_spec_source_directory_exclude (str, optional): Directory exclude in the source template spec. Defaults to None.
-        body_spec_template_spec_source_directory_include (str, optional): Directory include in the source template spec. Defaults to None.
-        body_spec_template_spec_source_directory_jsonnet_ext_vars (List[str], optional): Jsonnet external variables in the source directory. Defaults to None.
-        body_spec_template_spec_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries in the source directory. Defaults to None.
-        body_spec_template_spec_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments in the source directory. Defaults to None.
-        body_spec_template_spec_source_directory_recurse (bool, optional): Recurse in the source directory. Defaults to None.
-        body_spec_template_spec_source_helm_api_versions (List[str], optional): Helm API versions in the source template spec. Defaults to None.
-        body_spec_template_spec_source_helm_file_parameters (List[str], optional): Helm file parameters in the source template spec. Defaults to None.
-        body_spec_template_spec_source_helm_ignore_missing_value_files (bool, optional): Ignore missing value files in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_kube_version (str, optional): Kubernetes version in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_namespace (str, optional): Namespace in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_parameters (List[str], optional): Parameters in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_pass_credentials (bool, optional): Pass credentials in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_release_name (str, optional): Release name in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_skip_crds (bool, optional): Skip CRDs in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_skip_schema_validation (bool, optional): Skip schema validation in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_skip_tests (bool, optional): Skip tests in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_value_files (List[str], optional): Value files in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_values (str, optional): Values in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_values_object_raw (str, optional): Raw values object in Helm source. Defaults to None.
-        body_spec_template_spec_source_helm_version (str, optional): Helm version in the source template spec. Defaults to None.
-        body_spec_template_spec_source_kustomize_api_versions (List[str], optional): Kustomize API versions in the source template spec. Defaults to None.
-        body_spec_template_spec_source_kustomize_common_annotations (Dict[str, Any], optional): Common annotations in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_common_annotations_envsubst (bool, optional): Envsubst for common annotations in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_common_labels (Dict[str, Any], optional): Common labels in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_components (List[str], optional): Components in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_force_common_annotations (bool, optional): Force common annotations in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_force_common_labels (bool, optional): Force common labels in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_ignore_missing_components (bool, optional): Ignore missing components in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_images (List[str], optional): Images in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_kube_version (str, optional): Kubernetes version in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_label_include_templates (bool, optional): Include templates in Kustomize label. Defaults to None.
-        body_spec_template_spec_source_kustomize_label_without_selector (bool, optional): Label without selector in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_name_prefix (str, optional): Name prefix in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_name_suffix (str, optional): Name suffix in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_namespace (str, optional): Namespace in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_patches (List[str], optional): Patches in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_replicas (List[str], optional): Replicas in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_kustomize_version (str, optional): Version in Kustomize source. Defaults to None.
-        body_spec_template_spec_source_name (str, optional): Source name in the template spec. Defaults to None.
-        body_spec_template_spec_source_path (str, optional): Source path in the template spec. Defaults to None.
-        body_spec_template_spec_source_plugin_env (List[str], optional): Plugin environment in the source template spec. Defaults to None.
-        body_spec_template_spec_source_plugin_name (str, optional): Plugin name in the source template spec. Defaults to None.
-        body_spec_template_spec_source_plugin_parameters (List[str], optional): Plugin parameters in the source template spec. Defaults to None.
-        body_spec_template_spec_source_ref (str, optional): Source reference in the template spec. Defaults to None.
-        body_spec_template_spec_source_repo_url (str, optional): Repository URL in the source template spec. Defaults to None.
-        body_spec_template_spec_source_target_revision (str, optional): Target revision in the source template spec. Defaults to None.
-        body_spec_template_spec_source_hydrator_dry_source_path (str, optional): Dry source path in the hydrator. Defaults to None.
-        body_spec_template_spec_source_hydrator_dry_source_repo_url (str, optional): Dry source repository URL in the hydrator. Defaults to None.
-        body_spec_template_spec_source_hydrator_dry_source_target_revision (str, optional): Dry source target revision in the hydrator. Defaults to None.
-        body_spec_template_spec_source_hydrator_hydrate_to_target_branch (str, optional): Hydrate to target branch in the hydrator. Defaults to None.
-        body_spec_template_spec_source_hydrator_sync_source_path (str, optional): Sync source path in the hydrator. Defaults to None.
-        body_spec_template_spec_source_hydrator_sync_source_target_branch (str, optional): Sync source target branch in the hydrator. Defaults to None.
-        body_spec_template_spec_sources (List[str], optional): Sources in the template spec. Defaults to None.
-        body_spec_template_spec_sync_policy_automated_allow_empty (bool, optional): Allow empty in automated sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_automated_enable (bool, optional): Enable automated sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_automated_prune (bool, optional): Prune in automated sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_automated_self_heal (bool, optional): Self heal in automated sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_managed_namespace_metadata_annotations (Dict[str, Any], optional): Annotations for managed namespace metadata in sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_managed_namespace_metadata_labels (Dict[str, Any], optional): Labels for managed namespace metadata in sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_retry_backoff_duration (str, optional): Retry backoff duration in sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_retry_backoff_factor (int, optional): Retry backoff factor in sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_retry_backoff_max_duration (str, optional): Retry backoff max duration in sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_retry_limit (int, optional): Retry limit in sync policy. Defaults to None.
-        body_spec_template_spec_sync_policy_sync_options (List[str], optional): Sync options in sync policy. Defaults to None.
-        body_spec_template_patch (str, optional): Template patch. Defaults to None.
-        body_status_application_status (List[str], optional): Application status. Defaults to None.
-        body_status_conditions (List[str], optional): Conditions in the status. Defaults to None.
-        body_status_resources (List[str], optional): Resources in the status. Defaults to None.
-        param_upsert (str, optional): Upsert parameter. Defaults to None.
-        param_dryRun (str, optional): Dry run parameter. Defaults to None.
+        body_metadata_managedFields (List[str], optional): Managed fields for internal use. Defaults to None.
+        body_metadata_name (str, optional): Name of the metadata. Defaults to None.
+        body_metadata_namespace (str, optional): Namespace of the metadata. Defaults to None.
+        body_metadata_ownerReferences (List[str], optional): Owner references. Defaults to None.
+        body_metadata_resourceVersion (str, optional): Resource version for concurrency control. Defaults to None.
+        body_metadata_selfLink (str, optional): Self link of the metadata. Defaults to None.
+        body_metadata_uid (str, optional): Unique identifier. Defaults to None.
+        body_spec_applyNestedSelectors (bool, optional): Enables nested selectors. Defaults to None.
+        body_spec_generators (List[str], optional): List of generators. Defaults to None.
+        body_spec_goTemplate (bool, optional): Enables Go template. Defaults to None.
+        body_spec_goTemplateOptions (List[str], optional): Options for Go template. Defaults to None.
+        body_spec_ignoreApplicationDifferences (List[str], optional): Differences to ignore. Defaults to None.
+        body_spec_preservedFields_annotations (List[str], optional): Preserved annotations. Defaults to None.
+        body_spec_preservedFields_labels (List[str], optional): Preserved labels. Defaults to None.
+        body_spec_strategy_rollingSync_steps (List[str], optional): Steps for rolling sync strategy. Defaults to None.
+        body_spec_strategy_type (str, optional): Type of strategy. Defaults to None.
+        body_spec_syncPolicy_applicationsSync (str, optional): Sync policy for applications. Defaults to None.
+        body_spec_syncPolicy_preserveResourcesOnDeletion (bool, optional): Preserve resources on deletion. Defaults to None.
+        body_spec_template_metadata_annotations (Dict[str, Any], optional): Annotations for template metadata. Defaults to None.
+        body_spec_template_metadata_finalizers (List[str], optional): Finalizers for template metadata. Defaults to None.
+        body_spec_template_metadata_labels (Dict[str, Any], optional): Labels for template metadata. Defaults to None.
+        body_spec_template_metadata_name (str, optional): Name for template metadata. Defaults to None.
+        body_spec_template_metadata_namespace (str, optional): Namespace for template metadata. Defaults to None.
+        body_spec_template_spec_destination_name (str, optional): Name of the destination cluster. Defaults to None.
+        body_spec_template_spec_destination_namespace (str, optional): Namespace of the destination. Defaults to None.
+        body_spec_template_spec_destination_server (str, optional): Server URL of the destination cluster. Defaults to None.
+        body_spec_template_spec_ignoreDifferences (List[str], optional): Differences to ignore in template spec. Defaults to None.
+        body_spec_template_spec_info (List[str], optional): Information for template spec. Defaults to None.
+        body_spec_template_spec_project (str, optional): Project reference. Defaults to None.
+        body_spec_template_spec_revisionHistoryLimit (int, optional): Limit for revision history. Defaults to None.
+        body_spec_template_spec_source_chart (str, optional): Helm chart name. Defaults to None.
+        body_spec_template_spec_source_directory_exclude (str, optional): Directory exclude pattern. Defaults to None.
+        body_spec_template_spec_source_directory_include (str, optional): Directory include pattern. Defaults to None.
+        body_spec_template_spec_source_directory_jsonnet_extVars (List[str], optional): Jsonnet external variables. Defaults to None.
+        body_spec_template_spec_source_directory_jsonnet_libs (List[str], optional): Jsonnet libraries. Defaults to None.
+        body_spec_template_spec_source_directory_jsonnet_tlas (List[str], optional): Jsonnet top-level arguments. Defaults to None.
+        body_spec_template_spec_source_directory_recurse (bool, optional): Recurse directories. Defaults to None.
+        body_spec_template_spec_source_helm_apiVersions (List[str], optional): Helm API versions. Defaults to None.
+        body_spec_template_spec_source_helm_fileParameters (List[str], optional): Helm file parameters. Defaults to None.
+        body_spec_template_spec_source_helm_ignoreMissingValueFiles (bool, optional): Ignore missing value files in Helm. Defaults to None.
+        body_spec_template_spec_source_helm_kubeVersion (str, optional): Kubernetes version for Helm. Defaults to None.
+        body_spec_template_spec_source_helm_namespace (str, optional): Namespace for Helm. Defaults to None.
+        body_spec_template_spec_source_helm_parameters (List[str], optional): Helm parameters. Defaults to None.
+        body_spec_template_spec_source_helm_passCredentials (bool, optional): Pass credentials to Helm. Defaults to None.
+        body_spec_template_spec_source_helm_releaseName (str, optional): Helm release name. Defaults to None.
+        body_spec_template_spec_source_helm_skipCrds (bool, optional): Skip CRDs in Helm. Defaults to None.
+        body_spec_template_spec_source_helm_skipSchemaValidation (bool, optional): Skip schema validation in Helm. Defaults to None.
+        body_spec_template_spec_source_helm_skipTests (bool, optional): Skip tests in Helm. Defaults to None.
+        body_spec_template_spec_source_helm_valueFiles (List[str], optional): Helm value files. Defaults to None.
+        body_spec_template_spec_source_helm_values (str, optional): Helm values. Defaults to None.
+        body_spec_template_spec_source_helm_valuesObject_raw (str, optional): Raw Helm values object. Defaults to None.
+        body_spec_template_spec_source_helm_version (str, optional): Helm version. Defaults to None.
+        body_spec_template_spec_source_kustomize_apiVersions (List[str], optional): Kustomize API versions. Defaults to None.
+        body_spec_template_spec_source_kustomize_commonAnnotations (Dict[str, Any], optional): Common annotations for Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_commonAnnotationsEnvsubst (bool, optional): Enable envsubst for common annotations in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_commonLabels (Dict[str, Any], optional): Common labels for Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_components (List[str], optional): Kustomize components. Defaults to None.
+        body_spec_template_spec_source_kustomize_forceCommonAnnotations (bool, optional): Force common annotations in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_forceCommonLabels (bool, optional): Force common labels in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_ignoreMissingComponents (bool, optional): Ignore missing components in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_images (List[str], optional): Kustomize images. Defaults to None.
+        body_spec_template_spec_source_kustomize_kubeVersion (str, optional): Kubernetes version for Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_labelIncludeTemplates (bool, optional): Include label templates in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_labelWithoutSelector (bool, optional): Label without selector in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_namePrefix (str, optional): Name prefix in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_nameSuffix (str, optional): Name suffix in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_namespace (str, optional): Namespace in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_patches (List[str], optional): Patches in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_replicas (List[str], optional): Replicas in Kustomize. Defaults to None.
+        body_spec_template_spec_source_kustomize_version (str, optional): Kustomize version. Defaults to None.
+        body_spec_template_spec_source_name (str, optional): Source name. Defaults to None.
+        body_spec_template_spec_source_path (str, optional): Source path. Defaults to None.
+        body_spec_template_spec_source_plugin_env (List[str], optional): Plugin environment variables. Defaults to None.
+        body_spec_template_spec_source_plugin_name (str, optional): Plugin name. Defaults to None.
+        body_spec_template_spec_source_plugin_parameters (List[str], optional): Plugin parameters. Defaults to None.
+        body_spec_template_spec_source_ref (str, optional): Source reference. Defaults to None.
+        body_spec_template_spec_source_repoURL (str, optional): Repository URL. Defaults to None.
+        body_spec_template_spec_source_targetRevision (str, optional): Target revision. Defaults to None.
+        body_spec_template_spec_sourceHydrator_drySource_path (str, optional): Dry source path for hydrator. Defaults to None.
+        body_spec_template_spec_sourceHydrator_drySource_repoURL (str, optional): Dry source repo URL for hydrator. Defaults to None.
+        body_spec_template_spec_sourceHydrator_drySource_targetRevision (str, optional): Dry source target revision for hydrator. Defaults to None.
+        body_spec_template_spec_sourceHydrator_hydrateTo_targetBranch (str, optional): Target branch for hydrator. Defaults to None.
+        body_spec_template_spec_sourceHydrator_syncSource_path (str, optional): Sync source path for hydrator. Defaults to None.
+        body_spec_template_spec_sourceHydrator_syncSource_targetBranch (str, optional): Sync source target branch for hydrator. Defaults to None.
+        body_spec_template_spec_sources (List[str], optional): List of sources. Defaults to None.
+        body_spec_template_spec_syncPolicy_automated_allowEmpty (bool, optional): Allow empty automated sync policy. Defaults to None.
+        body_spec_template_spec_syncPolicy_automated_enable (bool, optional): Enable automated sync policy. Defaults to None.
+        body_spec_template_spec_syncPolicy_automated_prune (bool, optional): Prune automated sync policy. Defaults to None.
+        body_spec_template_spec_syncPolicy_automated_selfHeal (bool, optional): Self-heal automated sync policy. Defaults to None.
+        body_spec_template_spec_syncPolicy_managedNamespaceMetadata_annotations (Dict[str, Any], optional): Annotations for managed namespace metadata. Defaults to None.
+        body_spec_template_spec_syncPolicy_managedNamespaceMetadata_labels (Dict[str, Any], optional): Labels for managed namespace metadata. Defaults to None.
+        body_spec_template_spec_syncPolicy_retry_backoff_duration (str, optional): Retry backoff duration. Defaults to None.
+        body_spec_template_spec_syncPolicy_retry_backoff_factor (int, optional): Retry backoff factor. Defaults to None.
+        body_spec_template_spec_syncPolicy_retry_backoff_maxDuration (str, optional): Retry backoff max duration. Defaults to None.
+        body_spec_template_spec_syncPolicy_retry_limit (int, optional): Retry limit. Defaults to None.
+        body_spec_template_spec_syncPolicy_syncOptions (List[str], optional): Sync options. Defaults to None.
+        body_spec_templatePatch (str, optional): Template patch. Defaults to None.
+        body_status_applicationStatus (List[str], optional): Application status. Defaults to None.
+        body_status_conditions (List[str], optional): Status conditions. Defaults to None.
+        body_status_resources (List[str], optional): List of resources managed by the application set. Defaults to None.
+        param_upsert (bool, optional): Whether to upsert the application set. Defaults to False.
+        param_dryRun (bool, optional): Whether to perform a dry run. Defaults to False.
 
     Returns:
         Dict[str, Any]: The JSON response from the API call.
@@ -285,273 +316,296 @@ async def application_set_service__create(
     params = {}
     data = {}
 
-    params["upsert"] = param_upsert
-    params["dryRun"] = param_dryRun
+    params["upsert"] = str(param_upsert).lower() if isinstance(param_upsert, bool) else param_upsert
 
-    if body_metadata_annotations:
-        data["metadata_annotations"] = body_metadata_annotations
-    if body_metadata_creation_timestamp:
-        data["metadata_creation_timestamp"] = body_metadata_creation_timestamp
-    if body_metadata_deletion_grace_period_seconds:
-        data["metadata_deletion_grace_period_seconds"] = body_metadata_deletion_grace_period_seconds
-    if body_metadata_deletion_timestamp:
-        data["metadata_deletion_timestamp"] = body_metadata_deletion_timestamp
-    if body_metadata_finalizers:
-        data["metadata_finalizers"] = body_metadata_finalizers
-    if body_metadata_generate_name:
-        data["metadata_generate_name"] = body_metadata_generate_name
-    if body_metadata_generation:
-        data["metadata_generation"] = body_metadata_generation
-    if body_metadata_labels:
-        data["metadata_labels"] = body_metadata_labels
-    if body_metadata_managed_fields:
-        data["metadata_managed_fields"] = body_metadata_managed_fields
-    if body_metadata_name:
-        data["metadata_name"] = body_metadata_name
-    if body_metadata_namespace:
-        data["metadata_namespace"] = body_metadata_namespace
-    if body_metadata_owner_references:
-        data["metadata_owner_references"] = body_metadata_owner_references
-    if body_metadata_resource_version:
-        data["metadata_resource_version"] = body_metadata_resource_version
-    if body_metadata_self_link:
-        data["metadata_self_link"] = body_metadata_self_link
-    if body_metadata_uid:
-        data["metadata_uid"] = body_metadata_uid
-    if body_spec_apply_nested_selectors:
-        data["spec_apply_nested_selectors"] = body_spec_apply_nested_selectors
-    if body_spec_generators:
-        data["spec_generators"] = body_spec_generators
-    if body_spec_go_template:
-        data["spec_go_template"] = body_spec_go_template
-    if body_spec_go_template_options:
-        data["spec_go_template_options"] = body_spec_go_template_options
-    if body_spec_ignore_application_differences:
-        data["spec_ignore_application_differences"] = body_spec_ignore_application_differences
-    if body_spec_preserved_fields_annotations:
-        data["spec_preserved_fields_annotations"] = body_spec_preserved_fields_annotations
-    if body_spec_preserved_fields_labels:
-        data["spec_preserved_fields_labels"] = body_spec_preserved_fields_labels
-    if body_spec_strategy_rolling_sync_steps:
-        data["spec_strategy_rolling_sync_steps"] = body_spec_strategy_rolling_sync_steps
-    if body_spec_strategy_type:
-        data["spec_strategy_type"] = body_spec_strategy_type
-    if body_spec_sync_policy_applications_sync:
-        data["spec_sync_policy_applications_sync"] = body_spec_sync_policy_applications_sync
-    if body_spec_sync_policy_preserve_resources_on_deletion:
-        data["spec_sync_policy_preserve_resources_on_deletion"] = body_spec_sync_policy_preserve_resources_on_deletion
-    if body_spec_template_metadata_annotations:
-        data["spec_template_metadata_annotations"] = body_spec_template_metadata_annotations
-    if body_spec_template_metadata_finalizers:
-        data["spec_template_metadata_finalizers"] = body_spec_template_metadata_finalizers
-    if body_spec_template_metadata_labels:
-        data["spec_template_metadata_labels"] = body_spec_template_metadata_labels
-    if body_spec_template_metadata_name:
-        data["spec_template_metadata_name"] = body_spec_template_metadata_name
-    if body_spec_template_metadata_namespace:
-        data["spec_template_metadata_namespace"] = body_spec_template_metadata_namespace
-    if body_spec_template_spec_destination_name:
-        data["spec_template_spec_destination_name"] = body_spec_template_spec_destination_name
-    if body_spec_template_spec_destination_namespace:
-        data["spec_template_spec_destination_namespace"] = body_spec_template_spec_destination_namespace
-    if body_spec_template_spec_destination_server:
-        data["spec_template_spec_destination_server"] = body_spec_template_spec_destination_server
-    if body_spec_template_spec_ignore_differences:
-        data["spec_template_spec_ignore_differences"] = body_spec_template_spec_ignore_differences
-    if body_spec_template_spec_info:
-        data["spec_template_spec_info"] = body_spec_template_spec_info
-    if body_spec_template_spec_project:
-        data["spec_template_spec_project"] = body_spec_template_spec_project
-    if body_spec_template_spec_revision_history_limit:
-        data["spec_template_spec_revision_history_limit"] = body_spec_template_spec_revision_history_limit
-    if body_spec_template_spec_source_chart:
-        data["spec_template_spec_source_chart"] = body_spec_template_spec_source_chart
-    if body_spec_template_spec_source_directory_exclude:
-        data["spec_template_spec_source_directory_exclude"] = body_spec_template_spec_source_directory_exclude
-    if body_spec_template_spec_source_directory_include:
-        data["spec_template_spec_source_directory_include"] = body_spec_template_spec_source_directory_include
-    if body_spec_template_spec_source_directory_jsonnet_ext_vars:
-        data["spec_template_spec_source_directory_jsonnet_ext_vars"] = (
-            body_spec_template_spec_source_directory_jsonnet_ext_vars
+    params["dryRun"] = str(param_dryRun).lower() if isinstance(param_dryRun, bool) else param_dryRun
+
+    flat_body = {}
+    if body_metadata_annotations is not None:
+        flat_body["metadata_annotations"] = body_metadata_annotations
+    if body_metadata_creationTimestamp is not None:
+        flat_body["metadata_creationTimestamp"] = body_metadata_creationTimestamp
+    if body_metadata_deletionGracePeriodSeconds is not None:
+        flat_body["metadata_deletionGracePeriodSeconds"] = body_metadata_deletionGracePeriodSeconds
+    if body_metadata_deletionTimestamp is not None:
+        flat_body["metadata_deletionTimestamp"] = body_metadata_deletionTimestamp
+    if body_metadata_finalizers is not None:
+        flat_body["metadata_finalizers"] = body_metadata_finalizers
+    if body_metadata_generateName is not None:
+        flat_body["metadata_generateName"] = body_metadata_generateName
+    if body_metadata_generation is not None:
+        flat_body["metadata_generation"] = body_metadata_generation
+    if body_metadata_labels is not None:
+        flat_body["metadata_labels"] = body_metadata_labels
+    if body_metadata_managedFields is not None:
+        flat_body["metadata_managedFields"] = body_metadata_managedFields
+    if body_metadata_name is not None:
+        flat_body["metadata_name"] = body_metadata_name
+    if body_metadata_namespace is not None:
+        flat_body["metadata_namespace"] = body_metadata_namespace
+    if body_metadata_ownerReferences is not None:
+        flat_body["metadata_ownerReferences"] = body_metadata_ownerReferences
+    if body_metadata_resourceVersion is not None:
+        flat_body["metadata_resourceVersion"] = body_metadata_resourceVersion
+    if body_metadata_selfLink is not None:
+        flat_body["metadata_selfLink"] = body_metadata_selfLink
+    if body_metadata_uid is not None:
+        flat_body["metadata_uid"] = body_metadata_uid
+    if body_spec_applyNestedSelectors is not None:
+        flat_body["spec_applyNestedSelectors"] = body_spec_applyNestedSelectors
+    if body_spec_generators is not None:
+        flat_body["spec_generators"] = body_spec_generators
+    if body_spec_goTemplate is not None:
+        flat_body["spec_goTemplate"] = body_spec_goTemplate
+    if body_spec_goTemplateOptions is not None:
+        flat_body["spec_goTemplateOptions"] = body_spec_goTemplateOptions
+    if body_spec_ignoreApplicationDifferences is not None:
+        flat_body["spec_ignoreApplicationDifferences"] = body_spec_ignoreApplicationDifferences
+    if body_spec_preservedFields_annotations is not None:
+        flat_body["spec_preservedFields_annotations"] = body_spec_preservedFields_annotations
+    if body_spec_preservedFields_labels is not None:
+        flat_body["spec_preservedFields_labels"] = body_spec_preservedFields_labels
+    if body_spec_strategy_rollingSync_steps is not None:
+        flat_body["spec_strategy_rollingSync_steps"] = body_spec_strategy_rollingSync_steps
+    if body_spec_strategy_type is not None:
+        flat_body["spec_strategy_type"] = body_spec_strategy_type
+    if body_spec_syncPolicy_applicationsSync is not None:
+        flat_body["spec_syncPolicy_applicationsSync"] = body_spec_syncPolicy_applicationsSync
+    if body_spec_syncPolicy_preserveResourcesOnDeletion is not None:
+        flat_body["spec_syncPolicy_preserveResourcesOnDeletion"] = body_spec_syncPolicy_preserveResourcesOnDeletion
+    if body_spec_template_metadata_annotations is not None:
+        flat_body["spec_template_metadata_annotations"] = body_spec_template_metadata_annotations
+    if body_spec_template_metadata_finalizers is not None:
+        flat_body["spec_template_metadata_finalizers"] = body_spec_template_metadata_finalizers
+    if body_spec_template_metadata_labels is not None:
+        flat_body["spec_template_metadata_labels"] = body_spec_template_metadata_labels
+    if body_spec_template_metadata_name is not None:
+        flat_body["spec_template_metadata_name"] = body_spec_template_metadata_name
+    if body_spec_template_metadata_namespace is not None:
+        flat_body["spec_template_metadata_namespace"] = body_spec_template_metadata_namespace
+    if body_spec_template_spec_destination_name is not None:
+        flat_body["spec_template_spec_destination_name"] = body_spec_template_spec_destination_name
+    if body_spec_template_spec_destination_namespace is not None:
+        flat_body["spec_template_spec_destination_namespace"] = body_spec_template_spec_destination_namespace
+    if body_spec_template_spec_destination_server is not None:
+        flat_body["spec_template_spec_destination_server"] = body_spec_template_spec_destination_server
+    if body_spec_template_spec_ignoreDifferences is not None:
+        flat_body["spec_template_spec_ignoreDifferences"] = body_spec_template_spec_ignoreDifferences
+    if body_spec_template_spec_info is not None:
+        flat_body["spec_template_spec_info"] = body_spec_template_spec_info
+    if body_spec_template_spec_project is not None:
+        flat_body["spec_template_spec_project"] = body_spec_template_spec_project
+    if body_spec_template_spec_revisionHistoryLimit is not None:
+        flat_body["spec_template_spec_revisionHistoryLimit"] = body_spec_template_spec_revisionHistoryLimit
+    if body_spec_template_spec_source_chart is not None:
+        flat_body["spec_template_spec_source_chart"] = body_spec_template_spec_source_chart
+    if body_spec_template_spec_source_directory_exclude is not None:
+        flat_body["spec_template_spec_source_directory_exclude"] = body_spec_template_spec_source_directory_exclude
+    if body_spec_template_spec_source_directory_include is not None:
+        flat_body["spec_template_spec_source_directory_include"] = body_spec_template_spec_source_directory_include
+    if body_spec_template_spec_source_directory_jsonnet_extVars is not None:
+        flat_body["spec_template_spec_source_directory_jsonnet_extVars"] = (
+            body_spec_template_spec_source_directory_jsonnet_extVars
         )
-    if body_spec_template_spec_source_directory_jsonnet_libs:
-        data["spec_template_spec_source_directory_jsonnet_libs"] = body_spec_template_spec_source_directory_jsonnet_libs
-    if body_spec_template_spec_source_directory_jsonnet_tlas:
-        data["spec_template_spec_source_directory_jsonnet_tlas"] = body_spec_template_spec_source_directory_jsonnet_tlas
-    if body_spec_template_spec_source_directory_recurse:
-        data["spec_template_spec_source_directory_recurse"] = body_spec_template_spec_source_directory_recurse
-    if body_spec_template_spec_source_helm_api_versions:
-        data["spec_template_spec_source_helm_api_versions"] = body_spec_template_spec_source_helm_api_versions
-    if body_spec_template_spec_source_helm_file_parameters:
-        data["spec_template_spec_source_helm_file_parameters"] = body_spec_template_spec_source_helm_file_parameters
-    if body_spec_template_spec_source_helm_ignore_missing_value_files:
-        data["spec_template_spec_source_helm_ignore_missing_value_files"] = (
-            body_spec_template_spec_source_helm_ignore_missing_value_files
+    if body_spec_template_spec_source_directory_jsonnet_libs is not None:
+        flat_body["spec_template_spec_source_directory_jsonnet_libs"] = (
+            body_spec_template_spec_source_directory_jsonnet_libs
         )
-    if body_spec_template_spec_source_helm_kube_version:
-        data["spec_template_spec_source_helm_kube_version"] = body_spec_template_spec_source_helm_kube_version
-    if body_spec_template_spec_source_helm_namespace:
-        data["spec_template_spec_source_helm_namespace"] = body_spec_template_spec_source_helm_namespace
-    if body_spec_template_spec_source_helm_parameters:
-        data["spec_template_spec_source_helm_parameters"] = body_spec_template_spec_source_helm_parameters
-    if body_spec_template_spec_source_helm_pass_credentials:
-        data["spec_template_spec_source_helm_pass_credentials"] = body_spec_template_spec_source_helm_pass_credentials
-    if body_spec_template_spec_source_helm_release_name:
-        data["spec_template_spec_source_helm_release_name"] = body_spec_template_spec_source_helm_release_name
-    if body_spec_template_spec_source_helm_skip_crds:
-        data["spec_template_spec_source_helm_skip_crds"] = body_spec_template_spec_source_helm_skip_crds
-    if body_spec_template_spec_source_helm_skip_schema_validation:
-        data["spec_template_spec_source_helm_skip_schema_validation"] = (
-            body_spec_template_spec_source_helm_skip_schema_validation
+    if body_spec_template_spec_source_directory_jsonnet_tlas is not None:
+        flat_body["spec_template_spec_source_directory_jsonnet_tlas"] = (
+            body_spec_template_spec_source_directory_jsonnet_tlas
         )
-    if body_spec_template_spec_source_helm_skip_tests:
-        data["spec_template_spec_source_helm_skip_tests"] = body_spec_template_spec_source_helm_skip_tests
-    if body_spec_template_spec_source_helm_value_files:
-        data["spec_template_spec_source_helm_value_files"] = body_spec_template_spec_source_helm_value_files
-    if body_spec_template_spec_source_helm_values:
-        data["spec_template_spec_source_helm_values"] = body_spec_template_spec_source_helm_values
-    if body_spec_template_spec_source_helm_values_object_raw:
-        data["spec_template_spec_source_helm_values_object_raw"] = body_spec_template_spec_source_helm_values_object_raw
-    if body_spec_template_spec_source_helm_version:
-        data["spec_template_spec_source_helm_version"] = body_spec_template_spec_source_helm_version
-    if body_spec_template_spec_source_kustomize_api_versions:
-        data["spec_template_spec_source_kustomize_api_versions"] = body_spec_template_spec_source_kustomize_api_versions
-    if body_spec_template_spec_source_kustomize_common_annotations:
-        data["spec_template_spec_source_kustomize_common_annotations"] = (
-            body_spec_template_spec_source_kustomize_common_annotations
+    if body_spec_template_spec_source_directory_recurse is not None:
+        flat_body["spec_template_spec_source_directory_recurse"] = body_spec_template_spec_source_directory_recurse
+    if body_spec_template_spec_source_helm_apiVersions is not None:
+        flat_body["spec_template_spec_source_helm_apiVersions"] = body_spec_template_spec_source_helm_apiVersions
+    if body_spec_template_spec_source_helm_fileParameters is not None:
+        flat_body["spec_template_spec_source_helm_fileParameters"] = body_spec_template_spec_source_helm_fileParameters
+    if body_spec_template_spec_source_helm_ignoreMissingValueFiles is not None:
+        flat_body["spec_template_spec_source_helm_ignoreMissingValueFiles"] = (
+            body_spec_template_spec_source_helm_ignoreMissingValueFiles
         )
-    if body_spec_template_spec_source_kustomize_common_annotations_envsubst:
-        data["spec_template_spec_source_kustomize_common_annotations_envsubst"] = (
-            body_spec_template_spec_source_kustomize_common_annotations_envsubst
+    if body_spec_template_spec_source_helm_kubeVersion is not None:
+        flat_body["spec_template_spec_source_helm_kubeVersion"] = body_spec_template_spec_source_helm_kubeVersion
+    if body_spec_template_spec_source_helm_namespace is not None:
+        flat_body["spec_template_spec_source_helm_namespace"] = body_spec_template_spec_source_helm_namespace
+    if body_spec_template_spec_source_helm_parameters is not None:
+        flat_body["spec_template_spec_source_helm_parameters"] = body_spec_template_spec_source_helm_parameters
+    if body_spec_template_spec_source_helm_passCredentials is not None:
+        flat_body["spec_template_spec_source_helm_passCredentials"] = (
+            body_spec_template_spec_source_helm_passCredentials
         )
-    if body_spec_template_spec_source_kustomize_common_labels:
-        data["spec_template_spec_source_kustomize_common_labels"] = (
-            body_spec_template_spec_source_kustomize_common_labels
+    if body_spec_template_spec_source_helm_releaseName is not None:
+        flat_body["spec_template_spec_source_helm_releaseName"] = body_spec_template_spec_source_helm_releaseName
+    if body_spec_template_spec_source_helm_skipCrds is not None:
+        flat_body["spec_template_spec_source_helm_skipCrds"] = body_spec_template_spec_source_helm_skipCrds
+    if body_spec_template_spec_source_helm_skipSchemaValidation is not None:
+        flat_body["spec_template_spec_source_helm_skipSchemaValidation"] = (
+            body_spec_template_spec_source_helm_skipSchemaValidation
         )
-    if body_spec_template_spec_source_kustomize_components:
-        data["spec_template_spec_source_kustomize_components"] = body_spec_template_spec_source_kustomize_components
-    if body_spec_template_spec_source_kustomize_force_common_annotations:
-        data["spec_template_spec_source_kustomize_force_common_annotations"] = (
-            body_spec_template_spec_source_kustomize_force_common_annotations
+    if body_spec_template_spec_source_helm_skipTests is not None:
+        flat_body["spec_template_spec_source_helm_skipTests"] = body_spec_template_spec_source_helm_skipTests
+    if body_spec_template_spec_source_helm_valueFiles is not None:
+        flat_body["spec_template_spec_source_helm_valueFiles"] = body_spec_template_spec_source_helm_valueFiles
+    if body_spec_template_spec_source_helm_values is not None:
+        flat_body["spec_template_spec_source_helm_values"] = body_spec_template_spec_source_helm_values
+    if body_spec_template_spec_source_helm_valuesObject_raw is not None:
+        flat_body["spec_template_spec_source_helm_valuesObject_raw"] = (
+            body_spec_template_spec_source_helm_valuesObject_raw
         )
-    if body_spec_template_spec_source_kustomize_force_common_labels:
-        data["spec_template_spec_source_kustomize_force_common_labels"] = (
-            body_spec_template_spec_source_kustomize_force_common_labels
+    if body_spec_template_spec_source_helm_version is not None:
+        flat_body["spec_template_spec_source_helm_version"] = body_spec_template_spec_source_helm_version
+    if body_spec_template_spec_source_kustomize_apiVersions is not None:
+        flat_body["spec_template_spec_source_kustomize_apiVersions"] = (
+            body_spec_template_spec_source_kustomize_apiVersions
         )
-    if body_spec_template_spec_source_kustomize_ignore_missing_components:
-        data["spec_template_spec_source_kustomize_ignore_missing_components"] = (
-            body_spec_template_spec_source_kustomize_ignore_missing_components
+    if body_spec_template_spec_source_kustomize_commonAnnotations is not None:
+        flat_body["spec_template_spec_source_kustomize_commonAnnotations"] = (
+            body_spec_template_spec_source_kustomize_commonAnnotations
         )
-    if body_spec_template_spec_source_kustomize_images:
-        data["spec_template_spec_source_kustomize_images"] = body_spec_template_spec_source_kustomize_images
-    if body_spec_template_spec_source_kustomize_kube_version:
-        data["spec_template_spec_source_kustomize_kube_version"] = body_spec_template_spec_source_kustomize_kube_version
-    if body_spec_template_spec_source_kustomize_label_include_templates:
-        data["spec_template_spec_source_kustomize_label_include_templates"] = (
-            body_spec_template_spec_source_kustomize_label_include_templates
+    if body_spec_template_spec_source_kustomize_commonAnnotationsEnvsubst is not None:
+        flat_body["spec_template_spec_source_kustomize_commonAnnotationsEnvsubst"] = (
+            body_spec_template_spec_source_kustomize_commonAnnotationsEnvsubst
         )
-    if body_spec_template_spec_source_kustomize_label_without_selector:
-        data["spec_template_spec_source_kustomize_label_without_selector"] = (
-            body_spec_template_spec_source_kustomize_label_without_selector
+    if body_spec_template_spec_source_kustomize_commonLabels is not None:
+        flat_body["spec_template_spec_source_kustomize_commonLabels"] = (
+            body_spec_template_spec_source_kustomize_commonLabels
         )
-    if body_spec_template_spec_source_kustomize_name_prefix:
-        data["spec_template_spec_source_kustomize_name_prefix"] = body_spec_template_spec_source_kustomize_name_prefix
-    if body_spec_template_spec_source_kustomize_name_suffix:
-        data["spec_template_spec_source_kustomize_name_suffix"] = body_spec_template_spec_source_kustomize_name_suffix
-    if body_spec_template_spec_source_kustomize_namespace:
-        data["spec_template_spec_source_kustomize_namespace"] = body_spec_template_spec_source_kustomize_namespace
-    if body_spec_template_spec_source_kustomize_patches:
-        data["spec_template_spec_source_kustomize_patches"] = body_spec_template_spec_source_kustomize_patches
-    if body_spec_template_spec_source_kustomize_replicas:
-        data["spec_template_spec_source_kustomize_replicas"] = body_spec_template_spec_source_kustomize_replicas
-    if body_spec_template_spec_source_kustomize_version:
-        data["spec_template_spec_source_kustomize_version"] = body_spec_template_spec_source_kustomize_version
-    if body_spec_template_spec_source_name:
-        data["spec_template_spec_source_name"] = body_spec_template_spec_source_name
-    if body_spec_template_spec_source_path:
-        data["spec_template_spec_source_path"] = body_spec_template_spec_source_path
-    if body_spec_template_spec_source_plugin_env:
-        data["spec_template_spec_source_plugin_env"] = body_spec_template_spec_source_plugin_env
-    if body_spec_template_spec_source_plugin_name:
-        data["spec_template_spec_source_plugin_name"] = body_spec_template_spec_source_plugin_name
-    if body_spec_template_spec_source_plugin_parameters:
-        data["spec_template_spec_source_plugin_parameters"] = body_spec_template_spec_source_plugin_parameters
-    if body_spec_template_spec_source_ref:
-        data["spec_template_spec_source_ref"] = body_spec_template_spec_source_ref
-    if body_spec_template_spec_source_repo_url:
-        data["spec_template_spec_source_repo_url"] = body_spec_template_spec_source_repo_url
-    if body_spec_template_spec_source_target_revision:
-        data["spec_template_spec_source_target_revision"] = body_spec_template_spec_source_target_revision
-    if body_spec_template_spec_source_hydrator_dry_source_path:
-        data["spec_template_spec_source_hydrator_dry_source_path"] = (
-            body_spec_template_spec_source_hydrator_dry_source_path
+    if body_spec_template_spec_source_kustomize_components is not None:
+        flat_body["spec_template_spec_source_kustomize_components"] = (
+            body_spec_template_spec_source_kustomize_components
         )
-    if body_spec_template_spec_source_hydrator_dry_source_repo_url:
-        data["spec_template_spec_source_hydrator_dry_source_repo_url"] = (
-            body_spec_template_spec_source_hydrator_dry_source_repo_url
+    if body_spec_template_spec_source_kustomize_forceCommonAnnotations is not None:
+        flat_body["spec_template_spec_source_kustomize_forceCommonAnnotations"] = (
+            body_spec_template_spec_source_kustomize_forceCommonAnnotations
         )
-    if body_spec_template_spec_source_hydrator_dry_source_target_revision:
-        data["spec_template_spec_source_hydrator_dry_source_target_revision"] = (
-            body_spec_template_spec_source_hydrator_dry_source_target_revision
+    if body_spec_template_spec_source_kustomize_forceCommonLabels is not None:
+        flat_body["spec_template_spec_source_kustomize_forceCommonLabels"] = (
+            body_spec_template_spec_source_kustomize_forceCommonLabels
         )
-    if body_spec_template_spec_source_hydrator_hydrate_to_target_branch:
-        data["spec_template_spec_source_hydrator_hydrate_to_target_branch"] = (
-            body_spec_template_spec_source_hydrator_hydrate_to_target_branch
+    if body_spec_template_spec_source_kustomize_ignoreMissingComponents is not None:
+        flat_body["spec_template_spec_source_kustomize_ignoreMissingComponents"] = (
+            body_spec_template_spec_source_kustomize_ignoreMissingComponents
         )
-    if body_spec_template_spec_source_hydrator_sync_source_path:
-        data["spec_template_spec_source_hydrator_sync_source_path"] = (
-            body_spec_template_spec_source_hydrator_sync_source_path
+    if body_spec_template_spec_source_kustomize_images is not None:
+        flat_body["spec_template_spec_source_kustomize_images"] = body_spec_template_spec_source_kustomize_images
+    if body_spec_template_spec_source_kustomize_kubeVersion is not None:
+        flat_body["spec_template_spec_source_kustomize_kubeVersion"] = (
+            body_spec_template_spec_source_kustomize_kubeVersion
         )
-    if body_spec_template_spec_source_hydrator_sync_source_target_branch:
-        data["spec_template_spec_source_hydrator_sync_source_target_branch"] = (
-            body_spec_template_spec_source_hydrator_sync_source_target_branch
+    if body_spec_template_spec_source_kustomize_labelIncludeTemplates is not None:
+        flat_body["spec_template_spec_source_kustomize_labelIncludeTemplates"] = (
+            body_spec_template_spec_source_kustomize_labelIncludeTemplates
         )
-    if body_spec_template_spec_sources:
-        data["spec_template_spec_sources"] = body_spec_template_spec_sources
-    if body_spec_template_spec_sync_policy_automated_allow_empty:
-        data["spec_template_spec_sync_policy_automated_allow_empty"] = (
-            body_spec_template_spec_sync_policy_automated_allow_empty
+    if body_spec_template_spec_source_kustomize_labelWithoutSelector is not None:
+        flat_body["spec_template_spec_source_kustomize_labelWithoutSelector"] = (
+            body_spec_template_spec_source_kustomize_labelWithoutSelector
         )
-    if body_spec_template_spec_sync_policy_automated_enable:
-        data["spec_template_spec_sync_policy_automated_enable"] = body_spec_template_spec_sync_policy_automated_enable
-    if body_spec_template_spec_sync_policy_automated_prune:
-        data["spec_template_spec_sync_policy_automated_prune"] = body_spec_template_spec_sync_policy_automated_prune
-    if body_spec_template_spec_sync_policy_automated_self_heal:
-        data["spec_template_spec_sync_policy_automated_self_heal"] = (
-            body_spec_template_spec_sync_policy_automated_self_heal
+    if body_spec_template_spec_source_kustomize_namePrefix is not None:
+        flat_body["spec_template_spec_source_kustomize_namePrefix"] = (
+            body_spec_template_spec_source_kustomize_namePrefix
         )
-    if body_spec_template_spec_sync_policy_managed_namespace_metadata_annotations:
-        data["spec_template_spec_sync_policy_managed_namespace_metadata_annotations"] = (
-            body_spec_template_spec_sync_policy_managed_namespace_metadata_annotations
+    if body_spec_template_spec_source_kustomize_nameSuffix is not None:
+        flat_body["spec_template_spec_source_kustomize_nameSuffix"] = (
+            body_spec_template_spec_source_kustomize_nameSuffix
         )
-    if body_spec_template_spec_sync_policy_managed_namespace_metadata_labels:
-        data["spec_template_spec_sync_policy_managed_namespace_metadata_labels"] = (
-            body_spec_template_spec_sync_policy_managed_namespace_metadata_labels
+    if body_spec_template_spec_source_kustomize_namespace is not None:
+        flat_body["spec_template_spec_source_kustomize_namespace"] = body_spec_template_spec_source_kustomize_namespace
+    if body_spec_template_spec_source_kustomize_patches is not None:
+        flat_body["spec_template_spec_source_kustomize_patches"] = body_spec_template_spec_source_kustomize_patches
+    if body_spec_template_spec_source_kustomize_replicas is not None:
+        flat_body["spec_template_spec_source_kustomize_replicas"] = body_spec_template_spec_source_kustomize_replicas
+    if body_spec_template_spec_source_kustomize_version is not None:
+        flat_body["spec_template_spec_source_kustomize_version"] = body_spec_template_spec_source_kustomize_version
+    if body_spec_template_spec_source_name is not None:
+        flat_body["spec_template_spec_source_name"] = body_spec_template_spec_source_name
+    if body_spec_template_spec_source_path is not None:
+        flat_body["spec_template_spec_source_path"] = body_spec_template_spec_source_path
+    if body_spec_template_spec_source_plugin_env is not None:
+        flat_body["spec_template_spec_source_plugin_env"] = body_spec_template_spec_source_plugin_env
+    if body_spec_template_spec_source_plugin_name is not None:
+        flat_body["spec_template_spec_source_plugin_name"] = body_spec_template_spec_source_plugin_name
+    if body_spec_template_spec_source_plugin_parameters is not None:
+        flat_body["spec_template_spec_source_plugin_parameters"] = body_spec_template_spec_source_plugin_parameters
+    if body_spec_template_spec_source_ref is not None:
+        flat_body["spec_template_spec_source_ref"] = body_spec_template_spec_source_ref
+    if body_spec_template_spec_source_repoURL is not None:
+        flat_body["spec_template_spec_source_repoURL"] = body_spec_template_spec_source_repoURL
+    if body_spec_template_spec_source_targetRevision is not None:
+        flat_body["spec_template_spec_source_targetRevision"] = body_spec_template_spec_source_targetRevision
+    if body_spec_template_spec_sourceHydrator_drySource_path is not None:
+        flat_body["spec_template_spec_sourceHydrator_drySource_path"] = (
+            body_spec_template_spec_sourceHydrator_drySource_path
         )
-    if body_spec_template_spec_sync_policy_retry_backoff_duration:
-        data["spec_template_spec_sync_policy_retry_backoff_duration"] = (
-            body_spec_template_spec_sync_policy_retry_backoff_duration
+    if body_spec_template_spec_sourceHydrator_drySource_repoURL is not None:
+        flat_body["spec_template_spec_sourceHydrator_drySource_repoURL"] = (
+            body_spec_template_spec_sourceHydrator_drySource_repoURL
         )
-    if body_spec_template_spec_sync_policy_retry_backoff_factor:
-        data["spec_template_spec_sync_policy_retry_backoff_factor"] = (
-            body_spec_template_spec_sync_policy_retry_backoff_factor
+    if body_spec_template_spec_sourceHydrator_drySource_targetRevision is not None:
+        flat_body["spec_template_spec_sourceHydrator_drySource_targetRevision"] = (
+            body_spec_template_spec_sourceHydrator_drySource_targetRevision
         )
-    if body_spec_template_spec_sync_policy_retry_backoff_max_duration:
-        data["spec_template_spec_sync_policy_retry_backoff_max_duration"] = (
-            body_spec_template_spec_sync_policy_retry_backoff_max_duration
+    if body_spec_template_spec_sourceHydrator_hydrateTo_targetBranch is not None:
+        flat_body["spec_template_spec_sourceHydrator_hydrateTo_targetBranch"] = (
+            body_spec_template_spec_sourceHydrator_hydrateTo_targetBranch
         )
-    if body_spec_template_spec_sync_policy_retry_limit:
-        data["spec_template_spec_sync_policy_retry_limit"] = body_spec_template_spec_sync_policy_retry_limit
-    if body_spec_template_spec_sync_policy_sync_options:
-        data["spec_template_spec_sync_policy_sync_options"] = body_spec_template_spec_sync_policy_sync_options
-    if body_spec_template_patch:
-        data["spec_template_patch"] = body_spec_template_patch
-    if body_status_application_status:
-        data["status_application_status"] = body_status_application_status
-    if body_status_conditions:
-        data["status_conditions"] = body_status_conditions
-    if body_status_resources:
-        data["status_resources"] = body_status_resources
+    if body_spec_template_spec_sourceHydrator_syncSource_path is not None:
+        flat_body["spec_template_spec_sourceHydrator_syncSource_path"] = (
+            body_spec_template_spec_sourceHydrator_syncSource_path
+        )
+    if body_spec_template_spec_sourceHydrator_syncSource_targetBranch is not None:
+        flat_body["spec_template_spec_sourceHydrator_syncSource_targetBranch"] = (
+            body_spec_template_spec_sourceHydrator_syncSource_targetBranch
+        )
+    if body_spec_template_spec_sources is not None:
+        flat_body["spec_template_spec_sources"] = body_spec_template_spec_sources
+    if body_spec_template_spec_syncPolicy_automated_allowEmpty is not None:
+        flat_body["spec_template_spec_syncPolicy_automated_allowEmpty"] = (
+            body_spec_template_spec_syncPolicy_automated_allowEmpty
+        )
+    if body_spec_template_spec_syncPolicy_automated_enable is not None:
+        flat_body["spec_template_spec_syncPolicy_automated_enable"] = (
+            body_spec_template_spec_syncPolicy_automated_enable
+        )
+    if body_spec_template_spec_syncPolicy_automated_prune is not None:
+        flat_body["spec_template_spec_syncPolicy_automated_prune"] = body_spec_template_spec_syncPolicy_automated_prune
+    if body_spec_template_spec_syncPolicy_automated_selfHeal is not None:
+        flat_body["spec_template_spec_syncPolicy_automated_selfHeal"] = (
+            body_spec_template_spec_syncPolicy_automated_selfHeal
+        )
+    if body_spec_template_spec_syncPolicy_managedNamespaceMetadata_annotations is not None:
+        flat_body["spec_template_spec_syncPolicy_managedNamespaceMetadata_annotations"] = (
+            body_spec_template_spec_syncPolicy_managedNamespaceMetadata_annotations
+        )
+    if body_spec_template_spec_syncPolicy_managedNamespaceMetadata_labels is not None:
+        flat_body["spec_template_spec_syncPolicy_managedNamespaceMetadata_labels"] = (
+            body_spec_template_spec_syncPolicy_managedNamespaceMetadata_labels
+        )
+    if body_spec_template_spec_syncPolicy_retry_backoff_duration is not None:
+        flat_body["spec_template_spec_syncPolicy_retry_backoff_duration"] = (
+            body_spec_template_spec_syncPolicy_retry_backoff_duration
+        )
+    if body_spec_template_spec_syncPolicy_retry_backoff_factor is not None:
+        flat_body["spec_template_spec_syncPolicy_retry_backoff_factor"] = (
+            body_spec_template_spec_syncPolicy_retry_backoff_factor
+        )
+    if body_spec_template_spec_syncPolicy_retry_backoff_maxDuration is not None:
+        flat_body["spec_template_spec_syncPolicy_retry_backoff_maxDuration"] = (
+            body_spec_template_spec_syncPolicy_retry_backoff_maxDuration
+        )
+    if body_spec_template_spec_syncPolicy_retry_limit is not None:
+        flat_body["spec_template_spec_syncPolicy_retry_limit"] = body_spec_template_spec_syncPolicy_retry_limit
+    if body_spec_template_spec_syncPolicy_syncOptions is not None:
+        flat_body["spec_template_spec_syncPolicy_syncOptions"] = body_spec_template_spec_syncPolicy_syncOptions
+    if body_spec_templatePatch is not None:
+        flat_body["spec_templatePatch"] = body_spec_templatePatch
+    if body_status_applicationStatus is not None:
+        flat_body["status_applicationStatus"] = body_status_applicationStatus
+    if body_status_conditions is not None:
+        flat_body["status_conditions"] = body_status_conditions
+    if body_status_resources is not None:
+        flat_body["status_resources"] = body_status_resources
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request("/api/v1/applicationsets", method="POST", params=params, data=data)
 

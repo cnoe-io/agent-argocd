@@ -8,25 +8,49 @@ import logging
 from typing import Dict, Any
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains invalid keys that cannot be split into parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
 
 
 async def account_service__create_token(
-    path_name: str, body_expires_in: int = None, body_id: str = None, body_name: str = None
+    path_name: str, body_expiresIn: int = None, body_id: str = None, body_name: str = None
 ) -> Dict[str, Any]:
     '''
-    CreateToken creates a token for the specified account.
+    CreateToken creates a token.
 
     Args:
         path_name (str): The name of the account for which the token is being created.
-        body_expires_in (int, optional): The duration in seconds until the token expires. Defaults to None.
+        body_expiresIn (int, optional): The duration in seconds for which the token is valid. Defaults to None.
         body_id (str, optional): The unique identifier for the token. Defaults to None.
         body_name (str, optional): The name associated with the token. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call, containing the details of the created token.
+        Dict[str, Any]: The JSON response from the API call, containing the token details or an error message.
 
     Raises:
         Exception: If the API request fails or returns an error.
@@ -36,12 +60,14 @@ async def account_service__create_token(
     params = {}
     data = {}
 
-    if body_expires_in:
-        data["expires_in"] = body_expires_in
-    if body_id:
-        data["id"] = body_id
-    if body_name:
-        data["name"] = body_name
+    flat_body = {}
+    if body_expiresIn is not None:
+        flat_body["expiresIn"] = body_expiresIn
+    if body_id is not None:
+        flat_body["id"] = body_id
+    if body_name is not None:
+        flat_body["name"] = body_name
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request(
         f"/api/v1/account/{path_name}/token", method="POST", params=params, data=data

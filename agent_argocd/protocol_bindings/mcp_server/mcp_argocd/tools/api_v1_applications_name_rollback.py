@@ -8,6 +8,30 @@ import logging
 from typing import Dict, Any
 from agent_argocd.protocol_bindings.mcp_server.mcp_argocd.api.client import make_api_request
 
+
+def assemble_nested_body(flat_body: Dict[str, Any]) -> Dict[str, Any]:
+    '''
+    Convert a flat dictionary with underscore-separated keys into a nested dictionary.
+
+    Args:
+        flat_body (Dict[str, Any]): A dictionary where keys are underscore-separated strings representing nested paths.
+
+    Returns:
+        Dict[str, Any]: A nested dictionary constructed from the flat dictionary.
+
+    Raises:
+        ValueError: If the input dictionary contains invalid keys that cannot be split into parts.
+    '''
+    nested = {}
+    for key, value in flat_body.items():
+        parts = key.split("_")
+        d = nested
+        for part in parts[:-1]:
+            d = d.setdefault(part, {})
+        d[parts[-1]] = value
+    return nested
+
+
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("mcp_tools")
@@ -15,8 +39,8 @@ logger = logging.getLogger("mcp_tools")
 
 async def application_service__rollback(
     path_name: str,
-    body_app_namespace: str = None,
-    body_dry_run: bool = None,
+    body_appNamespace: str = None,
+    body_dryRun: bool = None,
     body_id: int = None,
     body_name: str = None,
     body_project: str = None,
@@ -26,16 +50,16 @@ async def application_service__rollback(
     Rollback syncs an application to its target state.
 
     Args:
-        path_name (str): The name of the path for the application rollback.
-        body_app_namespace (str, optional): The namespace of the application. Defaults to None.
-        body_dry_run (bool, optional): If true, performs a dry run of the rollback. Defaults to None.
-        body_id (int, optional): The ID of the application. Defaults to None.
-        body_name (str, optional): The name of the application. Defaults to None.
+        path_name (str): The name of the application path to rollback.
+        body_appNamespace (str, optional): The namespace of the application. Defaults to None.
+        body_dryRun (bool, optional): If true, performs a dry run of the rollback. Defaults to None.
+        body_id (int, optional): The ID of the application to rollback. Defaults to None.
+        body_name (str, optional): The name of the application to rollback. Defaults to None.
         body_project (str, optional): The project associated with the application. Defaults to None.
         body_prune (bool, optional): If true, prunes resources during rollback. Defaults to None.
 
     Returns:
-        Dict[str, Any]: The JSON response from the API call.
+        Dict[str, Any]: The JSON response from the API call, containing the result of the rollback operation.
 
     Raises:
         Exception: If the API request fails or returns an error.
@@ -45,18 +69,20 @@ async def application_service__rollback(
     params = {}
     data = {}
 
-    if body_app_namespace:
-        data["app_namespace"] = body_app_namespace
-    if body_dry_run:
-        data["dry_run"] = body_dry_run
-    if body_id:
-        data["id"] = body_id
-    if body_name:
-        data["name"] = body_name
-    if body_project:
-        data["project"] = body_project
-    if body_prune:
-        data["prune"] = body_prune
+    flat_body = {}
+    if body_appNamespace is not None:
+        flat_body["appNamespace"] = body_appNamespace
+    if body_dryRun is not None:
+        flat_body["dryRun"] = body_dryRun
+    if body_id is not None:
+        flat_body["id"] = body_id
+    if body_name is not None:
+        flat_body["name"] = body_name
+    if body_project is not None:
+        flat_body["project"] = body_project
+    if body_prune is not None:
+        flat_body["prune"] = body_prune
+    data = assemble_nested_body(flat_body)
 
     success, response = await make_api_request(
         f"/api/v1/applications/{path_name}/rollback", method="POST", params=params, data=data
