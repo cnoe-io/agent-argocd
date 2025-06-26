@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # Helm secrets files
-helm/values-secrets.yaml
+helm/agent-argocd/values-secrets.yaml
 helm/*/values-secrets.yaml
 
 # C extensions
