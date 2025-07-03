@@ -6,7 +6,7 @@ import json
 
 async def list_tools():
   async with Client(
-    transport=SSETransport("http://127.0.0.1:9000/sse")
+    transport=SSETransport("http://127.0.0.1:8000/sse")
   ) as client:
     # await client.ping()
     async with client:
@@ -17,5 +17,6 @@ async def list_tools():
             print("-" * 40)
         result = await client.call_tool("version_service__version")
         pprint.pprint(json.loads(result[0].text))
+
 if __name__ == "__main__":
   asyncio.run(list_tools())
